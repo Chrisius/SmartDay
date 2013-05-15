@@ -9,22 +9,19 @@
 	    android:orientation="vertical"
 	    android:layout_weight="4">
 	    
-	    <fragment android:name="com.example.smartday.SectionList"
+	    <fragment android:name="com.example.smartday.SectionListFragment"
 	        android:id="@+id/section_fragment"
 	        android:layout_width="match_parent"
-	        android:layout_height="match_parent"
-	        android:layout_weight="2"/>    
+	        android:layout_height="wrap_content"/>    
 	    
-	    <fragment android:name="com.example.smartday.OptionsFragment"
-	        android:id="@+id/options_fragment"
-	        android:layout_weight="1"
+	    <FrameLayout 
+	        android:id="@+id/options_fragment_container"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"/>
     </LinearLayout>
     
-    <fragment
-        android:id="@+id/mainWindow_fragment"
-        android:name="com.example.smartday.MainWindowFragment"
+    <FrameLayout
+        android:id="@+id/section_fragment_container"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>  
