@@ -41,7 +41,6 @@ public class SectionListFragment extends ListFragment {
 	@Override
 	public void onListItemClick(ListView l,View v,int position, long id){
 		mCallback.onSectionSelected(position);
-		
 		//getListView().setItemChecked(position, true);
 	}
 	

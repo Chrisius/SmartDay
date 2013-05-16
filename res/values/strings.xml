@@ -4,6 +4,29 @@
     <string name="app_name">SmartDay</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    
+    <string-array name="sections">
+        <item>Map View</item>
+        <item>Chart View</item>
+        <item>Timeline</item>
+    </string-array>
+    
+    
 
-
+    <string-array name="options_map">
+        <item>Photos</item>
+    </string-array>
+    
+    <string-array name="options_chart">
+        <item>Places</item>
+    </string-array>
+    
+    <string-array name="options_timeline">
+        
+    </string-array>
+    
+	<string-array name="options_general">
+        <item>Date</item>
+        <item>Apps</item>
+    </string-array>
 </resources>
