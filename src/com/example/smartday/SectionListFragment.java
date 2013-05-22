@@ -12,13 +12,14 @@ import android.widget.ListView;
 
 public class SectionListFragment extends ListFragment {
 	OnSectionSelectedListener mCallback;
+	boolean firstStart = true;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		ListAdapter sectionListAdapter = new ArrayAdapter<String>(
 				getActivity(),
-				android.R.layout.simple_list_item_1,		//the lists layout
+				android.R.layout.simple_list_item_activated_1,		//the lists layout
 				getResources().getStringArray(R.array.sections));	//the array with data (source)
 		setListAdapter(sectionListAdapter);
 	}
@@ -33,6 +34,15 @@ public class SectionListFragment extends ListFragment {
 	}
 	
 	@Override
+	public void onStart(){
+		super.onStart();
+		if(firstStart){
+			firstStart = !firstStart;
+			getListView().setItemChecked(0,true);
+		}
+	}
+	
+	@Override
 	public void onAttach(Activity activity){
 		super.onAttach(activity);
 		mCallback = (OnSectionSelectedListener) activity;
@@ -41,7 +51,7 @@ public class SectionListFragment extends ListFragment {
 	@Override
 	public void onListItemClick(ListView l,View v,int position, long id){
 		mCallback.onSectionSelected(position);
-		//getListView().setItemChecked(position, true);
+		l.setItemChecked(position, true);
 	}
 	
 }
