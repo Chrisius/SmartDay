@@ -100,7 +100,7 @@ public class OptionsListFragment extends ListFragment {
 	}
 	
 	private Map<String,String> displayDate(){
-		return toMap(option.getDate(),getResources().getString(R.string.options_date_text2));
+		return toMap(option.getSelectedDate(),getResources().getString(R.string.options_date_text2));
 	}
 	
 	private Map<String,String> toMap(String text1, String text2){

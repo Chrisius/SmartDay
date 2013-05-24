@@ -15,7 +15,7 @@ public class SelectAppsDialogFragment extends DialogFragment {
 		final ArrayList<Integer> selectedApps = new ArrayList<Integer>();
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(R.string.options_app_select) //Dialogtitle
-			   .setMultiChoiceItems(R.array.months, option.getApps(), 
+			   .setMultiChoiceItems(R.array.months, option.getSelectedApps(), 
 				new DialogInterface.OnMultiChoiceClickListener() {			
 			@Override
 			public void onClick(DialogInterface dialog, int which, boolean isChecked) {
@@ -31,7 +31,7 @@ public class SelectAppsDialogFragment extends DialogFragment {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				option.setApps(selectedApps);				
+				option.storeSelectedApps(selectedApps);				
 			}
 		})
 		.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

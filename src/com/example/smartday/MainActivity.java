@@ -24,7 +24,7 @@ public class MainActivity extends Activity
         fm.beginTransaction().add(R.id.options_fragment_container, optionsListFragment).commit();
         fm.beginTransaction().add(R.id.section_fragment_container, sectionMapFragment).commit();
         option = new Option(this);
-        option.setDefault();
+        option.init();
     }
     
     public void onSectionSelected(int pos){    	
