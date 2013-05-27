@@ -1,6 +1,8 @@
-package com.example.smartday;
+package com.zehjot.smartday;
 
 import java.util.ArrayList;
+
+import com.zehjot.smartday.R;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,7 +33,7 @@ public class SelectAppsDialogFragment extends DialogFragment {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				option.storeSelectedApps(selectedApps);				
+				option.storeSelectedApps(selectedApps);
 			}
 		})
 		.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

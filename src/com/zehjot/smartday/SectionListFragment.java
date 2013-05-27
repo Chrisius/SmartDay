@@ -1,4 +1,6 @@
-package com.example.smartday;
+package com.zehjot.smartday;
+
+import com.zehjot.smartday.R;
 
 import android.app.Activity;
 import android.app.ListFragment;
@@ -26,6 +28,7 @@ public class SectionListFragment extends ListFragment {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+		super.onCreateView(inflater, container, savedInstanceState);
 		return inflater.inflate(R.layout.section_list, container, false);
 	}
 	

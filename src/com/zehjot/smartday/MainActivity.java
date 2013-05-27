@@ -1,4 +1,6 @@
-package com.example.smartday;
+package com.zehjot.smartday;
+
+import com.zehjot.smartday.R;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -12,7 +14,7 @@ public class MainActivity extends Activity
 	SectionMapFragment sectionMapFragment = new SectionMapFragment();
 	SectionChartFragment sectionChartFragment = new SectionChartFragment();
 	SectionTimelineFragment sectionTimelineFragment  = new SectionTimelineFragment();
-	Option option;
+	Option option = null;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,26 +67,6 @@ public class MainActivity extends Activity
     	option.setDate(year, month, day);
     	((OptionsListFragment) fm.findFragmentById(R.id.options_fragment_container)).updateDate();
     }
-    /*
-    public class Option{
-    	Activity activity;
-    	SharedPreferences sharedPreferences;
-    	SharedPreferences.Editor editor;
-    	
-    	public Option(Activity act){
-    		activity = act;
-    		sharedPreferences = activity.getPreferences(MainActivity.MODE_PRIVATE);
-    		editor = sharedPreferences.edit();
-    	}
-    	
-    	public void setDate(int year,  int month, int day){
-    		editor.putString(getString(R.string.date), day+". "+getResources().getStringArray(R.array.months)[month]+" "+year);
-    		editor.commit();
-    	}
-    	
-    	public void setDefault(){
-    		editor.putString(getString(R.string.date), Calendar.getInstance().toString());
-    	}
-    }*/
+
     
 }

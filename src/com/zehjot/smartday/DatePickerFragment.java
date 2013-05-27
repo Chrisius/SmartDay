@@ -1,4 +1,4 @@
-package com.example.smartday;
+package com.zehjot.smartday;
 
 import java.util.Calendar;
 

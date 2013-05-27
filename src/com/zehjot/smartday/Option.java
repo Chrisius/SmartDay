@@ -1,27 +1,44 @@
-package com.example.smartday;
+package com.zehjot.smartday;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import com.zehjot.smartday.R;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
 
 public class Option{
-	static Activity activity;
-	static SharedPreferences sharedPreferences;
-	static SharedPreferences.Editor editor;
+	//private static Option option = null;
+	static Activity activity = null;
+	static SharedPreferences sharedPreferences = null;
+	static SharedPreferences.Editor editor = null;
 	static ArrayList<Integer> selectedApps=null;
 	
 	public Option(){
 		
 	}
-	
+	/*
+	public static Option getInstance(){
+		return option;
+	}*/
 	public Option(Activity act){
+		//option = this;
 		activity = act;
 		sharedPreferences = activity.getPreferences(MainActivity.MODE_PRIVATE);
 		editor = sharedPreferences.edit();
-	}
+		
+	}/*
+	public static void initOptions(Activity act){
+		if(option == null){
+			option = new Option();
+			activity = act;
+			sharedPreferences = activity.getPreferences(MainActivity.MODE_PRIVATE);
+			editor = sharedPreferences.edit();	
+		}
+		return;
+	}*/
 	
 	public void setDate(int year,  int month, int day){
 		editor.putString(activity.getString(R.string.key_date), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
@@ -37,6 +54,14 @@ public class Option{
 		if(date.equals(default_date))
 			return activity.getString(R.string.today);
 		return date;
+	}
+	
+	public int[] getSelectedDateAsArray(){
+		int year = getSharedInt(R.string.key_date_year);
+		int month = getSharedInt(R.string.key_date_month);
+		int day = getSharedInt(R.string.key_date_day);
+		
+		return new int[] {year, month, day};
 	}
 	
 	public void init(){

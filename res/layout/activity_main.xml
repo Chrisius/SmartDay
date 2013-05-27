@@ -1,3 +1,4 @@
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:baselineAligned="false"
     android:layout_width="match_parent"
@@ -8,12 +9,11 @@
 	    android:layout_height="match_parent"
 	    android:orientation="vertical"
 	    android:layout_weight="4">
-	    
-	    <fragment android:name="com.example.smartday.SectionListFragment"
+	    <fragment android:name="com.zehjot.smartday.SectionListFragment"
 	        android:id="@+id/section_fragment"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"/>    
-	    
+    
 	    <FrameLayout 
 	        android:id="@+id/options_fragment_container"
 	        android:layout_width="match_parent"

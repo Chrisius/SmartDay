@@ -1,10 +1,12 @@
-package com.example.smartday;
+package com.zehjot.smartday;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.model.CategorySeries;
 import org.achartengine.renderer.DefaultRenderer;
 import org.achartengine.renderer.SimpleSeriesRenderer;
+
+import com.zehjot.smartday.R;
 
 import android.app.Fragment;
 //import android.content.Context;
@@ -31,37 +33,9 @@ public class SectionChartFragment extends Fragment {
 	private void draw(){
 		draw3();
 		draw1();
-		draw2();
-/*		CategorySeries categories = new CategorySeries("Number1");
-		categories.add("Social", 12.0);
-		categories.add("Productiv", 6.0);
-		categories.add("Undefined", 8);
-		
-		int[] colors = {Color.BLUE, Color.GREEN, Color.RED};
-		
-		DefaultRenderer renderer = new DefaultRenderer();
-		for(int color : colors){
-			SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-			r.setColor(color);
-			renderer.addSeriesRenderer(r);
-		}
-		
-		renderer.setPanEnabled(false);
-		renderer.setInScroll(true);
-		
-		GraphicalView chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);
-					
-		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_1);
-		layout.addView(chartView);
-		
-		chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);
-		layout = (LinearLayout) getActivity().findViewById(R.id.chart_2);
-		layout.addView(chartView);
-		
-		chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);
-		layout = (LinearLayout) getActivity().findViewById(R.id.chart_3);
-		layout.addView(chartView);
-*/		
+		draw2();	
+		draw12();
+		draw13();
 	}
 	private void draw1(){
 		CategorySeries categories = new CategorySeries("Number1");
@@ -130,6 +104,52 @@ public class SectionChartFragment extends Fragment {
 		GraphicalView chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);
 					
 		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_3);
+		layout.addView(chartView);
+	}
+	private void draw12(){
+		CategorySeries categories = new CategorySeries("Number12");
+		categories.add("Social", 12.0);
+		categories.add("Productiv", 6.0);
+		categories.add("Undefined", 8);
+		
+		int[] colors = {Color.CYAN, Color.MAGENTA, Color.BLACK};
+		
+		DefaultRenderer renderer = new DefaultRenderer();
+		for(int color : colors){
+			SimpleSeriesRenderer r = new SimpleSeriesRenderer();
+			r.setColor(color);
+			renderer.addSeriesRenderer(r);
+		}
+		
+		renderer.setPanEnabled(false);
+		renderer.setInScroll(true);
+		
+		GraphicalView chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);
+					
+		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_12);
+		layout.addView(chartView);
+	}
+	private void draw13(){
+		CategorySeries categories = new CategorySeries("Number13");
+		categories.add("Social", 12.0);
+		categories.add("Productiv", 6.0);
+		categories.add("Undefined", 8);
+		
+		int[] colors = {Color.CYAN, Color.MAGENTA, Color.BLACK};
+		
+		DefaultRenderer renderer = new DefaultRenderer();
+		for(int color : colors){
+			SimpleSeriesRenderer r = new SimpleSeriesRenderer();
+			r.setColor(color);
+			renderer.addSeriesRenderer(r);
+		}
+		
+		renderer.setPanEnabled(false);
+		renderer.setInScroll(true);
+		
+		GraphicalView chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);
+					
+		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_13);
 		layout.addView(chartView);
 	}
 }
