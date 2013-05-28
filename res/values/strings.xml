@@ -4,6 +4,7 @@
     <string name="app_name">SmartDay</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="categories">Categories</string>
     <string name="options">Options</string>
     <string name="datepicker">Pick a date</string>
     <string name="today">Today</string>

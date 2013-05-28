@@ -9,12 +9,14 @@ import android.app.FragmentManager;
 public class MainActivity extends Activity 
 		implements SectionListFragment.OnSectionSelectedListener, OptionsListFragment.OnOptionSelectedListener,
 		DatePickerFragment.OnDateChosenListener{
-	FragmentManager fm = getFragmentManager();
-	OptionsListFragment optionsListFragment = new OptionsListFragment();
-	SectionMapFragment sectionMapFragment = new SectionMapFragment();
-	SectionChartFragment sectionChartFragment = new SectionChartFragment();
-	SectionTimelineFragment sectionTimelineFragment  = new SectionTimelineFragment();
-	Option option = null;
+	private FragmentManager fm = getFragmentManager();
+	private OptionsListFragment optionsListFragment = new OptionsListFragment();
+	private SectionMapFragment sectionMapFragment = new SectionMapFragment();
+	private SectionChartFragment sectionChartFragment = new SectionChartFragment();
+	private SectionTimelineFragment sectionTimelineFragment  = new SectionTimelineFragment();
+	private Draw draw = new Draw();
+	//private Option option = null;
+	private DataSet dataSet = null;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -23,13 +25,15 @@ public class MainActivity extends Activity
         
         if(savedInstanceState != null)
         	return;
+        
         fm.beginTransaction().add(R.id.options_fragment_container, optionsListFragment).commit();
         fm.beginTransaction().add(R.id.section_fragment_container, sectionMapFragment).commit();
-        option = new Option(this);
-        option.init();
+        //option = Option.getInstance(this);
+        dataSet = DataSet.getInstance(this);
     }
     
-    public void onSectionSelected(int pos){    	
+    public void onSectionSelected(int pos){
+    	dataSet.getApps();
     	switch (pos) {
 		case 0:
 			((OptionsListFragment) fm.findFragmentById(R.id.options_fragment_container)).updateOptions(pos); 	//Updates the displayed optionsList
@@ -64,7 +68,7 @@ public class MainActivity extends Activity
     }
     
     public void onDateChosen(int year, int month, int day){
-    	option.setDate(year, month, day);
+    	dataSet.setSelectedDate(year, month, day);
     	((OptionsListFragment) fm.findFragmentById(R.id.options_fragment_container)).updateDate();
     }
 

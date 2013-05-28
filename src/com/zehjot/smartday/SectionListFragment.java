@@ -13,23 +13,30 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 public class SectionListFragment extends ListFragment {
-	OnSectionSelectedListener mCallback;
-	boolean firstStart = true;
+	private OnSectionSelectedListener mCallback;
+	private boolean firstStart = true;
+	private ListAdapter sectionListAdapter = null;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		ListAdapter sectionListAdapter = new ArrayAdapter<String>(
+		sectionListAdapter = new ArrayAdapter<String>(
 				getActivity(),
 				android.R.layout.simple_list_item_activated_1,		//the lists layout
 				getResources().getStringArray(R.array.sections));	//the array with data (source)
-		setListAdapter(sectionListAdapter);
 	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		super.onCreateView(inflater, container, savedInstanceState);
 		return inflater.inflate(R.layout.section_list, container, false);
+	}
+	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		//getListView().addHeaderView(getActivity().getLayoutInflater().inflate(R.layout.header_view,null),null,false); //Inflates the Header View und attaches it to the List
+		setListAdapter(sectionListAdapter);
 	}
 	
 	public interface OnSectionSelectedListener{

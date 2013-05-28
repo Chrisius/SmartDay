@@ -11,13 +11,14 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 public class SelectAppsDialogFragment extends DialogFragment {
-	Option option = new Option();
+	private DataSet dataSet = null;
 	@Override
 	public Dialog onCreateDialog(Bundle saved){
+		dataSet = DataSet.getInstance(getActivity());
 		final ArrayList<Integer> selectedApps = new ArrayList<Integer>();
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(R.string.options_app_select) //Dialogtitle
-			   .setMultiChoiceItems(R.array.months, option.getSelectedApps(), 
+			   .setMultiChoiceItems(R.array.months, dataSet.getSelectedApps(), 
 				new DialogInterface.OnMultiChoiceClickListener() {			
 			@Override
 			public void onClick(DialogInterface dialog, int which, boolean isChecked) {
@@ -33,7 +34,7 @@ public class SelectAppsDialogFragment extends DialogFragment {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				option.storeSelectedApps(selectedApps);
+				dataSet.setSelectedApps(selectedApps);
 			}
 		})
 		.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

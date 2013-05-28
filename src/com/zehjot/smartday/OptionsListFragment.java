@@ -22,10 +22,11 @@ public class OptionsListFragment extends ListFragment {
 	private List<Map<String,String>> displayedOptions;
 	private static final String TEXT1 = "text1";
 	private static final String TEXT2 = "text2";
-	Option option = new Option();
+	DataSet dataSet = null;
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		dataSet = DataSet.getInstance(getActivity());
 		/*---Initialize data for list---*/
 		final String[] fromMapKey = new String[] {TEXT1, TEXT2};
 		final int[] toLayoutId = new int[] {android.R.id.text1, android.R.id.text2};
@@ -102,7 +103,7 @@ public class OptionsListFragment extends ListFragment {
 	}
 	
 	private Map<String,String> displayDate(){
-		return toMap(option.getSelectedDate(),getResources().getString(R.string.options_date_text2));
+		return toMap(dataSet.getSelectedDate(),getResources().getString(R.string.options_date_text2));
 	}
 	
 	private Map<String,String> toMap(String text1, String text2){

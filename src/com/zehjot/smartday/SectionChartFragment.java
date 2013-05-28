@@ -34,8 +34,8 @@ public class SectionChartFragment extends Fragment {
 		draw3();
 		draw1();
 		draw2();	
-		draw12();
-		draw13();
+		draw4();
+		draw5();
 	}
 	private void draw1(){
 		CategorySeries categories = new CategorySeries("Number1");
@@ -106,7 +106,7 @@ public class SectionChartFragment extends Fragment {
 		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_3);
 		layout.addView(chartView);
 	}
-	private void draw12(){
+	private void draw4(){
 		CategorySeries categories = new CategorySeries("Number12");
 		categories.add("Social", 12.0);
 		categories.add("Productiv", 6.0);
@@ -126,10 +126,10 @@ public class SectionChartFragment extends Fragment {
 		
 		GraphicalView chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);
 					
-		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_12);
+		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_4);
 		layout.addView(chartView);
 	}
-	private void draw13(){
+	private void draw5(){
 		CategorySeries categories = new CategorySeries("Number13");
 		categories.add("Social", 12.0);
 		categories.add("Productiv", 6.0);
@@ -149,7 +149,7 @@ public class SectionChartFragment extends Fragment {
 		
 		GraphicalView chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);
 					
-		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_13);
+		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_5);
 		layout.addView(chartView);
 	}
 }
