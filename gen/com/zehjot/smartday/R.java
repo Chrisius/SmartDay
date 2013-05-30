@@ -190,33 +190,32 @@ containing a value of this type.
     }
     public static final class id {
         public static final int action_settings=0x7f050011;
-        public static final int chart_1=0x7f05000b;
-        public static final int chart_2=0x7f05000f;
-        public static final int chart_3=0x7f05000e;
-        public static final int chart_4=0x7f05000c;
-        public static final int chart_5=0x7f05000d;
+        public static final int chart_1=0x7f05000a;
+        public static final int chart_2=0x7f05000e;
+        public static final int chart_3=0x7f05000d;
+        public static final int chart_4=0x7f05000b;
+        public static final int chart_5=0x7f05000c;
         public static final int hybrid=0x7f050004;
-        public static final int map=0x7f050007;
+        public static final int map_container=0x7f050010;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
-        public static final int option_header=0x7f050009;
+        public static final int option_header=0x7f050008;
         public static final int options_fragment_container=0x7f050006;
-        public static final int options_list=0x7f05000a;
+        public static final int options_list=0x7f050009;
         public static final int satellite=0x7f050002;
-        public static final int section_fragment=0x7f050005;
-        public static final int section_fragment_container=0x7f050008;
-        public static final int section_list_fragment=0x7f050010;
+        public static final int section_fragment_container=0x7f050007;
+        public static final int section_header_container=0x7f050005;
+        public static final int section_list_fragment=0x7f05000f;
         public static final int terrain=0x7f050003;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
-        public static final int draw_fragment=0x7f030001;
-        public static final int header_view=0x7f030002;
-        public static final int options_list=0x7f030003;
-        public static final int section_chart_fragment=0x7f030004;
-        public static final int section_list=0x7f030005;
-        public static final int section_map_fragment=0x7f030006;
-        public static final int section_timeline_fragment=0x7f030007;
+        public static final int header_view=0x7f030001;
+        public static final int options_list=0x7f030002;
+        public static final int section_chart_fragment=0x7f030003;
+        public static final int section_list=0x7f030004;
+        public static final int section_map_fragment=0x7f030005;
+        public static final int section_timeline_fragment=0x7f030006;
     }
     public static final class menu {
         public static final int main=0x7f0a0000;
@@ -291,19 +290,19 @@ containing a value of this type.
         public static final int common_signin_button_text_long=0x7f06000e;
         /**  Error Messages 
          */
-        public static final int date_error=0x7f060023;
+        public static final int date_error=0x7f060024;
         public static final int datepicker=0x7f06001a;
-        public static final int error=0x7f060024;
+        public static final int error=0x7f060025;
         public static final int hello_world=0x7f060017;
-        public static final int key_apps=0x7f060021;
-        public static final int key_date=0x7f06001d;
-        public static final int key_date_day=0x7f06001e;
+        public static final int key_apps=0x7f060022;
+        public static final int key_date=0x7f06001e;
+        public static final int key_date_day=0x7f06001f;
         /**  SharedPreferences Identifier 
          */
-        public static final int key_date_default=0x7f06001c;
-        public static final int key_date_month=0x7f06001f;
-        public static final int key_date_selected_apps=0x7f060022;
-        public static final int key_date_year=0x7f060020;
+        public static final int key_date_default=0x7f06001d;
+        public static final int key_date_month=0x7f060020;
+        public static final int key_date_selected_apps=0x7f060023;
+        public static final int key_date_year=0x7f060021;
         /**  Location client code resources (prefix with location_client) 
 
         Begin strings for location.reporting
@@ -316,16 +315,19 @@ containing a value of this type.
         public static final int location_client_ulr_inactive_age_unknown=0x7f060013;
         public static final int location_client_ulr_inactive_unknown_restriction=0x7f060014;
         public static final int options=0x7f060019;
-        public static final int options_app_select=0x7f06002c;
-        public static final int options_app_text1=0x7f060029;
-        public static final int options_app_text2=0x7f06002a;
-        public static final int options_chart_text1=0x7f060027;
-        public static final int options_chart_text2=0x7f060028;
-        public static final int options_date_text2=0x7f06002b;
+        public static final int options_app_select=0x7f06002d;
+        public static final int options_app_text1=0x7f06002a;
+        public static final int options_app_text2=0x7f06002b;
+        public static final int options_chart_text1=0x7f060028;
+        public static final int options_chart_text2=0x7f060029;
+        public static final int options_date_text2=0x7f06002c;
         /**  Option Names 
          */
-        public static final int options_map_text1=0x7f060025;
-        public static final int options_map_text2=0x7f060026;
+        public static final int options_map_text1=0x7f060026;
+        public static final int options_map_text2=0x7f060027;
+        /**  Bundle identifier 
+         */
+        public static final int start_position=0x7f06001c;
         public static final int today=0x7f06001b;
     }
     public static final class style {

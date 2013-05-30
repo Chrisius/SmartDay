@@ -23,6 +23,9 @@
         <item>November</item>
         <item>December</item>
     </string-array>
+<!-- Bundle identifier -->
+	<string name="start_position">startposistion</string>
+
 <!-- SharedPreferences Identifier -->
     <string name="key_date_default">default_date</string>
     <string name="key_date">date_by_user</string>

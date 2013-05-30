@@ -33,7 +33,7 @@ public class OptionsListFragment extends ListFragment {
 		displayedOptions = new ArrayList<Map<String,String>>();
 		displayedOptions.add(displayDate());
 		displayedOptions.add(toMap(getResources().getString(R.string.options_app_text1), getResources().getString(R.string.options_app_text2)));
-		displayedOptions.add(toMap(getResources().getString(R.string.options_map_text1), getResources().getString(R.string.options_map_text2)));
+		setStartView(getArguments().getInt(getString(R.string.start_position)));
 		/*---Set up list adapter---*/
 		optionsListAdapter = new SimpleAdapter(
 				getActivity(), 
@@ -124,5 +124,17 @@ public class OptionsListFragment extends ListFragment {
 		}
 		return listItem;
 	}*/
-
+	private void setStartView(int pos){
+		switch (pos) {
+		case 0:
+			displayedOptions.add(toMap(getResources().getString(R.string.options_map_text1), getResources().getString(R.string.options_map_text2)));			
+			break;
+		case 1:
+			displayedOptions.add(toMap(getResources().getString(R.string.options_chart_text1), getResources().getString(R.string.options_chart_text2)));
+			break;
+		default:
+			break;
+		}
+		
+	}
 }

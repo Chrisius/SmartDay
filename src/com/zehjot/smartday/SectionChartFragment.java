@@ -29,7 +29,6 @@ public class SectionChartFragment extends Fragment {
 		super.onResume();
 		draw();
 	}
-	
 	private void draw(){
 		draw3();
 		draw1();

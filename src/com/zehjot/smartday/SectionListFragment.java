@@ -13,6 +13,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 public class SectionListFragment extends ListFragment {
+	private int oldPos = -1;
 	private OnSectionSelectedListener mCallback;
 	private boolean firstStart = true;
 	private ListAdapter sectionListAdapter = null;
@@ -48,7 +49,8 @@ public class SectionListFragment extends ListFragment {
 		super.onStart();
 		if(firstStart){
 			firstStart = !firstStart;
-			getListView().setItemChecked(0,true);
+			oldPos = getArguments().getInt(getString(R.string.start_position));
+			getListView().setItemChecked(oldPos,true);
 		}
 	}
 	
@@ -60,8 +62,11 @@ public class SectionListFragment extends ListFragment {
 	
 	@Override
 	public void onListItemClick(ListView l,View v,int position, long id){
+		if(oldPos==position){
+			return;
+		}
+		oldPos = position;
 		mCallback.onSectionSelected(position);
 		l.setItemChecked(position, true);
 	}
-	
 }
