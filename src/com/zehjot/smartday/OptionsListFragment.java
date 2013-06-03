@@ -33,7 +33,7 @@ public class OptionsListFragment extends ListFragment {
 		displayedOptions = new ArrayList<Map<String,String>>();
 		displayedOptions.add(displayDate());
 		displayedOptions.add(toMap(getResources().getString(R.string.options_app_text1), getResources().getString(R.string.options_app_text2)));
-		setStartView(getArguments().getInt(getString(R.string.start_position)));
+		setStartView(getArguments().getInt(getString(R.string.start_view)));
 		/*---Set up list adapter---*/
 		optionsListAdapter = new SimpleAdapter(
 				getActivity(), 

@@ -1,6 +1,5 @@
 package com.zehjot.smartday;
 
-import com.google.android.gms.maps.MapFragment;
 import com.zehjot.smartday.R;
 
 import android.os.Bundle;
@@ -12,7 +11,7 @@ public class MainActivity extends Activity
 		DatePickerFragment.OnDateChosenListener{
 	private FragmentManager fm = getFragmentManager();
 	private OptionsListFragment optionsListFragment = new OptionsListFragment();
-	private MapFragment sectionMapFragment = new MapFragment();
+	private SectionMapFragment sectionMapFragment = new SectionMapFragment();
 	private SectionChartFragment sectionChartFragment = new SectionChartFragment();
 	private SectionTimelineFragment sectionTimelineFragment  = new SectionTimelineFragment();
 	private DataSet dataSet = null;
@@ -97,7 +96,7 @@ public class MainActivity extends Activity
         
         //setup bundle with int for start position
     	Bundle args = new Bundle();
-    	args.putInt(getString(R.string.start_position), pos);
+    	args.putInt(getString(R.string.start_view), pos);
     	
     	//attach bundle to options and sectionHeader to container
     	optionsListFragment.setArguments(args);
@@ -115,7 +114,7 @@ public class MainActivity extends Activity
 	        fm.beginTransaction().show(sectionTimelineFragment).commit();
 	        break;
 		default:
-	    	args.putInt(getString(R.string.start_position), 0);
+	    	args.putInt(getString(R.string.start_view), 0);
 	        fm.beginTransaction().add(R.id.section_fragment_container, sectionMapFragment).commit();	
 			break;
 		}

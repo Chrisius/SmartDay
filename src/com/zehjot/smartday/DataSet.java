@@ -1,20 +1,39 @@
 package com.zehjot.smartday;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.util.Log;
 
 public class DataSet {
+	private static final String USER_NAME = "username";
+	private static final String USER_PASS = "password";
+	private static final String PASSWORD = "DiCBP_2909";
 	private static DataSet instance = null;
 	private static Activity activity = null;
 	private static SharedPreferences sharedPreferences = null;
 	private static SharedPreferences.Editor editor = null;
 	private static ArrayList<Integer> selectedApps=null;
+    private static final String DEBUG_TAG = "HttpExample";
 	
 	private List<Pair> data = new ArrayList<Pair>();
 	
@@ -41,6 +60,13 @@ public class DataSet {
 			editor = sharedPreferences.edit();
 			DataSet.initDate();
 			instance.initTestData();
+		}
+		String user = sharedPreferences.getString(USER_NAME, activity.getString(R.string.error));
+		String pass = sharedPreferences.getString(USER_PASS, activity.getString(R.string.error));
+		if(user.equals(activity.getString(R.string.error))||pass.equals(activity.getString(R.string.error))){
+			editor.putString(USER_NAME, "Christian");
+			editor.putString(USER_PASS, instance.sha1(PASSWORD));
+			editor.commit();
 		}
 		return instance;
 	}
@@ -125,14 +151,22 @@ public class DataSet {
 	}
 
 	private ArrayList<String> getApps(int year, int month, int day_of_month){
-		//TODO query server Data
-		ArrayList<String> apps = new ArrayList<String>();
+		ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+		if(networkInfo == null || !networkInfo.isConnected()){
+			//TODO ErrorMessage
+		}
+		else{
+			new DownloadTask().execute("TESTURL");
+		}
 		
+		ArrayList<String> apps = new ArrayList<String>();
+		/*
 		String[] strApps = activity.getResources().getStringArray(R.array.months);
 		for(int i = 0; i<strApps.length;i++){
 			apps.add(strApps[i]);
 		}
-		
+		*/
 		return apps;
 	}
 	
@@ -141,5 +175,73 @@ public class DataSet {
 	}
 	private int getSharedInt(int id){
 		return sharedPreferences.getInt(activity.getString(id), -1);
+	}
+	
+	private String sha1(String s){
+        MessageDigest digest = null;
+        try {
+                digest = MessageDigest.getInstance("SHA-1");
+	        } catch (Exception e) {
+                e.printStackTrace();
+        }
+		digest.reset();
+		byte[] data = digest.digest(s.getBytes());
+		return String.format("%0" + (data.length*2) + "X", new BigInteger(1, data));		
+	}
+	
+	private class DownloadTask extends AsyncTask<String, Void, JSONObject>{
+		String json = "";
+
+		@Override
+		protected JSONObject doInBackground(String... url) {
+			
+			try{
+				return downloadData(url[0]);
+			} catch (IOException e){		
+				e.printStackTrace();
+				return null;
+			} catch (JSONException e) {				
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+		private JSONObject downloadData(String urlString) throws IOException, JSONException{
+			InputStream is = null;
+			try{
+				URL url = new URL(urlString);
+				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+				conn.setReadTimeout(10000 /*ms*/);
+				conn.setConnectTimeout(15000/*ms*/);
+				conn.setRequestMethod("GET");
+				conn.setDoInput(true);
+				
+				//Start query
+				conn.connect();
+				int response = conn.getResponseCode();
+				Log.d(DEBUG_TAG, "Response: "+response);
+				is = conn.getInputStream();
+				//InpuStream to JSONObeject
+				try{
+					BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"), 8);
+					StringBuilder sb = new StringBuilder();
+		            String line = null;
+		            while ((line = reader.readLine()) != null) {
+		                sb.append(line + "\n");
+		            }
+		            json = sb.toString();
+				}catch (Exception e) {
+		            Log.e("Buffer Error", "Error converting result " + e.toString());
+		        }
+				return new JSONObject(json);
+			}finally{
+		        if (is != null) {
+		            is.close();
+		        } 
+			}
+			
+			
+		}
+		
 	}
 }

@@ -49,7 +49,7 @@ public class SectionListFragment extends ListFragment {
 		super.onStart();
 		if(firstStart){
 			firstStart = !firstStart;
-			oldPos = getArguments().getInt(getString(R.string.start_position));
+			oldPos = getArguments().getInt(getString(R.string.start_view));
 			getListView().setItemChecked(oldPos,true);
 		}
 	}

@@ -327,7 +327,7 @@ containing a value of this type.
         public static final int options_map_text2=0x7f060027;
         /**  Bundle identifier 
          */
-        public static final int start_position=0x7f06001c;
+        public static final int start_view=0x7f06001c;
         public static final int today=0x7f06001b;
     }
     public static final class style {
