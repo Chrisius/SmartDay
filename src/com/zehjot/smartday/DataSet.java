@@ -4,38 +4,57 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class DataSet {
 	private static final String USER_NAME = "username";
 	private static final String USER_PASS = "password";
+	private static final String NAME  = "Christian";
 	private static final String PASSWORD = "DiCBP_2909";
+	private static final String AID = "5";
+	private static final String APP_SECRET = "9lycn2n42mgave0pgatx5s6po6zg4b0rfm39exbs6fdll0iuvm";
+	private static final String DOMAIN = "http://context.thues.com/";
+	private static final String VERSION = "2/";
 	private static DataSet instance = null;
 	private static Activity activity = null;
 	private static SharedPreferences sharedPreferences = null;
 	private static SharedPreferences.Editor editor = null;
 	private static ArrayList<Integer> selectedApps=null;
     private static final String DEBUG_TAG = "HttpExample";
-	
+    private static ArrayList<String> apps;
 	private List<Pair> data = new ArrayList<Pair>();
+	
+	private String test;
 	
 	protected DataSet(){
 		//For Singleton
@@ -59,12 +78,11 @@ public class DataSet {
 			sharedPreferences = activity.getPreferences(MainActivity.MODE_PRIVATE);
 			editor = sharedPreferences.edit();
 			DataSet.initDate();
-			instance.initTestData();
 		}
 		String user = sharedPreferences.getString(USER_NAME, activity.getString(R.string.error));
 		String pass = sharedPreferences.getString(USER_PASS, activity.getString(R.string.error));
 		if(user.equals(activity.getString(R.string.error))||pass.equals(activity.getString(R.string.error))){
-			editor.putString(USER_NAME, "Christian");
+			editor.putString(USER_NAME, NAME);
 			editor.putString(USER_PASS, instance.sha1(PASSWORD));
 			editor.commit();
 		}
@@ -136,37 +154,19 @@ public class DataSet {
 		editor.commit();
 		instance.setSelectedDate(year, month, day);
 	}
-
-	private void initTestData(){
-		data.add(new Pair("Facebook",0.4));
-		data.add(new Pair("Whatsapp",0.2));
-		data.add(new Pair("Facebook",1.0));
-		data.add(new Pair("Mail",3.0));
-		data.add(new Pair("Reader",0.4));
-		data.add(new Pair("Facebook",0.84));
-		data.add(new Pair("Google",1.2));
-		data.add(new Pair("PhoneCall",1.4));
-		data.add(new Pair("Google",0.7));
-		data.add(new Pair("Facebook",1.2));
-	}
-
 	private ArrayList<String> getApps(int year, int month, int day_of_month){
 		ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 		if(networkInfo == null || !networkInfo.isConnected()){
 			//TODO ErrorMessage
 		}
-		else{
-			new DownloadTask().execute("TESTURL");
+		else{apps = new ArrayList<String>();
+			new DownloadTask().execute("TEST");
+			String[] strApps = activity.getResources().getStringArray(R.array.months);
+			for(int i = 0; i<strApps.length;i++){
+				apps.add(strApps[i]);
+			}
 		}
-		
-		ArrayList<String> apps = new ArrayList<String>();
-		/*
-		String[] strApps = activity.getResources().getStringArray(R.array.months);
-		for(int i = 0; i<strApps.length;i++){
-			apps.add(strApps[i]);
-		}
-		*/
 		return apps;
 	}
 	
@@ -189,11 +189,72 @@ public class DataSet {
 		return String.format("%0" + (data.length*2) + "X", new BigInteger(1, data));		
 	}
 	
-	private class DownloadTask extends AsyncTask<String, Void, JSONObject>{
-		String json = "";
+	private static String getNonce() { 
+		SecureRandom sr = null;	
+		try {
+			sr = SecureRandom.getInstance("SHA1PRNG");
+		} catch (NoSuchAlgorithmException e1) {
+			e1.printStackTrace();
+		}
+		String nonce = new BigInteger(256, sr).toString(26);
+		return nonce;
+	}
+	
+	private static long getTimestamp(){
+		Calendar c = Calendar.getInstance();
+		c.set(2013, 6, 4);
+		return c.getTimeInMillis();
+	}
+	
+	private String getUserURL(String name, String password){
+		String url = DOMAIN+VERSION+"newuser";
+		
+		if(!url.endsWith("?"))
+	        url += "?";
+		//create JSONObject from back to front
+	    JSONObject jObj = new JSONObject();
+	    try {
+		    jObj.put("pass", password);
+			jObj.put("name", name);
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+	    //JSON Object as String with prefix
+	    String dataAsURL=jObj.toString();
+	    url += "data="+dataAsURL;
+	    return url;
+	}
+	
+	private String getURL(String queryType,String data){
+		String url = DOMAIN+VERSION+queryType;
+		if(!url.endsWith("?"))
+	        url += "?";
 
+	    List<NameValuePair> params = new LinkedList<NameValuePair>();
+	    String nonce = getNonce();
+	    
+	    params.add(new BasicNameValuePair("data", data));
+	    params.add(new BasicNameValuePair("nonce", nonce));
+	    params.add(new BasicNameValuePair("aid", AID));
+	    params.add(new BasicNameValuePair("user", USER_NAME));
+	    String dataAsURL=null;
+		try {
+			dataAsURL = URLEncoder.encode(data, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	    params.add(new BasicNameValuePair("h", sha1(dataAsURL+"."+AID+"."+nonce+"."+APP_SECRET+"."+sha1(USER_PASS))));
+	    
+	    String paramString = URLEncodedUtils.format(params, "utf-8");
+
+	    url += paramString;
+	    return url;
+	}
+	
+	private class DownloadTask extends AsyncTask<String, Void, String>{
+		String json = null;
 		@Override
-		protected JSONObject doInBackground(String... url) {
+		protected String doInBackground(String... url) {
 			
 			try{
 				return downloadData(url[0]);
@@ -205,10 +266,24 @@ public class DataSet {
 				return null;
 			}
 		}
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			//show query and result
+			if(result == null)
+				test = "FAIL";
+			else
+				test = getURL("foo", "bar")+"||"+getUserURL(NAME, PASSWORD)+"||"+result;
+			AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+			builder.setMessage(test);
+			AlertDialog dialog = builder.create();
+			dialog.show();			
+		}
 		
-		private JSONObject downloadData(String urlString) throws IOException, JSONException{
+		private String downloadData(String urlString) throws IOException, JSONException{
 			InputStream is = null;
 			try{
+				//creating URL object and open connection
 				URL url = new URL(urlString);
 				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 				conn.setReadTimeout(10000 /*ms*/);
@@ -221,6 +296,7 @@ public class DataSet {
 				int response = conn.getResponseCode();
 				Log.d(DEBUG_TAG, "Response: "+response);
 				is = conn.getInputStream();
+				
 				//InpuStream to JSONObeject
 				try{
 					BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"), 8);
@@ -233,9 +309,11 @@ public class DataSet {
 				}catch (Exception e) {
 		            Log.e("Buffer Error", "Error converting result " + e.toString());
 		        }
-				return new JSONObject(json);
+				
+				return json;//new JSONObject(json);
 			}finally{
 		        if (is != null) {
+		        	//close inputstream
 		            is.close();
 		        } 
 			}
