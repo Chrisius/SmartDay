@@ -1,6 +1,9 @@
 package com.zehjot.smartday;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,9 +18,9 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -25,26 +28,20 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.zehjot.smartday.helper.Security;
+
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Base64;
 import android.util.Log;
 
 public class DataSet {
-	private static final String USER_NAME = "username";
-	private static final String USER_PASS = "password";
-	private static final String NAME  = "Christian";
-	private static final String PASSWORD = "DiCBP_2909";
-	private static final String AID = "5";
-	private static final String APP_SECRET = "9lycn2n42mgave0pgatx5s6po6zg4b0rfm39exbs6fdll0iuvm";
-	private static final String DOMAIN = "http://context.thues.com/";
-	private static final String VERSION = "2/";
 	private static DataSet instance = null;
 	private static Activity activity = null;
 	private static SharedPreferences sharedPreferences = null;
@@ -52,14 +49,19 @@ public class DataSet {
 	private static ArrayList<Integer> selectedApps=null;
     private static final String DEBUG_TAG = "HttpExample";
     private static ArrayList<String> apps;
-	private List<Pair> data = new ArrayList<Pair>();
-	
-	private String test;
+	private static JSONObject user = null;
 	
 	protected DataSet(){
 		//For Singleton
 	}
 	
+	public static DataSet getInstance(Context context){
+		if(instance == null){
+			init(context);
+		}
+		return instance;
+	}
+
 	public class Pair{
 		public final String app;
 		public final double duration;
@@ -71,24 +73,6 @@ public class DataSet {
 		
 	}
 
-	public static DataSet getInstance(Context context){
-		if(instance == null){
-			activity = (Activity) context;
-			instance = new DataSet();
-			sharedPreferences = activity.getPreferences(MainActivity.MODE_PRIVATE);
-			editor = sharedPreferences.edit();
-			DataSet.initDate();
-		}
-		String user = sharedPreferences.getString(USER_NAME, activity.getString(R.string.error));
-		String pass = sharedPreferences.getString(USER_PASS, activity.getString(R.string.error));
-		if(user.equals(activity.getString(R.string.error))||pass.equals(activity.getString(R.string.error))){
-			editor.putString(USER_NAME, NAME);
-			editor.putString(USER_PASS, instance.sha1(PASSWORD));
-			editor.commit();
-		}
-		return instance;
-	}
-	
 	public List<Pair> getApps(){
 		int[] date = getSelectedDateAsArray();
 		return getAppsAtDate(date[0],date[1],date[2]);
@@ -143,7 +127,76 @@ public class DataSet {
 		return boolSelectedApps;
 		
 	}
-	
+	public JSONObject getUserData(){
+		FileInputStream fis;
+		StringBuilder sb = null;
+		String data = null;
+		try{
+			fis = activity.openFileInput(activity.getString(R.string.user_file));
+			InputStreamReader inputStreamReader = new InputStreamReader(fis);
+			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+			sb = new StringBuilder();
+			while ((data = bufferedReader.readLine()) != null) {
+				sb.append(data);
+			}
+			fis.close();
+		}catch(IOException e){
+			showDialog("No Userdata found");
+			return null;
+		}
+		data=sb.toString();
+		String decryptedData = Security.decrypt(data);
+		JSONObject result = null;
+		try {
+			result = new JSONObject(decryptedData);
+		} catch (JSONException e) {
+			showDialog("JSON Object failed");
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public void testUserData(){
+		String url = getURL("testcredentials",null);
+		new DownloadTask().execute(url);
+	}
+
+	private static void setUserData(String name, String pass){			
+		JSONObject jObj = new JSONObject();		
+		try {
+			jObj.put(activity.getString(R.string.user_appSec), "9lycn2n42mgave0pgatx5s6po6zg4b0rfm39exbs6fdll0iuvm");
+			jObj.put(activity.getString(R.string.user_appID),"5");
+			jObj.put(activity.getString(R.string.user_url_prefix), "http://context.thues.com/2/");
+			jObj.put(activity.getString(R.string.user_pass), pass);
+			jObj.put(activity.getString(R.string.user_name), name);
+		} catch (JSONException e) {
+			instance.showDialog("JSONError:USER CREATE");				
+		}
+		String encryptedData = Security.encrypt(jObj.toString());
+		FileOutputStream fos;
+		try{
+			fos = activity.openFileOutput(activity.getString(R.string.user_file), Context.MODE_PRIVATE);
+			fos.write(encryptedData.getBytes());
+			fos.close();
+		}catch(IOException e){
+			instance.showDialog("Error while storing Userdata");
+		}
+	}
+
+	private static void init(Context context){
+		activity = (Activity) context;
+		instance = new DataSet();
+		sharedPreferences = activity.getPreferences(MainActivity.MODE_PRIVATE);
+		editor = sharedPreferences.edit();
+		initDate();
+		File file = activity.getFileStreamPath(activity.getString(R.string.user_file));
+		if(!file.exists()){
+			//TODO create Dialog asking user for name and Password
+			setUserData("Christian","DiCBP_2909");
+		}
+		user = instance.getUserData();	
+		instance.testUserData();
+	}
 	private static void initDate(){
 		final Calendar c = Calendar.getInstance();
 		int day = c.get(Calendar.DAY_OF_MONTH);
@@ -155,18 +208,27 @@ public class DataSet {
 		instance.setSelectedDate(year, month, day);
 	}
 	private ArrayList<String> getApps(int year, int month, int day_of_month){
-		ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-		if(networkInfo == null || !networkInfo.isConnected()){
-			//TODO ErrorMessage
+		apps = new ArrayList<String>();
+		//new DownloadTask().execute("TEST")
+		/*
+		try {
+			new DownloadTask().execute(
+					getURLregisterUserToServer(
+							user.getString(activity.getString(R.string.user_name)),
+							user.getString(activity.getString(R.string.user_pass))
+							)
+						);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		else{apps = new ArrayList<String>();
-			new DownloadTask().execute("TEST");
-			String[] strApps = activity.getResources().getStringArray(R.array.months);
-			for(int i = 0; i<strApps.length;i++){
-				apps.add(strApps[i]);
-			}
-		}
+		*/
+		//testUserData();
+		getEventTypes();
+		String[] strApps = activity.getResources().getStringArray(R.array.months);
+		for(int i = 0; i<strApps.length;i++){
+			apps.add(strApps[i]);
+		}		
 		return apps;
 	}
 	
@@ -176,112 +238,125 @@ public class DataSet {
 	private int getSharedInt(int id){
 		return sharedPreferences.getInt(activity.getString(id), -1);
 	}
-	
-	private String sha1(String s){
-        MessageDigest digest = null;
-        try {
-                digest = MessageDigest.getInstance("SHA-1");
-	        } catch (Exception e) {
-                e.printStackTrace();
-        }
-		digest.reset();
-		byte[] data = digest.digest(s.getBytes());
-		return String.format("%0" + (data.length*2) + "X", new BigInteger(1, data));		
+	private void showDialog(String message){
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+		builder.setMessage(message);
+		AlertDialog dialog = builder.create();
+		dialog.show();		
 	}
 	
-	private static String getNonce() { 
-		SecureRandom sr = null;	
-		try {
-			sr = SecureRandom.getInstance("SHA1PRNG");
-		} catch (NoSuchAlgorithmException e1) {
-			e1.printStackTrace();
-		}
-		String nonce = new BigInteger(256, sr).toString(26);
-		return nonce;
+	private void getEventTypes(){
+		String url = getURL("types",null);
+		new DownloadTask().execute(url);
 	}
-	
-	private static long getTimestamp(){
-		Calendar c = Calendar.getInstance();
-		c.set(2013, 6, 4);
-		return c.getTimeInMillis();
-	}
-	
-	private String getUserURL(String name, String password){
-		String url = DOMAIN+VERSION+"newuser";
-		
-		if(!url.endsWith("?"))
-	        url += "?";
-		//create JSONObject from back to front
-	    JSONObject jObj = new JSONObject();
-	    try {
-		    jObj.put("pass", password);
+	private String getURLregisterUserToServer(String name, String password){
+		//create JSONObject
+	    try {	
+		    JSONObject jObj = new JSONObject();
 			jObj.put("name", name);
-		} catch (JSONException e1) {
-			e1.printStackTrace();
+		    jObj.put("pass", password);
+			return user.getString(activity.getString(R.string.user_url_prefix))
+		    		+"newuser?data="
+		    		+jObj.toString();
+		} catch (JSONException e) {
+			instance.showDialog("JSONError registerUserToServer");
+			e.printStackTrace();
+			return null;
 		}
-	    //JSON Object as String with prefix
-	    String dataAsURL=jObj.toString();
-	    url += "data="+dataAsURL;
-	    return url;
 	}
 	
 	private String getURL(String queryType,String data){
-		String url = DOMAIN+VERSION+queryType;
-		if(!url.endsWith("?"))
-	        url += "?";
-
-	    List<NameValuePair> params = new LinkedList<NameValuePair>();
-	    String nonce = getNonce();
-	    
-	    params.add(new BasicNameValuePair("data", data));
-	    params.add(new BasicNameValuePair("nonce", nonce));
-	    params.add(new BasicNameValuePair("aid", AID));
-	    params.add(new BasicNameValuePair("user", USER_NAME));
-	    String dataAsURL=null;
 		try {
-			dataAsURL = URLEncoder.encode(data, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
+		    List<NameValuePair> params = new LinkedList<NameValuePair>();
+		    String nonce = Security.getNonce();
+    	    if(data != null){
+    	    	params.add(new BasicNameValuePair("data", data));
+    	    }else{
+    	    	data="";
+    	    }
+	    	params.add(new BasicNameValuePair("nonce", nonce));		    
+	    	params.add(new BasicNameValuePair("aid", user.getString(activity.getString(R.string.user_appID))));
+			params.add(new BasicNameValuePair("user", user.getString(activity.getString(R.string.user_name))));
+			//String dataAsURL = URLEncoder.encode(data, "UTF-8");
+			params.add(new BasicNameValuePair("h", 
+				Security.sha1(	
+					data+
+					user.getString(activity.getString(R.string.user_appID))+
+					user.getString(activity.getString(R.string.user_name))+
+					nonce+
+					user.getString(activity.getString(R.string.user_appSec))+
+					Security.sha1(user.getString(activity.getString(R.string.user_pass)))
+				)
+			));
+			return user.getString(activity.getString(R.string.user_url_prefix))
+					+queryType
+					+"?"
+					+URLEncodedUtils.format(params, "utf-8");
+				
+		}catch (JSONException e) {
+			instance.showDialog("JSONError in getURL");
 			e.printStackTrace();
+			return null;
 		}
-	    params.add(new BasicNameValuePair("h", sha1(dataAsURL+"."+AID+"."+nonce+"."+APP_SECRET+"."+sha1(USER_PASS))));
-	    
-	    String paramString = URLEncodedUtils.format(params, "utf-8");
-
-	    url += paramString;
-	    return url;
 	}
-	
-	private class DownloadTask extends AsyncTask<String, Void, String>{
-		String json = null;
+	private void downloadTaskErrorHandler(JSONObject jObj, int serverResponse){
+		ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+		if(networkInfo == null || !networkInfo.isConnected()){
+			showDialog("No dataservice available");
+			return;
+		}
+		if(jObj == null){
+			showDialog("Invalid name or password. Server response:"+ serverResponse);
+			//TODO Add dialog to request new user data
+			setUserData("Christian", "DiCBP_2909");
+			user = getUserData();
+			testUserData();
+			return;
+		}
+		try {
+			showDialog("Error occurred: "+jObj.getString("reason"));
+		} catch (JSONException e) {
+			showDialog("Error occured while trying to read server error, no reason stated.");
+		}
+	}
+	private class DownloadTask extends AsyncTask<String, Void, JSONObject>{
+		String urlRequest = null;
+		int serverResponse = -1;
 		@Override
-		protected String doInBackground(String... url) {
-			
+		protected JSONObject doInBackground(String... url) {
+			ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+			if(networkInfo == null || !networkInfo.isConnected()){
+				return null;
+			}
+			urlRequest = url[0];
 			try{
 				return downloadData(url[0]);
-			} catch (IOException e){		
-				e.printStackTrace();
+			} catch (IOException e){	
 				return null;
-			} catch (JSONException e) {				
-				e.printStackTrace();
+			} catch (JSONException e) {	
 				return null;
 			}
 		}
 		@Override
-		protected void onPostExecute(String result) {
+		protected void onPostExecute(JSONObject result) {
 			super.onPostExecute(result);
 			//show query and result
-			if(result == null)
-				test = "FAIL";
-			else
-				test = getURL("foo", "bar")+"||"+getUserURL(NAME, PASSWORD)+"||"+result;
-			AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-			builder.setMessage(test);
-			AlertDialog dialog = builder.create();
-			dialog.show();			
+			try {
+				if(result == null || result.get("result").toString().equals("0"))
+					downloadTaskErrorHandler(result, serverResponse);
+				else
+					showDialog("Sucsess Query: "+urlRequest+"\n"+"Result: "+result.toString());
+			} catch (JSONException e) {
+				downloadTaskErrorHandler(result, serverResponse);
+			}
+			
 		}
 		
-		private String downloadData(String urlString) throws IOException, JSONException{
+		private JSONObject downloadData(String urlString) throws IOException, JSONException{
 			InputStream is = null;
+			String json = null;
 			try{
 				//creating URL object and open connection
 				URL url = new URL(urlString);
@@ -293,8 +368,8 @@ public class DataSet {
 				
 				//Start query
 				conn.connect();
-				int response = conn.getResponseCode();
-				Log.d(DEBUG_TAG, "Response: "+response);
+				serverResponse = conn.getResponseCode();
+				Log.d(DEBUG_TAG, "Response: "+serverResponse);
 				is = conn.getInputStream();
 				
 				//InpuStream to JSONObeject
@@ -310,7 +385,7 @@ public class DataSet {
 		            Log.e("Buffer Error", "Error converting result " + e.toString());
 		        }
 				
-				return json;//new JSONObject(json);
+				return new JSONObject(json);
 			}finally{
 		        if (is != null) {
 		        	//close inputstream
@@ -322,4 +397,7 @@ public class DataSet {
 		}
 		
 	}
+	/*public class AuthDialogFragment extends DialogFragment {
+		
+	}*/
 }

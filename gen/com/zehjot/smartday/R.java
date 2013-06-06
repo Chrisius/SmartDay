@@ -189,33 +189,37 @@ containing a value of this type.
         public static final int square=0x7f020019;
     }
     public static final class id {
-        public static final int action_settings=0x7f050011;
-        public static final int chart_1=0x7f05000a;
-        public static final int chart_2=0x7f05000e;
-        public static final int chart_3=0x7f05000d;
-        public static final int chart_4=0x7f05000b;
-        public static final int chart_5=0x7f05000c;
+        public static final int action_settings=0x7f050014;
+        public static final int auth_user_email=0x7f05000a;
+        public static final int auth_user_name=0x7f050008;
+        public static final int auth_user_pass=0x7f050009;
+        public static final int chart_1=0x7f05000d;
+        public static final int chart_2=0x7f050011;
+        public static final int chart_3=0x7f050010;
+        public static final int chart_4=0x7f05000e;
+        public static final int chart_5=0x7f05000f;
         public static final int hybrid=0x7f050004;
-        public static final int map_container=0x7f050010;
+        public static final int map_container=0x7f050013;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
-        public static final int option_header=0x7f050008;
+        public static final int option_header=0x7f05000b;
         public static final int options_fragment_container=0x7f050006;
-        public static final int options_list=0x7f050009;
+        public static final int options_list=0x7f05000c;
         public static final int satellite=0x7f050002;
         public static final int section_fragment_container=0x7f050007;
         public static final int section_header_container=0x7f050005;
-        public static final int section_list_fragment=0x7f05000f;
+        public static final int section_list_fragment=0x7f050012;
         public static final int terrain=0x7f050003;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
-        public static final int header_view=0x7f030001;
-        public static final int options_list=0x7f030002;
-        public static final int section_chart_fragment=0x7f030003;
-        public static final int section_list=0x7f030004;
-        public static final int section_map_fragment=0x7f030005;
-        public static final int section_timeline_fragment=0x7f030006;
+        public static final int dialog_auth=0x7f030001;
+        public static final int header_view=0x7f030002;
+        public static final int options_list=0x7f030003;
+        public static final int section_chart_fragment=0x7f030004;
+        public static final int section_list=0x7f030005;
+        public static final int section_map_fragment=0x7f030006;
+        public static final int section_timeline_fragment=0x7f030007;
     }
     public static final class menu {
         public static final int main=0x7f0a0000;
@@ -294,6 +298,11 @@ containing a value of this type.
         public static final int datepicker=0x7f06001a;
         public static final int error=0x7f060025;
         public static final int hello_world=0x7f060017;
+        public static final int hint_user_email=0x7f060036;
+        /**  Hint 
+         */
+        public static final int hint_user_name=0x7f060034;
+        public static final int hint_user_pass=0x7f060035;
         public static final int key_apps=0x7f060022;
         public static final int key_date=0x7f06001e;
         public static final int key_date_day=0x7f06001f;
@@ -329,6 +338,16 @@ containing a value of this type.
          */
         public static final int start_view=0x7f06001c;
         public static final int today=0x7f06001b;
+        public static final int user_appID=0x7f060032;
+        public static final int user_appSec=0x7f060031;
+        /**  FileNames 
+         */
+        public static final int user_file=0x7f06002e;
+        /**  UserFile Identifier
+         */
+        public static final int user_name=0x7f06002f;
+        public static final int user_pass=0x7f060030;
+        public static final int user_url_prefix=0x7f060033;
     }
     public static final class style {
         /** 

@@ -54,5 +54,17 @@
 	<string name="options_date_text2">select a date</string>
 	
 	<string name="options_app_select">select apps</string>
+<!-- FileNames -->
+	<string name="user_file">user_preferences</string>
+	<!-- UserFile Identifier-->
+		<string name="user_name">name</string>
+		<string name="user_pass">password</string>
+		<string name="user_appSec">asec</string>
+		<string name="user_appID">app_ID</string>
+		<string name="user_url_prefix">url_prefix</string>
 	
+<!-- Hint -->
+	<string name="hint_user_name">Username</string>
+	<string name="hint_user_pass">Password</string>
+	<string name="hint_user_email">Email (optional)</string>
 </resources>
