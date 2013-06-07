@@ -16,7 +16,9 @@ public class SelectAppsDialogFragment extends DialogFragment {
 	public Dialog onCreateDialog(Bundle saved){
 		dataSet = DataSet.getInstance(getActivity());
 		final ArrayList<Integer> selectedApps = new ArrayList<Integer>();
+		
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		
 		builder.setTitle(R.string.options_app_select) //Dialogtitle
 			   .setMultiChoiceItems(R.array.months, dataSet.getSelectedApps(), 
 				new DialogInterface.OnMultiChoiceClickListener() {			

@@ -8,6 +8,7 @@
     <string name="options">Options</string>
     <string name="datepicker">Pick a date</string>
     <string name="today">Today</string>
+    <string name="save">Save login data?</string>
     <string-array name="months">
         <item>January</item>
         <item>February</item>
@@ -59,9 +60,7 @@
 	<!-- UserFile Identifier-->
 		<string name="user_name">name</string>
 		<string name="user_pass">password</string>
-		<string name="user_appSec">asec</string>
-		<string name="user_appID">app_ID</string>
-		<string name="user_url_prefix">url_prefix</string>
+		<string name="user_email">user_email</string>
 	
 <!-- Hint -->
 	<string name="hint_user_name">Username</string>

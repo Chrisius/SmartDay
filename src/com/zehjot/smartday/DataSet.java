@@ -28,21 +28,30 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.zehjot.smartday.R.layout;
+import com.zehjot.smartday.UserData.OnCallBackListener;
 import com.zehjot.smartday.helper.Security;
+import com.zehjot.smartday.helper.Utilities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
 
-public class DataSet {
+public class DataSet implements OnCallBackListener{
 	private static DataSet instance = null;
+	private static UserData userData = null;
 	private static Activity activity = null;
 	private static SharedPreferences sharedPreferences = null;
 	private static SharedPreferences.Editor editor = null;
@@ -54,14 +63,22 @@ public class DataSet {
 	protected DataSet(){
 		//For Singleton
 	}
-	
+	/*
+	public JSONObject getUser(){
+		if(user == null){
+			userData = new UserData();
+			user = userData.getUserLoginData(activity);
+		}
+		return user;
+		
+	}*/
 	public static DataSet getInstance(Context context){
 		if(instance == null){
 			init(context);
 		}
 		return instance;
 	}
-
+	
 	public class Pair{
 		public final String app;
 		public final double duration;
@@ -127,75 +144,100 @@ public class DataSet {
 		return boolSelectedApps;
 		
 	}
-	public JSONObject getUserData(){
-		FileInputStream fis;
-		StringBuilder sb = null;
-		String data = null;
-		try{
-			fis = activity.openFileInput(activity.getString(R.string.user_file));
-			InputStreamReader inputStreamReader = new InputStreamReader(fis);
-			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-			sb = new StringBuilder();
-			while ((data = bufferedReader.readLine()) != null) {
-				sb.append(data);
-			}
-			fis.close();
-		}catch(IOException e){
-			showDialog("No Userdata found");
-			return null;
-		}
-		data=sb.toString();
-		String decryptedData = Security.decrypt(data);
-		JSONObject result = null;
-		try {
-			result = new JSONObject(decryptedData);
-		} catch (JSONException e) {
-			showDialog("JSON Object failed");
-			e.printStackTrace();
-		}
-		return result;
+	
+	@Override
+	public void onCallback(JSONObject jObj) {
+		user = jObj;		
 	}
-
-	public void testUserData(){
+	/**
+	 * Functions to handle user data (Name, Password, Email)
+	 * ask  - opens an alertDialog in which data can be written
+	 * set  - stores if wanted login data in external file 
+	 * get  - gets name, pw, email
+	 * test - verifies login data with server
+	 */	/*
+	public void askForUserLogInData(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+		LayoutInflater inflater = activity.getLayoutInflater();
+		final View view = inflater.inflate(R.layout.dialog_auth,null);
+		builder.setView(view)
+			.setTitle("Authentication")
+			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+	           @Override
+	           public void onClick(DialogInterface dialog, int id) {
+	        	   EditText editText = (EditText) view.findViewById(R.id.auth_user_name);
+	        	   String user_name = editText.getText().toString();
+	        	   editText = (EditText) view.findViewById(R.id.auth_user_pass);
+	        	   String user_pass = editText.getText().toString();
+	        	   editText = (EditText) view.findViewById(R.id.auth_user_email);
+	        	   String user_email = editText.getText().toString();
+	        	   CheckBox saveData = (CheckBox) view.findViewById(R.id.auth_save_user_data);
+	        	   Boolean save = saveData.isChecked();
+	        	   createUserLogInData(user_name, user_pass, user_email, save);
+	           }
+	       })
+	       
+	       .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+	           @Override
+	           public void onClick(DialogInterface dialog, int id) {
+	               
+	           }
+	       });
+		AlertDialog dialog = builder.create();
+		dialog.show();
+	}*/
+	/*
+	private static JSONObject createUserLogInData(String name, String pass, String email, Boolean saveData){			
+		JSONObject jObj = new JSONObject();
+		try {
+			jObj.put(activity.getString(R.string.user_pass), Security.sha1(pass));
+			jObj.put(activity.getString(R.string.user_name), name);
+			if(email != null)
+				jObj.put(activity.getString(R.string.user_email), name);
+				
+		} catch (JSONException e) {
+			instance.showDialog("JSONError:USER CREATE");				
+		}
+		if(saveData){
+			instance.writeFile(activity.getString(R.string.user_file),jObj.toString());
+			return instance.loadUserLogInData();
+		}
+		return jObj;
+		
+	}*/
+/*
+	public void testUserLogInData(){
 		String url = getURL("testcredentials",null);
 		new DownloadTask().execute(url);
 	}
 
-	private static void setUserData(String name, String pass){			
-		JSONObject jObj = new JSONObject();		
+	private JSONObject loadUserLogInData(){
+		String data = readFile(activity.getString(R.string.user_file));
+		JSONObject jObj = null;
 		try {
-			jObj.put(activity.getString(R.string.user_appSec), "9lycn2n42mgave0pgatx5s6po6zg4b0rfm39exbs6fdll0iuvm");
-			jObj.put(activity.getString(R.string.user_appID),"5");
-			jObj.put(activity.getString(R.string.user_url_prefix), "http://context.thues.com/2/");
-			jObj.put(activity.getString(R.string.user_pass), pass);
-			jObj.put(activity.getString(R.string.user_name), name);
+			jObj = new JSONObject(data);
 		} catch (JSONException e) {
-			instance.showDialog("JSONError:USER CREATE");				
+			showDialog("JSON Object failed");
+			e.printStackTrace();
 		}
-		String encryptedData = Security.encrypt(jObj.toString());
-		FileOutputStream fos;
-		try{
-			fos = activity.openFileOutput(activity.getString(R.string.user_file), Context.MODE_PRIVATE);
-			fos.write(encryptedData.getBytes());
-			fos.close();
-		}catch(IOException e){
-			instance.showDialog("Error while storing Userdata");
-		}
+		return jObj;
 	}
+*/
+	public void init(){
 
+		userData = new UserData();
+		userData.getUserLoginData(activity);
+	}
 	private static void init(Context context){
-		activity = (Activity) context;
 		instance = new DataSet();
+		activity = (Activity) context;
 		sharedPreferences = activity.getPreferences(MainActivity.MODE_PRIVATE);
 		editor = sharedPreferences.edit();
 		initDate();
 		File file = activity.getFileStreamPath(activity.getString(R.string.user_file));
-		if(!file.exists()){
-			//TODO create Dialog asking user for name and Password
-			setUserData("Christian","DiCBP_2909");
+		if(file.exists()){
+			file.delete();
 		}
-		user = instance.getUserData();	
-		instance.testUserData();
 	}
 	private static void initDate(){
 		final Calendar c = Calendar.getInstance();
@@ -224,7 +266,8 @@ public class DataSet {
 		}
 		*/
 		//testUserData();
-		getEventTypes();
+		//getEventTypes();
+		//askForUserLogInData();
 		String[] strApps = activity.getResources().getStringArray(R.array.months);
 		for(int i = 0; i<strApps.length;i++){
 			apps.add(strApps[i]);
@@ -237,25 +280,24 @@ public class DataSet {
 	}
 	private int getSharedInt(int id){
 		return sharedPreferences.getInt(activity.getString(id), -1);
-	}
+	}/*
 	private void showDialog(String message){
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 		builder.setMessage(message);
 		AlertDialog dialog = builder.create();
 		dialog.show();		
-	}
-	
+	}*/
 	private void getEventTypes(){
-		String url = getURL("types",null);
+		String url = Utilities.getURL("types",null,user,activity);
 		new DownloadTask().execute(url);
-	}
+	}/*
 	private String getURLregisterUserToServer(String name, String password){
 		//create JSONObject
 	    try {	
 		    JSONObject jObj = new JSONObject();
 			jObj.put("name", name);
 		    jObj.put("pass", password);
-			return user.getString(activity.getString(R.string.user_url_prefix))
+			return user.getString(Config.getDomain()+Config.getApiVersion())
 		    		+"newuser?data="
 		    		+jObj.toString();
 		} catch (JSONException e) {
@@ -263,9 +305,9 @@ public class DataSet {
 			e.printStackTrace();
 			return null;
 		}
-	}
-	
-	private String getURL(String queryType,String data){
+	}*/
+	/*
+	public static String getURL(String queryType,String data){
 		try {
 		    List<NameValuePair> params = new LinkedList<NameValuePair>();
 		    String nonce = Security.getNonce();
@@ -275,20 +317,21 @@ public class DataSet {
     	    	data="";
     	    }
 	    	params.add(new BasicNameValuePair("nonce", nonce));		    
-	    	params.add(new BasicNameValuePair("aid", user.getString(activity.getString(R.string.user_appID))));
+	    	params.add(new BasicNameValuePair("aid", Config.getAppID()));
 			params.add(new BasicNameValuePair("user", user.getString(activity.getString(R.string.user_name))));
 			//String dataAsURL = URLEncoder.encode(data, "UTF-8");
 			params.add(new BasicNameValuePair("h", 
 				Security.sha1(	
-					data+
-					user.getString(activity.getString(R.string.user_appID))+
-					user.getString(activity.getString(R.string.user_name))+
-					nonce+
-					user.getString(activity.getString(R.string.user_appSec))+
-					Security.sha1(user.getString(activity.getString(R.string.user_pass)))
+					data
+					+Config.getAppID()
+					+user.getString(activity.getString(R.string.user_name))
+					+nonce
+					+Config.getAppSecret()
+					+user.getString(activity.getString(R.string.user_pass))
 				)
 			));
-			return user.getString(activity.getString(R.string.user_url_prefix))
+			return Config.getDomain()
+					+Config.getApiVersion()
 					+queryType
 					+"?"
 					+URLEncodedUtils.format(params, "utf-8");
@@ -299,25 +342,62 @@ public class DataSet {
 			return null;
 		}
 	}
+	private Boolean writeFile(String filename, String data){
+		String encryptedData = Security.encrypt(data);
+		FileOutputStream fos;
+		try{
+			fos = activity.openFileOutput(filename, Context.MODE_PRIVATE);
+			fos.write(encryptedData.getBytes());
+			fos.close();
+		}catch(IOException e){
+			instance.showDialog("Error while storing Userdata");
+			return false;
+		}		
+		return true;
+	}
+	private String readFile(String filename){
+		FileInputStream fis;
+		StringBuilder sb = null;
+		String data = null;
+		try{
+			fis = activity.openFileInput(activity.getString(R.string.user_file));
+			InputStreamReader inputStreamReader = new InputStreamReader(fis);
+			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+			sb = new StringBuilder();
+			while ((data = bufferedReader.readLine()) != null) {
+				sb.append(data);
+			}
+			fis.close();
+		}catch(IOException e){
+			showDialog("No Userdata found");
+			return null;
+		}
+		data=sb.toString();
+		String decryptedData = Security.decrypt(data);
+		return decryptedData;
+		
+	}*/
 	private void downloadTaskErrorHandler(JSONObject jObj, int serverResponse){
 		ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 		if(networkInfo == null || !networkInfo.isConnected()){
-			showDialog("No dataservice available");
+			Utilities.showDialog("No dataservice available",activity);
 			return;
 		}
 		if(jObj == null){
-			showDialog("Invalid name or password. Server response:"+ serverResponse);
+			Utilities.showDialog("Invalid name or password. Server response:"+ serverResponse,activity);
+			//askForUserLogInData();
 			//TODO Add dialog to request new user data
-			setUserData("Christian", "DiCBP_2909");
-			user = getUserData();
-			testUserData();
+			//setUserData("Christian", "DiCBP_2909",null);
+			//askForUserLogInData();
+			//user = getUserLogInData();
+			//testUserLogInData();
 			return;
 		}
 		try {
-			showDialog("Error occurred: "+jObj.getString("reason"));
+			Utilities.showDialog("Error occurred: "+jObj.getString("reason"),activity);
 		} catch (JSONException e) {
-			showDialog("Error occured while trying to read server error, no reason stated.");
+			Utilities.showDialog("Error occured while trying to read server error, no reason stated.",activity);
 		}
 	}
 	private class DownloadTask extends AsyncTask<String, Void, JSONObject>{
@@ -344,10 +424,12 @@ public class DataSet {
 			super.onPostExecute(result);
 			//show query and result
 			try {
-				if(result == null || result.get("result").toString().equals("0"))
+				if(result == null || result.get("result").toString().equals("0")){
+				//	showDialog("Failed Query: "+urlRequest);
 					downloadTaskErrorHandler(result, serverResponse);
+				}
 				else
-					showDialog("Sucsess Query: "+urlRequest+"\n"+"Result: "+result.toString());
+					Utilities.showDialog("Sucsess Query: "+urlRequest+"\n"+"Result: "+result.toString(),activity);
 			} catch (JSONException e) {
 				downloadTaskErrorHandler(result, serverResponse);
 			}
@@ -397,7 +479,4 @@ public class DataSet {
 		}
 		
 	}
-	/*public class AuthDialogFragment extends DialogFragment {
-		
-	}*/
 }

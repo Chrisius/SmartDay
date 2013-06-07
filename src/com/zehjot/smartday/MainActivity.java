@@ -25,9 +25,14 @@ public class MainActivity extends Activity
         setStartView(1);
         dataSet = DataSet.getInstance(this);
     }
+    @Override
+    public void onResume(){
+    	super.onResume();
+    	dataSet.init();
+    	//dataSet.initUser();
+    }
     
     public void onSectionSelected(int pos){
-    	dataSet.getApps();
     	switch (pos) {
 		case 0:
 			optionsListFragment.updateOptions(pos); 	//Updates the displayed optionsList
@@ -70,7 +75,7 @@ public class MainActivity extends Activity
 		}
     }
     
-    public void onDateChosen(int year, int month, int day){
+    public void onDateChosen(int year, int month, int day){    	
     	dataSet.setSelectedDate(year, month, day);
     	((OptionsListFragment) fm.findFragmentById(R.id.options_fragment_container)).updateDate();
     }

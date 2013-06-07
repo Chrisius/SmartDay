@@ -45,6 +45,11 @@ public class OptionsListFragment extends ListFragment {
 	}
 	
 	@Override
+	public void onStart(){
+		super.onStart();
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		return inflater.inflate(R.layout.options_list, container, false);
 	}
