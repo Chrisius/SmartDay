@@ -5,9 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -18,15 +21,39 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-
+import android.content.DialogInterface;
 import com.zehjot.smartday.Config;
 import com.zehjot.smartday.R;
 
 public class Utilities {
-	public static long getTimestamp(int year, int month, int day, int hour, int minutes, int seconds){
+	public static String getFileName(String request, JSONObject jObj){
+		String fileName = request;
+		
+		try {
+			fileName += jObj.getString("start");
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+		try {
+			fileName += jObj.getString("end");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return Security.sha1(fileName);
+	}
+	public static long getTimestamp(int year, int month, int day, int h, int m, int s){
 		Calendar c = Calendar.getInstance();
-		c.set(2013, 6, 4);
-		return c.getTimeInMillis()+seconds*1000+minutes*60000+hour*360000;
+		c.set(year, month, day,h,m,s);
+		TimeZone tz = c.getTimeZone();
+		long date = c.getTimeInMillis();
+		date += tz.getOffset(date);
+		return date/1000;//c.getTimeInMillis()+seconds*1000+minutes*60000+hour*360000;
+	}
+	
+	public static long getSystemTime(){
+		Calendar c = Calendar.getInstance();
+		return c.getTimeInMillis();
 	}
 
 	public static Boolean writeFile(String filename, String data, Activity activity){
@@ -47,7 +74,7 @@ public class Utilities {
 		StringBuilder sb = null;
 		String data = null;
 		try{
-			fis = activity.openFileInput(activity.getString(R.string.user_file));
+			fis = activity.openFileInput(filename);
 			InputStreamReader inputStreamReader = new InputStreamReader(fis);
 			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 			sb = new StringBuilder();
@@ -66,11 +93,20 @@ public class Utilities {
 	
 	public static void showDialog(String message, Activity activity){
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder.setMessage(message);
+		builder.setMessage(message)
+			.setCancelable(false)
+			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+		           @Override
+		           public void onClick(DialogInterface dialog, int id) {
+		           }
+		       });
 		AlertDialog dialog = builder.create();
-		dialog.show();		
+		dialog.show();
 	}
 	public static String getURL(String queryType,String data,JSONObject user, Activity activity){
+		if(user==null||activity==null){
+			return null;
+		}
 		try {
 		    List<NameValuePair> params = new LinkedList<NameValuePair>();
 		    String nonce = Security.getNonce();
@@ -82,10 +118,16 @@ public class Utilities {
 	    	params.add(new BasicNameValuePair("nonce", nonce));		    
 	    	params.add(new BasicNameValuePair("aid", Config.getAppID()));
 			params.add(new BasicNameValuePair("user", user.getString(activity.getString(R.string.user_name))));
-			//String dataAsURL = URLEncoder.encode(data, "UTF-8");
+			String dataAsURL ="";
+			try {
+				dataAsURL = URLEncoder.encode(data, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			params.add(new BasicNameValuePair("h", 
 				Security.sha1(	
-					data
+					dataAsURL
 					+Config.getAppID()
 					+user.getString(activity.getString(R.string.user_name))
 					+nonce

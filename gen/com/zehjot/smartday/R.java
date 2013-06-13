@@ -238,6 +238,7 @@ containing a value of this type.
         /**   Requested by string saying which app requested the notification. [CHAR LIMIT=42] 
          */
         public static final int auth_client_requested_by_msg=0x7f060011;
+        public static final int bundle_app_string_array=0x7f06001e;
         public static final int categories=0x7f060018;
         /**  Button in confirmation dialog to enable Google Play services.  Clicking it
         will direct user to application settings of Google Play services where they
@@ -296,24 +297,32 @@ containing a value of this type.
         public static final int common_signin_button_text_long=0x7f06000e;
         /**  Error Messages 
          */
-        public static final int date_error=0x7f060025;
+        public static final int date_error=0x7f060027;
         public static final int datepicker=0x7f06001a;
-        public static final int error=0x7f060026;
+        public static final int error=0x7f060028;
+        public static final int error_authentication_fail=0x7f06002b;
+        public static final int error_no_string=0x7f060029;
+        public static final int error_no_user_jObj=0x7f06002a;
+        public static final int error_storing_file=0x7f06002c;
         public static final int hello_world=0x7f060017;
-        public static final int hint_user_email=0x7f060035;
+        public static final int hint_user_email=0x7f06003c;
         /**  Hint 
          */
-        public static final int hint_user_name=0x7f060033;
-        public static final int hint_user_pass=0x7f060034;
-        public static final int key_apps=0x7f060023;
-        public static final int key_date=0x7f06001f;
-        public static final int key_date_day=0x7f060020;
+        public static final int hint_user_name=0x7f06003a;
+        public static final int hint_user_pass=0x7f06003b;
+        /**  Infos 
+         */
+        public static final int info_user_data_ok=0x7f06002d;
+        public static final int key_apps=0x7f060025;
+        public static final int key_date=0x7f060021;
+        public static final int key_date_day=0x7f060022;
         /**  SharedPreferences Identifier 
          */
-        public static final int key_date_default=0x7f06001e;
-        public static final int key_date_month=0x7f060021;
-        public static final int key_date_selected_apps=0x7f060024;
-        public static final int key_date_year=0x7f060022;
+        public static final int key_date_default=0x7f06001f;
+        public static final int key_date_default_timestamp=0x7f060020;
+        public static final int key_date_month=0x7f060023;
+        public static final int key_date_selected_apps=0x7f060026;
+        public static final int key_date_year=0x7f060024;
         /**  Location client code resources (prefix with location_client) 
 
         Begin strings for location.reporting
@@ -326,29 +335,29 @@ containing a value of this type.
         public static final int location_client_ulr_inactive_age_unknown=0x7f060013;
         public static final int location_client_ulr_inactive_unknown_restriction=0x7f060014;
         public static final int options=0x7f060019;
-        public static final int options_app_select=0x7f06002e;
-        public static final int options_app_text1=0x7f06002b;
-        public static final int options_app_text2=0x7f06002c;
-        public static final int options_chart_text1=0x7f060029;
-        public static final int options_chart_text2=0x7f06002a;
-        public static final int options_date_text2=0x7f06002d;
+        public static final int options_app_select=0x7f060035;
+        public static final int options_app_text1=0x7f060032;
+        public static final int options_app_text2=0x7f060033;
+        public static final int options_chart_text1=0x7f060030;
+        public static final int options_chart_text2=0x7f060031;
+        public static final int options_date_text2=0x7f060034;
         /**  Option Names 
          */
-        public static final int options_map_text1=0x7f060027;
-        public static final int options_map_text2=0x7f060028;
+        public static final int options_map_text1=0x7f06002e;
+        public static final int options_map_text2=0x7f06002f;
         public static final int save=0x7f06001c;
         /**  Bundle identifier 
          */
         public static final int start_view=0x7f06001d;
         public static final int today=0x7f06001b;
-        public static final int user_email=0x7f060032;
+        public static final int user_email=0x7f060039;
         /**  FileNames 
          */
-        public static final int user_file=0x7f06002f;
+        public static final int user_file=0x7f060036;
         /**  UserFile Identifier
          */
-        public static final int user_name=0x7f060030;
-        public static final int user_pass=0x7f060031;
+        public static final int user_name=0x7f060037;
+        public static final int user_pass=0x7f060038;
     }
     public static final class style {
         /** 

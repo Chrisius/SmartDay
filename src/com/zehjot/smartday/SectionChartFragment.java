@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 public class SectionChartFragment extends Fragment {
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		return inflater.inflate(R.layout.section_chart_fragment, container, false);
@@ -28,6 +29,10 @@ public class SectionChartFragment extends Fragment {
 	public void onResume(){
 		super.onResume();
 		draw();
+	}
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
 	}
 	private void draw(){
 		draw3();

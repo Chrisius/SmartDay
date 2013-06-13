@@ -5,6 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.zehjot.smartday.data_access.DataSet;
+import com.zehjot.smartday.data_access.DataSet.onDataAvailableListener;
 import com.zehjot.smartday.R;
 
 import android.app.Activity;
@@ -16,16 +22,21 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
-public class OptionsListFragment extends ListFragment {
+public class OptionsListFragment extends ListFragment implements onDataAvailableListener{
 	private OnOptionSelectedListener mCallback;
 	private SimpleAdapter optionsListAdapter;
 	private List<Map<String,String>> displayedOptions;
 	private static final String TEXT1 = "text1";
 	private static final String TEXT2 = "text2";
-	DataSet dataSet = null;
+	private DataSet dataSet = null;
+	public interface OnOptionSelectedListener{
+		public void onOptionSelected(int pos);
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		
 		dataSet = DataSet.getInstance(getActivity());
 		/*---Initialize data for list---*/
 		final String[] fromMapKey = new String[] {TEXT1, TEXT2};
@@ -61,10 +72,6 @@ public class OptionsListFragment extends ListFragment {
 		setListAdapter(optionsListAdapter);
 	}
 	
-	public interface OnOptionSelectedListener{
-		public void onOptionSelected(int pos);
-	}
-	
 	@Override
 	public void onAttach(Activity activity){
 		super.onAttach(activity);
@@ -73,9 +80,38 @@ public class OptionsListFragment extends ListFragment {
 	
 	@Override
 	public void onListItemClick(ListView l,View v,int position, long id){
-		mCallback.onOptionSelected(position-1); //-1 to eliminate the unclickable header
+		switch (position-1) {
+		case 0:
+			mCallback.onOptionSelected(position-1);	//-1 to eliminate the unclickable header	
+			break;
+		case 1:
+			dataSet.getApps((onDataAvailableListener)this);			
+			break;
+		case 2:
+			dataSet.getContext();
+			break;
+		default:
+			break;
+		}
+		//mCallback.onOptionSelected(position-1); 
 	}
-	
+	public void onDataAvailable(JSONObject jObj, String request){
+		if(request.equals("values")){
+			ArrayList<String> list = new ArrayList<String>();
+			JSONArray jArray;
+			try {
+				jArray = jObj.getJSONArray("values");
+				for(int i=0;i < jArray.length();i++ ){
+					list.add(jArray.getJSONObject(i).getString("value"));
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			SelectAppsDialogFragment apps = new SelectAppsDialogFragment();
+			apps.setStrings(list.toArray(new String[0]));
+			apps.show(getFragmentManager(), getString(R.string.datepicker));
+		}
+	}
 	public void updateDate(){
 		displayedOptions.set(0, displayDate());
 		optionsListAdapter.notifyDataSetChanged();
@@ -85,16 +121,16 @@ public class OptionsListFragment extends ListFragment {
 		switch (pos) {
 		case 0:
 			if(displayedOptions.size()<3){//check if exists because of nullpointer
-				displayedOptions.add(toMap(getResources().getString(R.string.options_map_text1), getResources().getString(R.string.options_map_text2)));}
+				displayedOptions.add(toMap(getString(R.string.options_map_text1), getString(R.string.options_map_text2)));}
 			else{
-				displayedOptions.set(2,toMap(getResources().getString(R.string.options_map_text1), getResources().getString(R.string.options_map_text2)));}
+				displayedOptions.set(2,toMap(getString(R.string.options_map_text1), getString(R.string.options_map_text2)));}
 			optionsListAdapter.notifyDataSetChanged();
 			break;
 		case 1:
 			if(displayedOptions.size()<3){//check if exists because of nullpointer
-				displayedOptions.add(toMap(getResources().getString(R.string.options_chart_text1), getResources().getString(R.string.options_chart_text2)));}
+				displayedOptions.add(toMap(getString(R.string.options_chart_text1), getString(R.string.options_chart_text2)));}
 			else{
-				displayedOptions.set(2,toMap(getResources().getString(R.string.options_chart_text1), getResources().getString(R.string.options_chart_text2)));}
+				displayedOptions.set(2,toMap(getString(R.string.options_chart_text1), getString(R.string.options_chart_text2)));}
 			optionsListAdapter.notifyDataSetChanged();
 			break;
 		case 2:

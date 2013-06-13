@@ -1,4 +1,4 @@
-package com.zehjot.smartday;
+package com.zehjot.smartday.data_access;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,13 +7,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
@@ -25,13 +25,14 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.zehjot.smartday.R;
 import com.zehjot.smartday.helper.Security;
 import com.zehjot.smartday.helper.Utilities;
 
 public class UserData {
 	private static Activity activity = null;
 	private static JSONObject user = null;
-	private static OnCallBackListener mCallBack;
+	private static OnUserDataAvailableListener mCallBack;
 	/**
 	 * Functions to handle user data (Name, Password, Email)
 	 * ask  - opens an alertDialog in which data can be written
@@ -40,28 +41,26 @@ public class UserData {
 	 * test - verifies login data with server
 	 */
 
-	public interface OnCallBackListener{
-		public void onCallback(JSONObject jObj);
+	public interface OnUserDataAvailableListener{
+		public void onUserDataAvailable(JSONObject jObj);
 	}
 	public void getUserLoginData(Context context){
-		if(activity == null)
+		if(context != null)
 			activity = (Activity) context;		
 		if(user !=null)
-			mCallBack.onCallback(user);		
-		mCallBack = (OnCallBackListener) DataSet.getInstance(activity);
-		File file = activity.getFileStreamPath(activity.getString(R.string.user_file));
-		if(!file.exists()){
-			askForUserLogInData();
-		}
+			mCallBack.onUserDataAvailable(user);	
 		else{
-			loadUserLogInData();
+			mCallBack = (OnUserDataAvailableListener) DataSet.getInstance(activity);
+			File file = activity.getFileStreamPath(activity.getString(R.string.user_file));
+//			if(file.exists())
+//				file.delete();
+			if(!file.exists()){
+				askForUserLogInData();
+			}
+			else{
+				loadUserLogInData();
+			}
 		}
-//		testUserLogInData();
-//		if(user_ok){
-//			user_ok=false;
-//		}
-//		Utilities.showDialog("Invalid User", activity);
-//		return getUserLoginData(context);
 	}
 	
 	private void askForUserLogInData(){
@@ -70,6 +69,7 @@ public class UserData {
 		final View view = inflater.inflate(R.layout.dialog_auth,null);
 		builder.setView(view)
 			.setTitle("Authentication")
+			.setCancelable(false)
 			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 	           @Override
 	           public void onClick(DialogInterface dialog, int id) {
@@ -88,7 +88,7 @@ public class UserData {
 	       .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 	           @Override
 	           public void onClick(DialogInterface dialog, int id) {
-	               
+	        	   	user=null;
 	           }
 	       });
 		AlertDialog dialog = builder.create();
@@ -138,16 +138,9 @@ public class UserData {
 		testUserLogInData();
 	}
 	private class DownloadTask extends AsyncTask<String, Void, Boolean>{
-		int serverResponse = -1;
+		private ProgressDialog progress;
 		@Override
-		protected Boolean doInBackground(String... url) {/*
-			try {
-				this.get();
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			} catch (ExecutionException e1) {
-				e1.printStackTrace();
-			}*/
+		protected Boolean doInBackground(String... url) {
 			ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 			if(networkInfo == null || !networkInfo.isConnected()){
@@ -160,16 +153,34 @@ public class UserData {
 			} 
 		}
 		@Override
+		protected void onPreExecute(){
+			super.onPreExecute();
+			progress = new ProgressDialog(activity);
+			progress.setCancelable(false);
+			progress.setMessage("Testing user data...");
+			progress.show();
+		}
+		
+		@Override
 		protected void onPostExecute(Boolean result) {
+			progress.cancel();
 			super.onPostExecute(result);				
 			if(result==null || result== false){
-				Utilities.showDialog("NOT", activity);
-				askForUserLogInData();
-				return;
+				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+				builder.setMessage(activity.getString(R.string.error_authentication_fail))
+					.setCancelable(false)
+					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+				           @Override
+				           public void onClick(DialogInterface dialog, int id) {
+								askForUserLogInData();
+				           }
+				       });
+				AlertDialog dialog = builder.create();
+				dialog.show();
 			}
 			else{
-				Utilities.showDialog("OK", activity);
-				mCallBack.onCallback(user);
+				Utilities.showDialog(activity.getString(R.string.info_user_data_ok), activity);
+				mCallBack.onUserDataAvailable(user);
 			}
 		}
 		
@@ -187,8 +198,7 @@ public class UserData {
 				
 				//Start query
 				conn.connect();
-				serverResponse = conn.getResponseCode();
-				Log.d("Verify User", "Response: "+serverResponse);
+				Log.d("Verify User", "Response: "+conn.getResponseCode());
 				is = conn.getInputStream();
 				
 				//InpuStream to JSONObeject
@@ -210,6 +220,7 @@ public class UserData {
 					else
 						return false;
 				} catch (JSONException e) {
+					e.printStackTrace();
 				}
 			}finally{
 		        if (is != null) {

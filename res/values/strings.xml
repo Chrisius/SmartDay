@@ -25,9 +25,11 @@
     </string-array>
 <!-- Bundle identifier -->
 	<string name="start_view">startview</string>
+	<string name="bundle_app_string_array">bundle_app_string_array</string>
 
 <!-- SharedPreferences Identifier -->
     <string name="key_date_default">default_date</string>
+    <string name="key_date_default_timestamp">default_date_as_timestamp</string>
     <string name="key_date">date_by_user</string>
     <string name="key_date_day">day</string>
     <string name="key_date_month">month</string>
@@ -37,7 +39,13 @@
     
 <!-- Error Messages -->
     <string name="date_error">no date found</string>
-    <string name="error">Error: no such string</string>
+    <string name="error">Something went wrong</string>
+    <string name="error_no_string">Error: no such string</string>
+    <string name="error_no_user_jObj">No user data available</string>
+    <string name="error_authentication_fail">Invalid name or password</string>
+    <string name="error_storing_file">Storing file went wrong!</string>
+<!-- Infos -->
+	<string name="info_user_data_ok">User data verfied</string>
 <!-- Section Titles -->
     <string-array name="sections">
         <item>Map View</item>

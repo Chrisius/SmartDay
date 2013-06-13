@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 public class SectionMapFragment extends MapFragment {
 	private GoogleMap map;
 	
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		return super.onCreateView(inflater, container, savedInstanceState);

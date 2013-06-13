@@ -65,6 +65,7 @@ public class SectionListFragment extends ListFragment {
 		if(oldPos==position){
 			return;
 		}
+		getArguments().putInt(getString(R.string.start_view), position);
 		oldPos = position;
 		mCallback.onSectionSelected(position);
 		l.setItemChecked(position, true);
