@@ -14,7 +14,7 @@ import android.widget.ListView;
 
 public class SectionListFragment extends ListFragment {
 	private int oldPos = -1;
-	private OnSectionSelectedListener mCallback;
+	private OnSectionSelectedListenerOLD mCallback;
 	private boolean firstStart = true;
 	private ListAdapter sectionListAdapter = null;
 	
@@ -40,7 +40,7 @@ public class SectionListFragment extends ListFragment {
 		setListAdapter(sectionListAdapter);
 	}
 	
-	public interface OnSectionSelectedListener{
+	public interface OnSectionSelectedListenerOLD{
 		public void onSectionSelected(int pos);
 	}
 	
@@ -57,7 +57,7 @@ public class SectionListFragment extends ListFragment {
 	@Override
 	public void onAttach(Activity activity){
 		super.onAttach(activity);
-		mCallback = (OnSectionSelectedListener) activity;
+		mCallback = (OnSectionSelectedListenerOLD) activity;
 	}
 	
 	@Override

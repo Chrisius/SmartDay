@@ -10,6 +10,7 @@ import java.net.URL;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.zehjot.smartday.MainActivity;
 import com.zehjot.smartday.data_access.DataSet.onDataAvailableListener;
 
 import android.app.Activity;
@@ -27,12 +28,12 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject>{
 	private onDataAvailableListener requester;
 	private static Activity activity;
 	private String fileName = null;
+	private String fileNameBasic= null; 
 	private static onDataDownloadedListener listener = (onDataDownloadedListener) DataSet.getInstance(activity);
 	
 	protected interface onDataDownloadedListener{
-		public void onDataDownloaded(int serverResponse, JSONObject jObj, String request, onDataAvailableListener requester, String fileName);
+		public void onDataDownloaded(int serverResponse, JSONObject jObj, String request, onDataAvailableListener requester, String fileName, String fileNameBasic);
 	}
-	
 	protected DownloadTask(onDataAvailableListener requester, Activity activity){
 		this.requester = requester;
 		DownloadTask.activity = activity;
@@ -46,7 +47,9 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject>{
 		progress = new ProgressDialog(activity);
 		progress.setCancelable(false);
 		progress.setMessage("Downloading data from server...");
-		progress.show();
+		if(((MainActivity) activity).isRunning())
+			progress.show();
+		//}
 	}
 	
 	@Override
@@ -56,9 +59,10 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject>{
 		if(networkInfo == null || !networkInfo.isConnected()){
 			return null;
 		}
-		if(url.length>1){
+		if(url.length>2){
 			request = url[1];
 			fileName = url[2];
+			fileNameBasic = url[3];
 		}
 		try{
 			return downloadData(url[0]);
@@ -71,8 +75,11 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject>{
 	@Override
 	protected void onPostExecute(JSONObject result) {
 		super.onPostExecute(result);
-		progress.cancel();
-		listener.onDataDownloaded(serverResponse, result, request, requester, fileName);		
+		//if(oldActivity == activity){
+		if(((MainActivity)activity).isRunning())
+			progress.cancel();
+		//}
+		listener.onDataDownloaded(serverResponse, result, request, requester, fileName, fileNameBasic);		
 	}
 	
 	private JSONObject downloadData(String urlString) throws IOException, JSONException{

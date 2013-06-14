@@ -189,7 +189,10 @@ containing a value of this type.
         public static final int square=0x7f020019;
     }
     public static final class id {
-        public static final int action_settings=0x7f050016;
+        public static final int action_blacklist=0x7f050016;
+        public static final int action_color_apps=0x7f050019;
+        public static final int action_delete_files=0x7f050017;
+        public static final int action_new_user=0x7f050018;
         public static final int auth_dialog=0x7f050008;
         public static final int auth_save_user_data=0x7f05000c;
         public static final int auth_user_email=0x7f05000b;
@@ -304,12 +307,15 @@ containing a value of this type.
         public static final int error_no_string=0x7f060029;
         public static final int error_no_user_jObj=0x7f06002a;
         public static final int error_storing_file=0x7f06002c;
+        /**  FileNames 
+         */
+        public static final int file_ignored_apps=0x7f06003a;
         public static final int hello_world=0x7f060017;
-        public static final int hint_user_email=0x7f06003c;
+        public static final int hint_user_email=0x7f060041;
         /**  Hint 
          */
-        public static final int hint_user_name=0x7f06003a;
-        public static final int hint_user_pass=0x7f06003b;
+        public static final int hint_user_name=0x7f06003f;
+        public static final int hint_user_pass=0x7f060040;
         /**  Infos 
          */
         public static final int info_user_data_ok=0x7f06002d;
@@ -335,6 +341,10 @@ containing a value of this type.
         public static final int location_client_ulr_inactive_age_unknown=0x7f060013;
         public static final int location_client_ulr_inactive_unknown_restriction=0x7f060014;
         public static final int options=0x7f060019;
+        public static final int options_actionbar_blacklist=0x7f060036;
+        public static final int options_actionbar_colorApp=0x7f060039;
+        public static final int options_actionbar_deleteFiles=0x7f060037;
+        public static final int options_actionbar_newUser=0x7f060038;
         public static final int options_app_select=0x7f060035;
         public static final int options_app_text1=0x7f060032;
         public static final int options_app_text2=0x7f060033;
@@ -350,14 +360,12 @@ containing a value of this type.
          */
         public static final int start_view=0x7f06001d;
         public static final int today=0x7f06001b;
-        public static final int user_email=0x7f060039;
-        /**  FileNames 
-         */
-        public static final int user_file=0x7f060036;
+        public static final int user_email=0x7f06003e;
+        public static final int user_file=0x7f06003b;
         /**  UserFile Identifier
          */
-        public static final int user_name=0x7f060037;
-        public static final int user_pass=0x7f060038;
+        public static final int user_name=0x7f06003c;
+        public static final int user_pass=0x7f06003d;
     }
     public static final class style {
         /** 

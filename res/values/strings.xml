@@ -60,16 +60,21 @@
     <string name="options_chart_text2">select places to be displayed</string>
 	<string name="options_app_text1">Apps</string>	
 	<string name="options_app_text2">select displayed apps</string>	
-	<string name="options_date_text2">select a date</string>
-	
+	<string name="options_date_text2">select a date</string>	
 	<string name="options_app_select">select apps</string>
+	
+	<string name="options_actionbar_blacklist">Ignore apps</string>
+	<string name="options_actionbar_deleteFiles">Delete saved files</string>
+	<string name="options_actionbar_newUser">Switch user</string>
+	<string name="options_actionbar_colorApp">Color apps</string>
+	
 <!-- FileNames -->
+	<string name="file_ignored_apps">ignoreAppsFile</string>
 	<string name="user_file">user_preferences</string>
 	<!-- UserFile Identifier-->
 		<string name="user_name">name</string>
 		<string name="user_pass">password</string>
 		<string name="user_email">user_email</string>
-	
 <!-- Hint -->
 	<string name="hint_user_name">Username</string>
 	<string name="hint_user_pass">Password</string>

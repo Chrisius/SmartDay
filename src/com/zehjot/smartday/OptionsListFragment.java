@@ -5,13 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.zehjot.smartday.data_access.DataSet;
 import com.zehjot.smartday.data_access.DataSet.onDataAvailableListener;
-import com.zehjot.smartday.R;
+import com.zehjot.smartday.helper.Utilities;
+import com.zehjot.smartday.TabListener.OnSectionSelectedListener;
 
 import android.app.Activity;
 import android.app.ListFragment;
@@ -22,12 +21,13 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
-public class OptionsListFragment extends ListFragment implements onDataAvailableListener{
+public class OptionsListFragment extends ListFragment implements onDataAvailableListener, OnSectionSelectedListener {
 	private OnOptionSelectedListener mCallback;
 	private SimpleAdapter optionsListAdapter;
 	private List<Map<String,String>> displayedOptions;
 	private static final String TEXT1 = "text1";
 	private static final String TEXT2 = "text2";
+	private int startview = -1;
 	private DataSet dataSet = null;
 	public interface OnOptionSelectedListener{
 		public void onOptionSelected(int pos);
@@ -41,10 +41,12 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		/*---Initialize data for list---*/
 		final String[] fromMapKey = new String[] {TEXT1, TEXT2};
 		final int[] toLayoutId = new int[] {android.R.id.text1, android.R.id.text2};
-		displayedOptions = new ArrayList<Map<String,String>>();
-		displayedOptions.add(displayDate());
-		displayedOptions.add(toMap(getResources().getString(R.string.options_app_text1), getResources().getString(R.string.options_app_text2)));
-		setStartView(getArguments().getInt(getString(R.string.start_view)));
+		if(displayedOptions==null){
+			displayedOptions = new ArrayList<Map<String,String>>();
+			displayedOptions.add(displayDate());
+			displayedOptions.add(toMap(getResources().getString(R.string.options_app_text1), getResources().getString(R.string.options_app_text2)));
+		}
+		setStartView(startview);
 		/*---Set up list adapter---*/
 		optionsListAdapter = new SimpleAdapter(
 				getActivity(), 
@@ -52,7 +54,6 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 				android.R.layout.simple_list_item_2, //the layout
 				fromMapKey, 
 				toLayoutId);
-
 	}
 	
 	@Override
@@ -62,14 +63,17 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-		return inflater.inflate(R.layout.options_list, container, false);
+		View view = inflater.inflate(R.layout.options_list, container, false);
+		((ListView)view).addHeaderView(inflater.inflate(R.layout.header_view,null),null,false);
+		setListAdapter(optionsListAdapter);
+		return view;
 	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		getListView().addHeaderView(getActivity().getLayoutInflater().inflate(R.layout.header_view,null),null,false); //Inflates the Header View und attaches it to the List		
-		setListAdapter(optionsListAdapter);
+		//getListView().addHeaderView(getActivity().getLayoutInflater().inflate(R.layout.header_view,null),null,false); //Inflates the Header View und attaches it to the List		
+		//setListAdapter(optionsListAdapter);
 	}
 	
 	@Override
@@ -85,10 +89,10 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 			mCallback.onOptionSelected(position-1);	//-1 to eliminate the unclickable header	
 			break;
 		case 1:
-			dataSet.getApps((onDataAvailableListener)this);			
+			dataSet.getApps(this);			
 			break;
 		case 2:
-			dataSet.getContext();
+			dataSet.getContext(dataSet.getSelectedDateAsTimestamp(),dataSet.getNextDayAsTimestamp(),this);
 			break;
 		default:
 			break;
@@ -96,28 +100,33 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		//mCallback.onOptionSelected(position-1); 
 	}
 	public void onDataAvailable(JSONObject jObj, String request){
-		if(request.equals("values")){
-			ArrayList<String> list = new ArrayList<String>();
-			JSONArray jArray;
-			try {
-				jArray = jObj.getJSONArray("values");
-				for(int i=0;i < jArray.length();i++ ){
-					list.add(jArray.getJSONObject(i).getString("value"));
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+		//check if fragment is added to activity
+		if(!isAdded())
+			return;
+		if(request.equals("values")){			
 			SelectAppsDialogFragment apps = new SelectAppsDialogFragment();
-			apps.setStrings(list.toArray(new String[0]));
+			apps.setStrings(Utilities.jObjValuesToArrayList(jObj).toArray(new String[0]));
+			apps.setMode(SelectAppsDialogFragment.SELECT_APPS);
 			apps.show(getFragmentManager(), getString(R.string.datepicker));
 		}
+		if(request.equals("events")){
+			Utilities.showDialog(jObj.toString(), getActivity());
+		}
 	}
+	@Override
+	public void onSectionSelected(int pos) {
+		if(displayedOptions == null){
+			startview = pos;
+		}else
+		updateOptions(pos);
+	}
+
 	public void updateDate(){
 		displayedOptions.set(0, displayDate());
 		optionsListAdapter.notifyDataSetChanged();
 	}
 	
-	public void updateOptions(int pos){
+	private void updateOptions(int pos){
 		switch (pos) {
 		case 0:
 			if(displayedOptions.size()<3){//check if exists because of nullpointer

@@ -13,23 +13,37 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 public class SelectAppsDialogFragment extends DialogFragment{
+	public static final int SELECT_APPS=0;
+	public static final int IGNORE_APPS=1;
 	private DataSet dataSet = null;
 	private String[]strings = {"No Data Available"};
+	private int mode=0;
 	
-	public void setStrings(String[] array_of_strings){
-		strings = array_of_strings;
+	public void setStrings(String[] strings) {
+		this.strings = strings;
+	}
+	public void setMode(int mode) {
+		this.mode = mode;
+	}
+	@Override
+	public void onCreate(Bundle saved){
+		super.onCreate(saved);
+		if(saved!=null)
+			strings= saved.getStringArray("strings");
 	}
 	@Override
 	public Dialog onCreateDialog(Bundle saved){
 		dataSet = DataSet.getInstance(getActivity());
-		final JSONObject selectedApps = dataSet.getSelectedApps();
-		
+		final JSONObject selectedApps;
+		if(mode == SELECT_APPS){
+			selectedApps = dataSet.getSelectedApps();
+		}else{
+			selectedApps = dataSet.getIgnoreApps();
+		}
 		boolean[] boolSelectedApps = new boolean[strings.length];
 		for(int i=0 ; i<strings.length;i++){
 			boolSelectedApps[i] = selectedApps.optBoolean(strings[i]);
 		}
-		//strings = getArguments().getStringArray(getString(R.string.bundle_app_string_array));
-		//final ArrayList<Integer> selectedApps = new ArrayList<Integer>();
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		
@@ -40,9 +54,9 @@ public class SelectAppsDialogFragment extends DialogFragment{
 			public void onClick(DialogInterface dialog, int which, boolean isChecked) {
 				try{
 					if(isChecked){
-						selectedApps.put(strings[which], "true");
+						dataSet.getSelectedApps().put(strings[which], "true");
 					} else {
-						selectedApps.put(strings[which], "false");
+						dataSet.getSelectedApps().put(strings[which], "false");
 					}
 				}catch(JSONException e){
 					e.printStackTrace();
@@ -54,16 +68,24 @@ public class SelectAppsDialogFragment extends DialogFragment{
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				dataSet.setSelectedApps(selectedApps);
+				if(mode == SELECT_APPS)
+					dataSet.setSelectedApps(selectedApps);
+				else
+					dataSet.setIgnoreApps(selectedApps);
 			}
 		})
 		.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				
+
 			}
 		});
 		return builder.create();
+	}
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putStringArray("strings", strings);
+		super.onSaveInstanceState(outState);
 	}
 }

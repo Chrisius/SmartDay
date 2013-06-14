@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.TimeZone;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,23 +25,26 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import com.zehjot.smartday.Config;
+import com.zehjot.smartday.MainActivity;
 import com.zehjot.smartday.R;
 
 public class Utilities {
-	public static String getFileName(String request, JSONObject jObj){
+	public static String getFileName(String request, JSONObject user,JSONObject jObj,Activity activity){
 		String fileName = request;
 		
 		try {
+			fileName += user.getString(activity.getString(R.string.user_pass));
+			fileName += user.getString(activity.getString(R.string.user_name));
 			fileName += jObj.getString("start");
 		} catch (JSONException e) {
 			e.printStackTrace();
 			return null;
-		}
+		}/*
 		try {
 			fileName += jObj.getString("end");
 		} catch (JSONException e) {
 			e.printStackTrace();
-		}
+		}*/
 		return Security.sha1(fileName);
 	}
 	public static long getTimestamp(int year, int month, int day, int h, int m, int s){
@@ -101,7 +106,8 @@ public class Utilities {
 		           }
 		       });
 		AlertDialog dialog = builder.create();
-		dialog.show();
+		if(((MainActivity) activity).isRunning())
+			dialog.show();
 	}
 	public static String getURL(String queryType,String data,JSONObject user, Activity activity){
 		if(user==null||activity==null){
@@ -146,5 +152,18 @@ public class Utilities {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	public static ArrayList<String> jObjValuesToArrayList(JSONObject jObj){
+		ArrayList<String> list = new ArrayList<String>();
+		JSONArray jArray;
+		try {
+			jArray = jObj.getJSONArray("result");
+			for(int i=0;i < jArray.length();i++ ){
+				list.add(jArray.getJSONObject(i).getString("app"));
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return list;
 	}
 }

@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.zehjot.smartday.MainActivity;
 import com.zehjot.smartday.R;
 import com.zehjot.smartday.helper.Security;
 import com.zehjot.smartday.helper.Utilities;
@@ -45,13 +46,15 @@ public class UserData {
 		public void onUserDataAvailable(JSONObject jObj);
 	}
 	public void getUserLoginData(Context context){
+		getUserLoginData(context, false);
+	}
+	
+	public void getUserLoginData(Context context, boolean createNew){
 		if(context != null)
-			activity = (Activity) context;		
-		if(user !=null)
-			mCallBack.onUserDataAvailable(user);	
-		else{
+			activity = (Activity) context;
+		if(createNew || user == null){
 			mCallBack = (OnUserDataAvailableListener) DataSet.getInstance(activity);
-			File file = activity.getFileStreamPath(activity.getString(R.string.user_file));
+			File file = activity.getFileStreamPath(Security.sha1(activity.getString(R.string.user_file)));
 //			if(file.exists())
 //				file.delete();
 			if(!file.exists()){
@@ -60,6 +63,8 @@ public class UserData {
 			else{
 				loadUserLogInData();
 			}
+		}else{
+			mCallBack.onUserDataAvailable(user);
 		}
 	}
 	
@@ -92,7 +97,8 @@ public class UserData {
 	           }
 	       });
 		AlertDialog dialog = builder.create();
-		dialog.show();
+		if(((MainActivity) activity).isRunning())
+			dialog.show();
 	}
 
 	private void createUserLogInData(String name, String pass, String email, Boolean saveData){			
@@ -107,10 +113,10 @@ public class UserData {
 			Utilities.showDialog("JSONError:USER CREATE",activity);				
 		}
 		if(saveData){
-			Utilities.writeFile(activity.getString(R.string.user_file),jObj.toString(),activity);
+			Utilities.writeFile(Security.sha1(activity.getString(R.string.user_file)),jObj.toString(),activity);
 			loadUserLogInData();
 		}else{
-			File file = activity.getFileStreamPath(activity.getString(R.string.user_file));
+			File file = activity.getFileStreamPath(Security.sha1(activity.getString(R.string.user_file)));
 			if(file.exists()){
 				file.delete();
 			}
@@ -126,7 +132,7 @@ public class UserData {
 	}
 
 	private void loadUserLogInData(){
-		String data = Utilities.readFile(activity.getString(R.string.user_file),activity);
+		String data = Utilities.readFile(Security.sha1(activity.getString(R.string.user_file)),activity);
 		JSONObject jObj = null;
 		try {
 			jObj = new JSONObject(data);
@@ -158,12 +164,14 @@ public class UserData {
 			progress = new ProgressDialog(activity);
 			progress.setCancelable(false);
 			progress.setMessage("Testing user data...");
-			progress.show();
+			if(((MainActivity) activity).isRunning())
+				progress.show();
 		}
 		
 		@Override
 		protected void onPostExecute(Boolean result) {
-			progress.cancel();
+			if(((MainActivity)activity).isRunning())
+				progress.cancel();
 			super.onPostExecute(result);				
 			if(result==null || result== false){
 				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -176,7 +184,8 @@ public class UserData {
 				           }
 				       });
 				AlertDialog dialog = builder.create();
-				dialog.show();
+				if(((MainActivity) activity).isRunning())
+					dialog.show();
 			}
 			else{
 				Utilities.showDialog(activity.getString(R.string.info_user_data_ok), activity);

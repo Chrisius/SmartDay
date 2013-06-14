@@ -1,101 +1,135 @@
 package com.zehjot.smartday;
 
+import java.io.File;
+
+import org.json.JSONObject;
+
 import com.zehjot.smartday.R;
 import com.zehjot.smartday.data_access.DataSet;
+import com.zehjot.smartday.helper.Security;
+import com.zehjot.smartday.helper.Utilities;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.FragmentManager;
 
 public class MainActivity extends Activity 
-		implements SectionListFragment.OnSectionSelectedListener, OptionsListFragment.OnOptionSelectedListener,
+		implements OptionsListFragment.OnOptionSelectedListener, DataSet.onDataAvailableListener,
 		DatePickerFragment.OnDateChosenListener{
 	private FragmentManager fm;
 	private OptionsListFragment optionsListFragment;
-	private SectionMapFragment sectionMapFragment;
-	private SectionChartFragment sectionChartFragment;
-	private SectionTimelineFragment sectionTimelineFragment;
 	private DataSet dataSet;
-	private Bundle args;
+	private boolean isRunning = true;
 	
-    @Override
+    public boolean isRunning(){
+		return isRunning;
+	}
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fm = getFragmentManager();
-        dataSet = DataSet.getInstance(this);
-        args = new Bundle();
+        dataSet = DataSet.getInstance(this);          
+
         if(savedInstanceState != null){
-        	args.putInt(getString(R.string.start_view), savedInstanceState.getInt(getString(R.string.start_view)));
         	optionsListFragment = (OptionsListFragment) fm.findFragmentByTag("optionsList");
-        	sectionMapFragment = (SectionMapFragment) fm.findFragmentByTag("sectionMap");
-        	sectionChartFragment = (SectionChartFragment) fm.findFragmentByTag("sectionChart");
-        	sectionTimelineFragment = (SectionTimelineFragment) fm.findFragmentByTag("sectionTimeline");
-        	onSectionSelected(args.getInt(getString(R.string.start_view)));
-        	//showView(args.getInt(getString(R.string.start_view)));
-//        	fm.beginTransaction().hide(sectionChartFragment).commit();
-//        	fm.beginTransaction().hide(sectionMapFragment).commit();
-//        	fm.beginTransaction().hide(sectionTimelineFragment).commit();
-        	return;
+        }else{
+	    	optionsListFragment = new OptionsListFragment();
+	    	fm.beginTransaction().add(R.id.options_fragment_container, optionsListFragment,"optionsList").commit();
         }
-    	optionsListFragment = new OptionsListFragment();
-    	sectionMapFragment = new SectionMapFragment();
-    	sectionChartFragment = new SectionChartFragment();
-    	sectionTimelineFragment  = new SectionTimelineFragment();
-        setStartView(1);
+        /**
+         * Set Up Tabs
+         */
+        ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        Tab tab = actionBar.newTab();
+        tab.setText("MapView NoR.");
+        tab.setTabListener(new TabListener<SectionMapFragment>(this, "mapView", SectionMapFragment.class, optionsListFragment));
+        actionBar.addTab(tab);
+        
+        tab = actionBar.newTab();
+        tab.setText("ChartView NoR.");
+        tab.setTabListener(new TabListener<SectionChartFragment>(this, "chartView", SectionChartFragment.class, optionsListFragment));
+        actionBar.addTab(tab);
+        
+        tab = actionBar.newTab();
+        tab.setText("Timeline NoR.");
+        tab.setTabListener(new TabListener<SectionTimelineFragment>(this, "timeline", SectionTimelineFragment.class, optionsListFragment));
+        actionBar.addTab(tab);
+        
+        if(savedInstanceState != null){
+        	actionBar.setSelectedNavigationItem(0);
+        	actionBar.setSelectedNavigationItem(1);
+        	actionBar.setSelectedNavigationItem(2);
+        	actionBar.setSelectedNavigationItem(savedInstanceState.getInt(getString(R.string.start_view)));
+        }
     }
     @Override
     public void onResume(){
     	super.onResume();
+    	isRunning = true;
     	DataSet.updateActivity(this);
-    	//dataSet.init();
-    	//dataSet.initUser();
     }
     
     @Override
     public void onStop(){
+    	isRunning = false;
     	super.onStop();
     }
     
     @Override
-    public void onSaveInstanceState(Bundle outState){
-        super.onSaveInstanceState(outState);
-        outState.putInt(getString(R.string.start_view),args.getInt(getString(R.string.start_view)));
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);    	
+    	return true;
     }
     
     @Override
-    public void onDestroy(){
-    	super.onDestroy();
-    }
-    
-    public void onSectionSelected(int pos){
-    	args.putInt(getString(R.string.start_view), pos);
-    	switch (pos) {
-		case 0:
-			optionsListFragment.updateOptions(pos); 	//Updates the displayed optionsList
-//			fm.beginTransaction().hide(sectionChartFragment).commit();
-//			fm.beginTransaction().hide(sectionTimelineFragment).commit();
-//			fm.beginTransaction().show(sectionMapFragment).commit();
-			//fm.beginTransaction().replace(R.id.section_fragment_container, sectionMapFragment).commit();		//Switches the fragments
+    public boolean onOptionsItemSelected(MenuItem item){
+    	super.onOptionsItemSelected(item);
+    	switch (item.getItemId()) {
+		case R.id.action_blacklist:
+			dataSet.getAllApps(this);
 			break;
-		case 1:
-			optionsListFragment.updateOptions(pos);
-//			fm.beginTransaction().hide(sectionMapFragment).commit();
-//			fm.beginTransaction().hide(sectionTimelineFragment).commit();
-//			fm.beginTransaction().show(sectionChartFragment).commit();
-			//fm.beginTransaction().replace(R.id.section_fragment_container, sectionChartFragment).commit();
+		case R.id.action_color_apps:
 			break;
-		case 2:
-			optionsListFragment.updateOptions(pos);
-//			fm.beginTransaction().hide(sectionChartFragment).commit();
-//			fm.beginTransaction().hide(sectionMapFragment).commit();
-//			fm.beginTransaction().show(sectionTimelineFragment).commit();
-			//fm.beginTransaction().replace(R.id.section_fragment_container, sectionTimelineFragment).commit();
+		case R.id.action_delete_files:
+			String[] list = getFilesDir().list();
+			for(int i=0; i<list.length;i++){
+			File file = new File(getFilesDir(),list[i]);
+				if(file.equals(new File(getFilesDir(),Security.sha1(getString(R.string.user_file)))))
+					Utilities.showDialog(item.toString()+item.getItemId(), this);
+				else
+					file.delete();
+			
+			}
+			break;
+		case R.id.action_new_user:
+			File file = new File(getFilesDir(),Security.sha1(getString(R.string.user_file)));
+			file.delete();
+			dataSet.createNewUser();
 			break;
 		default:
 			break;
 		}
-    	showView(pos);
+    	//Utilities.showDialog(item.toString()+item.getItemId(), this);
+    	return true;
+    }
+    
+    
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putInt(getString(R.string.start_view), getActionBar().getSelectedNavigationIndex());
+    }
+    @Override
+    public void onDestroy(){
+    	super.onDestroy();
     }
     
     public void onOptionSelected(int pos){
@@ -120,68 +154,15 @@ public class MainActivity extends Activity
     	dataSet.setSelectedDate(year, month, day);
     	((OptionsListFragment) fm.findFragmentById(R.id.options_fragment_container)).updateDate();
     }
-    private void setStartView(int pos){
-    	
-    	
-    	fm.beginTransaction().add(R.id.section_fragment_container, sectionMapFragment,"sectionMap").commit();
-    	//fm.beginTransaction().hide(sectionMapFragment).commit();
-		fm.beginTransaction().add(R.id.section_fragment_container, sectionTimelineFragment,"sectionTimeline").commit();
-    	//fm.beginTransaction().hide(sectionTimelineFragment).commit();
-		fm.beginTransaction().add(R.id.section_fragment_container, sectionChartFragment,"sectionChart").commit();
-    	//fm.beginTransaction().hide(sectionChartFragment).commit();
-    	
-    	//Create Section "Header" and fill container
-    	SectionListFragment sectionHeader = new SectionListFragment();
-        fm.beginTransaction().add(R.id.section_header_container, sectionHeader).commit();
-        fm.beginTransaction().add(R.id.options_fragment_container, optionsListFragment,"optionsList").commit();
-        
-        //setup bundle with int for start position
-    	args.putInt(getString(R.string.start_view), pos);
-    	
-    	//attach bundle to options and sectionHeader to container
-    	optionsListFragment.setArguments(args);
-    	sectionHeader.setArguments(args);
-    	
-        //set main view
-    	showView(pos);/*
-    	switch (pos) {
-		case 0:
-	        fm.beginTransaction().show(sectionMapFragment).commit();			
-			break;
-		case 1:
-	    	fm.beginTransaction().show(sectionChartFragment).commit();
-	        break;
-		case 2:
-	        fm.beginTransaction().show(sectionTimelineFragment).commit();
-	        break;
-		default:
-	    	args.putInt(getString(R.string.start_view), 0);
-	        fm.beginTransaction().add(R.id.section_fragment_container, sectionMapFragment).commit();	
-			break;
-		}*/
-    }
-    private void showView(int pos){
-    	switch (pos) {
-		case 0:
-			fm.beginTransaction().hide(sectionChartFragment).commit();
-			fm.beginTransaction().hide(sectionTimelineFragment).commit();
-			fm.beginTransaction().show(sectionMapFragment).commit();		
-			break;
-		case 1:
-			fm.beginTransaction().hide(sectionMapFragment).commit();
-			fm.beginTransaction().hide(sectionTimelineFragment).commit();
-			fm.beginTransaction().show(sectionChartFragment).commit();
-	        break;
-		case 2:
-			fm.beginTransaction().hide(sectionChartFragment).commit();
-			fm.beginTransaction().hide(sectionMapFragment).commit();
-			fm.beginTransaction().show(sectionTimelineFragment).commit();
-	        break;
-		default:
-			fm.beginTransaction().hide(sectionChartFragment).commit();
-			fm.beginTransaction().hide(sectionTimelineFragment).commit();
-			fm.beginTransaction().show(sectionMapFragment).commit();	
-			break;
+    
+	@Override
+	public void onDataAvailable(JSONObject jObj, String request) {
+		if(request=="allApps"){
+			SelectAppsDialogFragment ignoreAppsDialog = new SelectAppsDialogFragment();
+			ignoreAppsDialog.setStrings(Utilities.jObjValuesToArrayList(jObj).toArray(new String[0]));
+			ignoreAppsDialog.setMode(SelectAppsDialogFragment.IGNORE_APPS);
+			ignoreAppsDialog.show(fm, "nada");
 		}
-    }
+	}
+
 }

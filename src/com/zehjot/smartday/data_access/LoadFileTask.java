@@ -3,6 +3,7 @@ package com.zehjot.smartday.data_access;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.zehjot.smartday.MainActivity;
 import com.zehjot.smartday.data_access.DataSet.onDataAvailableListener;
 import com.zehjot.smartday.helper.Utilities;
 
@@ -35,7 +36,8 @@ public class LoadFileTask extends AsyncTask<String, Void, JSONObject>{
 		progress = new ProgressDialog(activity);
 		progress.setCancelable(false);
 		progress.setMessage("Loading data from internal file...");
-		progress.show();
+		if(((MainActivity) activity).isRunning())
+			progress.show();
 	}
 	
 	@Override
