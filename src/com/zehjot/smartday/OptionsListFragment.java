@@ -174,6 +174,7 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		}
 		return listItem;
 	}*/
+	
 	private void setStartView(int pos){
 		switch (pos) {
 		case 0:

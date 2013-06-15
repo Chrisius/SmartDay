@@ -13,12 +13,15 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +51,9 @@ public class UserData {
 	public void getUserLoginData(Context context){
 		getUserLoginData(context, false);
 	}
-	
+	public void updateActivity(Activity act){
+		activity = act;
+	}
 	public void getUserLoginData(Context context, boolean createNew){
 		if(context != null)
 			activity = (Activity) context;
@@ -68,40 +73,13 @@ public class UserData {
 		}
 	}
 	
-	private void askForUserLogInData(){
-		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		LayoutInflater inflater = activity.getLayoutInflater();
-		final View view = inflater.inflate(R.layout.dialog_auth,null);
-		builder.setView(view)
-			.setTitle("Authentication")
-			.setCancelable(false)
-			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-	           @Override
-	           public void onClick(DialogInterface dialog, int id) {
-	        	   EditText editText = (EditText) view.findViewById(R.id.auth_user_name);
-	        	   String user_name = editText.getText().toString();
-	        	   editText = (EditText) view.findViewById(R.id.auth_user_pass);
-	        	   String user_pass = editText.getText().toString();
-	        	   editText = (EditText) view.findViewById(R.id.auth_user_email);
-	        	   String user_email = editText.getText().toString();
-	        	   CheckBox saveData = (CheckBox) view.findViewById(R.id.auth_save_user_data);
-	        	   Boolean save = saveData.isChecked();
-	        	   createUserLogInData(user_name, user_pass, user_email, save);
-	           }
-	       })
-	       
-	       .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-	           @Override
-	           public void onClick(DialogInterface dialog, int id) {
-	        	   	user=null;
-	           }
-	       });
-		AlertDialog dialog = builder.create();
+	private static void askForUserLogInData(){
+		LoginDialogFragment login = new LoginDialogFragment(); 
 		if(((MainActivity) activity).isRunning())
-			dialog.show();
+			login.show(activity.getFragmentManager(), "loginDialog");
 	}
 
-	private void createUserLogInData(String name, String pass, String email, Boolean saveData){			
+	private static void createUserLogInData(String name, String pass, String email, Boolean saveData){			
 		JSONObject jObj = new JSONObject();
 		try {
 			jObj.put(activity.getString(R.string.user_pass), Security.sha1(pass));
@@ -126,12 +104,12 @@ public class UserData {
 		
 	}
 
-	private void testUserLogInData(){
+	private static void testUserLogInData(){
 		String url = Utilities.getURL("testcredentials",null,user,activity);
 		new DownloadTask().execute(url);
 	}
 
-	private void loadUserLogInData(){
+	private static void loadUserLogInData(){
 		String data = Utilities.readFile(Security.sha1(activity.getString(R.string.user_file)),activity);
 		JSONObject jObj = null;
 		try {
@@ -143,7 +121,7 @@ public class UserData {
 		user = jObj;
 		testUserLogInData();
 	}
-	private class DownloadTask extends AsyncTask<String, Void, Boolean>{
+	private static class DownloadTask extends AsyncTask<String, Void, Boolean>{
 		private ProgressDialog progress;
 		@Override
 		protected Boolean doInBackground(String... url) {
@@ -162,7 +140,8 @@ public class UserData {
 		protected void onPreExecute(){
 			super.onPreExecute();
 			progress = new ProgressDialog(activity);
-			progress.setCancelable(false);
+//			progress.setCancelable(false);
+			progress.setCanceledOnTouchOutside(false);
 			progress.setMessage("Testing user data...");
 			if(((MainActivity) activity).isRunning())
 				progress.show();
@@ -239,6 +218,40 @@ public class UserData {
 			}
 			
 		return false;	
+		}
+		
+	}
+	public static class LoginDialogFragment extends DialogFragment{
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+			LayoutInflater inflater = activity.getLayoutInflater();
+			final View view = inflater.inflate(R.layout.dialog_auth,null);
+			builder.setView(view)
+				.setTitle("Authentication")
+				.setCancelable(false)
+				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+		           @Override
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   EditText editText = (EditText) view.findViewById(R.id.auth_user_name);
+		        	   String user_name = editText.getText().toString();
+		        	   editText = (EditText) view.findViewById(R.id.auth_user_pass);
+		        	   String user_pass = editText.getText().toString();
+		        	   editText = (EditText) view.findViewById(R.id.auth_user_email);
+		        	   String user_email = editText.getText().toString();
+		        	   CheckBox saveData = (CheckBox) view.findViewById(R.id.auth_save_user_data);
+		        	   Boolean save = saveData.isChecked();
+		        	   createUserLogInData(user_name, user_pass, user_email, save);
+		           }
+		       })
+		       
+		       .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+		           @Override
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   	user=null;
+		           }
+		       });
+			return builder.create();
 		}
 		
 	}

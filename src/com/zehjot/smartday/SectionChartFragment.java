@@ -5,8 +5,11 @@ import org.achartengine.GraphicalView;
 import org.achartengine.model.CategorySeries;
 import org.achartengine.renderer.DefaultRenderer;
 import org.achartengine.renderer.SimpleSeriesRenderer;
+import org.json.JSONObject;
 
 import com.zehjot.smartday.R;
+import com.zehjot.smartday.data_access.DataSet;
+import com.zehjot.smartday.data_access.DataSet.onDataAvailableListener;
 
 import android.app.Fragment;
 //import android.content.Context;
@@ -19,7 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-public class SectionChartFragment extends Fragment {
+public class SectionChartFragment extends Fragment implements onDataAvailableListener{
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -30,7 +33,7 @@ public class SectionChartFragment extends Fragment {
 	@Override
 	public void onResume(){
 		super.onResume();
-		draw();
+		//getData();
 	}
 	@Override
 	public void onDestroy(){
@@ -162,5 +165,14 @@ public class SectionChartFragment extends Fragment {
 	public void onSaveInstanceState(Bundle outState){
 		outState.putBoolean("isHidden",this.isHidden());
 		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public void onDataAvailable(JSONObject jObj, String request) {
+		// TODO Auto-generated method stub
+		draw();
+	}
+	private void getData(){
+		DataSet.getInstance(getActivity()).getContext(this);
 	}
 }

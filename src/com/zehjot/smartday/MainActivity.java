@@ -25,6 +25,7 @@ public class MainActivity extends Activity
 	private OptionsListFragment optionsListFragment;
 	private DataSet dataSet;
 	private boolean isRunning = true;
+	private static Activity activity;
 	
     public boolean isRunning(){
 		return isRunning;
@@ -33,40 +34,21 @@ public class MainActivity extends Activity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        fm = getFragmentManager();
-        dataSet = DataSet.getInstance(this);          
+        fm = getFragmentManager();       
+        dataSet = DataSet.getInstance(this);   
 
         if(savedInstanceState != null){
         	optionsListFragment = (OptionsListFragment) fm.findFragmentByTag("optionsList");
         }else{
-	    	optionsListFragment = new OptionsListFragment();
-	    	fm.beginTransaction().add(R.id.options_fragment_container, optionsListFragment,"optionsList").commit();
         }
-        /**
-         * Set Up Tabs
-         */
-        ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        Tab tab = actionBar.newTab();
-        tab.setText("MapView NoR.");
-        tab.setTabListener(new TabListener<SectionMapFragment>(this, "mapView", SectionMapFragment.class, optionsListFragment));
-        actionBar.addTab(tab);
-        
-        tab = actionBar.newTab();
-        tab.setText("ChartView NoR.");
-        tab.setTabListener(new TabListener<SectionChartFragment>(this, "chartView", SectionChartFragment.class, optionsListFragment));
-        actionBar.addTab(tab);
-        
-        tab = actionBar.newTab();
-        tab.setText("Timeline NoR.");
-        tab.setTabListener(new TabListener<SectionTimelineFragment>(this, "timeline", SectionTimelineFragment.class, optionsListFragment));
-        actionBar.addTab(tab);
-        
         if(savedInstanceState != null){
-        	actionBar.setSelectedNavigationItem(0);
-        	actionBar.setSelectedNavigationItem(1);
-        	actionBar.setSelectedNavigationItem(2);
-        	actionBar.setSelectedNavigationItem(savedInstanceState.getInt(getString(R.string.start_view)));
+        	if(DataSet.getUser()==null)
+        		return;
+        	initShit(savedInstanceState);
+        	getActionBar().setSelectedNavigationItem(0);
+        	getActionBar().setSelectedNavigationItem(1);
+        	getActionBar().setSelectedNavigationItem(2);
+        	getActionBar().setSelectedNavigationItem(savedInstanceState.getInt(getString(R.string.start_view)));
         }
     }
     @Override
@@ -74,6 +56,7 @@ public class MainActivity extends Activity
     	super.onResume();
     	isRunning = true;
     	DataSet.updateActivity(this);
+    	activity = this;
     }
     
     @Override
@@ -88,7 +71,9 @@ public class MainActivity extends Activity
         inflater.inflate(R.menu.main, menu);    	
     	return true;
     }
-    
+    public static Activity getActivity() {
+		return activity;
+	}
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
     	super.onOptionsItemSelected(item);
@@ -105,8 +90,7 @@ public class MainActivity extends Activity
 				if(file.equals(new File(getFilesDir(),Security.sha1(getString(R.string.user_file)))))
 					Utilities.showDialog(item.toString()+item.getItemId(), this);
 				else
-					file.delete();
-			
+					file.delete();			
 			}
 			break;
 		case R.id.action_new_user:
@@ -157,6 +141,8 @@ public class MainActivity extends Activity
     
 	@Override
 	public void onDataAvailable(JSONObject jObj, String request) {
+		if(jObj == null&& request == null)
+			initShit(null);
 		if(request=="allApps"){
 			SelectAppsDialogFragment ignoreAppsDialog = new SelectAppsDialogFragment();
 			ignoreAppsDialog.setStrings(Utilities.jObjValuesToArrayList(jObj).toArray(new String[0]));
@@ -164,5 +150,33 @@ public class MainActivity extends Activity
 			ignoreAppsDialog.show(fm, "nada");
 		}
 	}
+	private void initShit(Bundle savedInstanceState){
+		if(savedInstanceState== null){
+	    	optionsListFragment = new OptionsListFragment();
+	    	fm.beginTransaction().add(R.id.options_fragment_container, optionsListFragment,"optionsList").commit();
+		}
+        /**
+         * Set Up Tabs
+         */
+        ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        Tab tab = actionBar.newTab();
+        tab.setText("MapView NoR.");
+        tab.setTabListener(new TabListener<SectionMapFragment>(this, "mapView", SectionMapFragment.class, optionsListFragment));
+        actionBar.addTab(tab);
+        
+        tab = actionBar.newTab();
+        tab.setText("ChartView NoR.");
+        tab.setTabListener(new TabListener<SectionChartFragment>(this, "chartView", SectionChartFragment.class, optionsListFragment));
+        actionBar.addTab(tab);
+        
+        tab = actionBar.newTab();
+        tab.setText("Timeline NoR.");
+        tab.setTabListener(new TabListener<SectionTimelineFragment>(this, "timeline", SectionTimelineFragment.class, optionsListFragment));
+        actionBar.addTab(tab);
+    	actionBar.setSelectedNavigationItem(1);
+	
 
+		
+	}
 }

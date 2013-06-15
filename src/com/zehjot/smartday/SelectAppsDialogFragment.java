@@ -18,6 +18,8 @@ public class SelectAppsDialogFragment extends DialogFragment{
 	private DataSet dataSet = null;
 	private String[]strings = {"No Data Available"};
 	private int mode=0;
+	private static JSONObject selectedApps;
+	private boolean[] boolSelectedApps;
 	
 	public void setStrings(String[] strings) {
 		this.strings = strings;
@@ -28,35 +30,51 @@ public class SelectAppsDialogFragment extends DialogFragment{
 	@Override
 	public void onCreate(Bundle saved){
 		super.onCreate(saved);
-		if(saved!=null)
+		if(saved!=null){
 			strings= saved.getStringArray("strings");
+			boolSelectedApps = saved.getBooleanArray("checked");
+		}
 	}
 	@Override
 	public Dialog onCreateDialog(Bundle saved){
 		dataSet = DataSet.getInstance(getActivity());
-		final JSONObject selectedApps;
-		if(mode == SELECT_APPS){
-			selectedApps = dataSet.getSelectedApps();
-		}else{
-			selectedApps = dataSet.getIgnoreApps();
-		}
-		boolean[] boolSelectedApps = new boolean[strings.length];
-		for(int i=0 ; i<strings.length;i++){
-			boolSelectedApps[i] = selectedApps.optBoolean(strings[i]);
-		}
+		if(saved==null){	
+			try{
+				if(mode == SELECT_APPS){
+					selectedApps = /*dataSet.getSelectedApps();*/new JSONObject(dataSet.getSelectedApps().toString());
+				}else{
+					selectedApps = /*dataSet.getIgnoreApps();*/new JSONObject(dataSet.getIgnoreApps().toString());
+				}
+			}catch(JSONException e){
+				selectedApps = new JSONObject();
+			}
+
+			boolSelectedApps = new boolean[strings.length];
+			if(mode == SELECT_APPS){
+				for(int i=0 ; i<strings.length;i++){
+					boolSelectedApps[i] = selectedApps.optBoolean(strings[i],true);
+				}
+			}else{
+				for(int i=0 ; i<strings.length;i++){
+					boolSelectedApps[i] = selectedApps.optBoolean(strings[i]);
+				}
+			}
+		}	
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		
 		builder.setTitle(R.string.options_app_select) //Dialogtitle
 			   .setMultiChoiceItems(strings, boolSelectedApps,
-				new DialogInterface.OnMultiChoiceClickListener() {			
+				new DialogInterface.OnMultiChoiceClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which, boolean isChecked) {
 				try{
 					if(isChecked){
-						dataSet.getSelectedApps().put(strings[which], "true");
+						selectedApps.put(strings[which], "true");
+						//boolSelectedApps[which]="true" != null;
 					} else {
-						dataSet.getSelectedApps().put(strings[which], "false");
+						selectedApps.put(strings[which], "false");
+						//boolSelectedApps[which]="false" != null;
 					}
 				}catch(JSONException e){
 					e.printStackTrace();
@@ -86,6 +104,7 @@ public class SelectAppsDialogFragment extends DialogFragment{
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putStringArray("strings", strings);
+		outState.putBooleanArray("checked", boolSelectedApps);
 		super.onSaveInstanceState(outState);
 	}
 }

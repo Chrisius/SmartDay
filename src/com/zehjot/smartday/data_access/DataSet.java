@@ -13,7 +13,6 @@ import com.zehjot.smartday.R;
 import com.zehjot.smartday.data_access.DownloadTask.onDataDownloadedListener;
 import com.zehjot.smartday.data_access.LoadFileTask.onDataLoadedListener;
 import com.zehjot.smartday.data_access.UserData.OnUserDataAvailableListener;
-import com.zehjot.smartday.helper.Security;
 import com.zehjot.smartday.helper.Utilities;
 
 import android.app.Activity;
@@ -50,6 +49,12 @@ public class DataSet extends Activity implements OnUserDataAvailableListener, on
 		if(act == null)
 			return;
 		activity = act;
+		userData.updateActivity(act);
+		updateDate();
+	}
+	
+	public static JSONObject getUser() {
+		return user;
 	}
 	
 	private static void init(Context context){
@@ -85,12 +90,21 @@ public class DataSet extends Activity implements OnUserDataAvailableListener, on
 		int month = c.get(Calendar.MONTH);
 		int year = c.get(Calendar.YEAR);
 		editor.putString(activity.getString(R.string.key_date_default), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
-		editor.putString(activity.getString(R.string.key_date_selected_apps),"not Initialized"); //Sets String for selectDate to "not Initialized" 
-		editor.putLong(activity.getString(R.string.key_date_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0));
+		editor.putLong(activity.getString(R.string.key_date_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();
+		//editor.putString(activity.getString(R.string.key_date_selected_apps),"not Initialized"); //Sets String for selectDate to "not Initialized"
 		editor.commit();
 		instance.setSelectedDate(year, month, day);
 	}
-
+	
+	private static void updateDate(){ 
+		final Calendar c = Calendar.getInstance();
+		int day = c.get(Calendar.DAY_OF_MONTH);
+		int month = c.get(Calendar.MONTH);
+		int year = c.get(Calendar.YEAR);
+		editor.putString(activity.getString(R.string.key_date_default), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
+		editor.putLong(activity.getString(R.string.key_date_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();		
+	}
+	
 	private static void createUserData(){
 		if(userData==null)
 			userData = new UserData();
@@ -128,19 +142,6 @@ public class DataSet extends Activity implements OnUserDataAvailableListener, on
 		getData(listener, "values", data);
 	}
 	
-	/*
-		ArrayList<String> appsAtDate = getApps(getSharedInt(R.string.key_date_year),getSharedInt(R.string.key_date_month),getSharedInt(R.string.key_date_day));
-		int size = appsAtDate.size();
-		boolean[] boolSelectedApps = new boolean[size];
-		Arrays.fill(boolSelectedApps, Boolean.FALSE);
-	
-		if(getSharedString(R.string.key_date_selected_apps).equals(getSelectedDate())){
-			for(int i = 0 ; i<selectedApps.size() ; i++){ 				//looks up every stored selected App
-				boolSelectedApps[selectedApps.get(i)]=true;				//sets every arrayfield to true if app was selected
-			}
-		}
-		return boolSelectedApps;
-		*/
 	public JSONObject getSelectedApps(){
 		return selectedApps;
 	}
@@ -151,7 +152,7 @@ public class DataSet extends Activity implements OnUserDataAvailableListener, on
 	
 	public void setIgnoreApps(JSONObject ignoreApps) {
 		DataSet.ignoreApps = ignoreApps;
-		Utilities.writeFile(getString(R.string.file_ignored_apps), ignoreApps.toString(), activity);
+		Utilities.writeFile(activity.getString(R.string.file_ignored_apps), ignoreApps.toString(), activity);
 	}
 	public boolean[] getSelectedApps(ArrayList<String> apps){
 		boolean[] boolSelectedApps = new boolean[apps.size()];
@@ -219,7 +220,8 @@ public class DataSet extends Activity implements OnUserDataAvailableListener, on
 	}
 	@Override
 	public void onUserDataAvailable(JSONObject jObj) {
-		user = jObj;		
+		user = jObj;
+		((onDataAvailableListener)activity).onDataAvailable(null, null);
 	}
 	public void onDataDownloaded(int serverResponse, JSONObject jObj, String request, onDataAvailableListener requester, String fileName, String fileNameBasic){
 		/**
@@ -240,7 +242,7 @@ public class DataSet extends Activity implements OnUserDataAvailableListener, on
 				if(requester!=null)
 					requester.onDataAvailable(result, request);
 			}else if(request == "values"){
-				result = constructAppNameJSONObj(result);
+				//result = constructAppNameJSONObj(result);
 				if(getSelectedDateAsTimestamp()<getTodayAsTimestamp() && fileName != null){
 					new StoreFileTask(activity).execute(result.toString(),fileName);
 				}			
@@ -273,12 +275,17 @@ public class DataSet extends Activity implements OnUserDataAvailableListener, on
 			if(file.exists())
 				file.delete();
 		}else{
+			jObj = filterIgnoredApps(jObj);
 			requester.onDataAvailable(jObj, request);
 		}
 		String time = "Internal Storage time: "+(queryEnd-queryStart)+"ms";
 		Utilities.showDialog(time, activity);
 	}
-
+	
+	public void getContext(onDataAvailableListener requester){
+		getContext(getSelectedDateAsTimestamp(), getNextDayAsTimestamp(), requester);
+	}
+	
 	public void getContext(long start, long end, onDataAvailableListener requester){
 		JSONObject data = new JSONObject();
 		try{
@@ -478,8 +485,14 @@ public class DataSet extends Activity implements OnUserDataAvailableListener, on
 				else
 					errorMessage = activity.getString(R.string.error);
 				break;
+			case -2:
+				//task was canceled by user
+				return;
 			case 403:
 				errorMessage = activity.getString(R.string.error_authentication_fail)+serverResponse;
+				break;
+			case 404:
+				errorMessage = activity.getString(R.string.error)+serverResponse;
 				break;
 			default:
 				errorMessage = activity.getString(R.string.error);

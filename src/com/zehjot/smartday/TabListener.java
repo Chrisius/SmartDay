@@ -34,6 +34,7 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
         		ft.add(R.id.section_fragment_container, fragment, tag);
         	}
         } else {
+        	//fragment.onResume();
             ft.show(fragment);
         }
         options.onSectionSelected(tab.getPosition());

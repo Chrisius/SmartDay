@@ -10,18 +10,20 @@ import java.net.URL;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.zehjot.smartday.MainActivity;
-import com.zehjot.smartday.data_access.DataSet.onDataAvailableListener;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class DownloadTask extends AsyncTask<String, Void, JSONObject>{
+import com.zehjot.smartday.MainActivity;
+import com.zehjot.smartday.data_access.DataSet.onDataAvailableListener;
+
+public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements OnCancelListener{
 	private int serverResponse = -1;
 	private ProgressDialog progress;
 	private String request;
@@ -41,36 +43,41 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject>{
 	protected DownloadTask(){
 	}
 	
+	
 	@Override
 	protected void onPreExecute(){
 		super.onPreExecute();
 		progress = new ProgressDialog(activity);
-		progress.setCancelable(false);
+//		progress.setCancelable(false);
+		progress.setCanceledOnTouchOutside(false);
 		progress.setMessage("Downloading data from server...");
+		progress.setOnCancelListener( (OnCancelListener) this);
 		if(((MainActivity) activity).isRunning())
 			progress.show();
-		//}
 	}
 	
 	@Override
 	protected JSONObject doInBackground(String... url) {
-		ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-		if(networkInfo == null || !networkInfo.isConnected()){
-			return null;
+		while(!isCancelled()){
+			ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+			if(networkInfo == null || !networkInfo.isConnected()){
+				return null;
+			}
+			if(url.length>2){
+				request = url[1];
+				fileName = url[2];
+				fileNameBasic = url[3];
+			}
+			try{
+				return downloadData(url[0]);
+			} catch (IOException e){	
+				return null;
+			} catch (JSONException e) {	
+				return null;
+			}
 		}
-		if(url.length>2){
-			request = url[1];
-			fileName = url[2];
-			fileNameBasic = url[3];
-		}
-		try{
-			return downloadData(url[0]);
-		} catch (IOException e){	
-			return null;
-		} catch (JSONException e) {	
-			return null;
-		}
+		return null;
 	}
 	@Override
 	protected void onPostExecute(JSONObject result) {
@@ -99,13 +106,14 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject>{
 			serverResponse = conn.getResponseCode();
 			Log.d("HTTPDebug", "Response: "+serverResponse);
 			is = conn.getInputStream();
-			
 			//InpuStream to JSONObeject
 			try{
 				BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"), 8);
 				StringBuilder sb = new StringBuilder();
 	            String line = null;
 	            while ((line = reader.readLine()) != null) {
+					if(isCancelled())
+						return null;
 	                sb.append(line + "\n");
 	            }
 	            json = sb.toString();
@@ -122,6 +130,15 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject>{
 		}
 		
 		
+	}
+	@Override
+	protected void onCancelled(JSONObject result) {
+		super.onCancelled(result);
+		listener.onDataDownloaded(-2, null, request, requester, fileName, fileNameBasic);		
+	}
+	@Override
+	public void onCancel(DialogInterface dialog) {
+		cancel(true);
 	}
 	
 }

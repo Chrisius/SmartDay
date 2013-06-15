@@ -22,13 +22,18 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Bundle;
+
 import com.zehjot.smartday.Config;
 import com.zehjot.smartday.MainActivity;
 import com.zehjot.smartday.R;
 
-public class Utilities {
+public class Utilities{
 	public static String getFileName(String request, JSONObject user,JSONObject jObj,Activity activity){
 		String fileName = request;
 		
@@ -96,19 +101,6 @@ public class Utilities {
 		return decryptedData;
 	}
 	
-	public static void showDialog(String message, Activity activity){
-		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder.setMessage(message)
-			.setCancelable(false)
-			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-		           @Override
-		           public void onClick(DialogInterface dialog, int id) {
-		           }
-		       });
-		AlertDialog dialog = builder.create();
-		if(((MainActivity) activity).isRunning())
-			dialog.show();
-	}
 	public static String getURL(String queryType,String data,JSONObject user, Activity activity){
 		if(user==null||activity==null){
 			return null;
@@ -165,5 +157,28 @@ public class Utilities {
 			e.printStackTrace();
 		}
 		return list;
+	}
+	public static void showDialog(String message, Activity activity){
+	
+		ShowDialogFragment dialog = new ShowDialogFragment();
+		Bundle bundle = new Bundle();
+		bundle.putString("string", message);
+		dialog.setArguments(bundle);
+		if(((MainActivity) activity).isRunning())
+			dialog.show(activity.getFragmentManager(),"Dialog");
+	}
+	public static class ShowDialogFragment extends DialogFragment{
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.getActivity());
+			builder.setMessage(getArguments().getString("string"))
+				.setCancelable(false)
+				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			           @Override
+			           public void onClick(DialogInterface dialog, int id) {
+			           }
+			       });
+			return builder.create();			 
+		}
 	}
 }

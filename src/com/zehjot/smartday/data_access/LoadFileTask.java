@@ -34,7 +34,8 @@ public class LoadFileTask extends AsyncTask<String, Void, JSONObject>{
 	protected void onPreExecute(){
 		super.onPreExecute();
 		progress = new ProgressDialog(activity);
-		progress.setCancelable(false);
+//		progress.setCancelable(false);
+		progress.setCanceledOnTouchOutside(false);
 		progress.setMessage("Loading data from internal file...");
 		if(((MainActivity) activity).isRunning())
 			progress.show();
