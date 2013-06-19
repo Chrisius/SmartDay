@@ -235,7 +235,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		private String[] apps = {"No Data available"};
 		private JSONObject data;
 		private double[] time = {1.0};
-		private int[] colors = {0};
+		private int[] colors = {0xA4A4A4FF};
 		private GraphicalView chartView;
 		private JSONObject rendererToArrayIndex;
 		private JSONArray otherRendererToArrayIndex;
@@ -287,7 +287,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				
 				DataSet.getInstance(getActivity()).setColorsOfApps(colorsOfApps);
 			}catch(JSONException e){
-				
 			}
 		}
 		
@@ -495,8 +494,9 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				LinearLayout details = (LinearLayout) ((LinearLayout)valueTV.getParent().getParent()).getChildAt(1);
 				details.removeAllViews();
 				JSONObject appTime = getTimesOfApp(appName);
-				JSONArray appUsages = appTime.optJSONArray("times");
-				
+				if(appTime == null)
+					return;
+				JSONArray appUsages = appTime.optJSONArray("times");				
 				if(appUsages==null)
 					return;
 				/*
@@ -565,13 +565,17 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					JSONArray output = new JSONArray();
 					try {
 						for(int j = 0 ; j<usages.length();j++){
-							JSONObject usage = usages.optJSONObject(j);						
-							output.put(
-								new JSONObject()
-									.put("start", usage.optLong("start"))
-									.put("duration", usage.optLong("end")-usage.optLong("start"))
-							);
-							totalTime += usage.optLong("end")-usage.optLong("start");											
+							JSONObject usage = usages.optJSONObject(j);
+							long start = usage.optLong("start",-1);
+							long end = usage.optLong("end",-1);
+							if(start!=-1 && end!=-1){
+								output.put(
+									new JSONObject()
+										.put("start", start)
+										.put("duration", end-start)
+								);
+								totalTime += end-start;
+							}
 						}
 						result.put("times", output);
 						result.put("total", totalTime);

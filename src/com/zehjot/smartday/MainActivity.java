@@ -169,17 +169,17 @@ public class MainActivity extends Activity
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         Tab tab = actionBar.newTab();
-        tab.setText("MapView NoR.");
+        tab.setText("MapView");
         tab.setTabListener(new TabListener<SectionMapFragment>(this, "mapView", SectionMapFragment.class, optionsListFragment));
         actionBar.addTab(tab);
         
         tab = actionBar.newTab();
-        tab.setText("ChartView NoR.");
+        tab.setText("ChartView");
         tab.setTabListener(new TabListener<SectionChartFragment>(this, "chartView", SectionChartFragment.class, optionsListFragment));
         actionBar.addTab(tab);
         
         tab = actionBar.newTab();
-        tab.setText("Timeline NoR.");
+        tab.setText("Timeline");
         tab.setTabListener(new TabListener<SectionTimelineFragment>(this, "timeline", SectionTimelineFragment.class, optionsListFragment));
         actionBar.addTab(tab);
     	actionBar.setSelectedNavigationItem(1);
