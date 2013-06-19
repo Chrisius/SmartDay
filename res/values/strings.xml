@@ -46,6 +46,7 @@
     <string name="error_storing_file">Storing file went wrong!</string>
 <!-- Infos -->
 	<string name="info_user_data_ok">User data verfied</string>
+	<string name="info_no_data_connection">No data connection available</string>
 <!-- Section Titles -->
     <string-array name="sections">
         <item>Map View</item>
@@ -70,6 +71,7 @@
 	
 <!-- FileNames -->
 	<string name="file_ignored_apps">ignoreAppsFile</string>
+	<string name="file_app_colors">appcolorsFile</string>
 	<string name="user_file">user_preferences</string>
 	<!-- UserFile Identifier-->
 		<string name="user_name">name</string>

@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,6 +27,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.zehjot.smartday.Config;
 import com.zehjot.smartday.MainActivity;
 import com.zehjot.smartday.R;
 import com.zehjot.smartday.helper.Security;
@@ -105,7 +105,7 @@ public class UserData {
 	}
 
 	private static void testUserLogInData(){
-		String url = Utilities.getURL("testcredentials",null,user,activity);
+		String url = Utilities.getURL(Config.Request.testuser,null,user,activity);
 		new DownloadTask().execute(url);
 	}
 
@@ -151,7 +151,13 @@ public class UserData {
 		protected void onPostExecute(Boolean result) {
 			if(((MainActivity)activity).isRunning())
 				progress.cancel();
-			super.onPostExecute(result);				
+			super.onPostExecute(result);
+			ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+			if(networkInfo == null || !networkInfo.isConnected()){
+				Utilities.showDialog(activity.getString(R.string.info_no_data_connection), activity);
+				mCallBack.onUserDataAvailable(user);
+			}
 			if(result==null || result== false){
 				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 				builder.setMessage(activity.getString(R.string.error_authentication_fail))

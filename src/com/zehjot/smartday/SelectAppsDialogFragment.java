@@ -1,5 +1,6 @@
 package com.zehjot.smartday;
 
+import java.util.Arrays;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,6 +23,7 @@ public class SelectAppsDialogFragment extends DialogFragment{
 	private boolean[] boolSelectedApps;
 	
 	public void setStrings(String[] strings) {
+		Arrays.sort(strings);
 		this.strings = strings;
 	}
 	public void setMode(int mode) {

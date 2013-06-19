@@ -21,8 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
-public class OptionsListFragment extends ListFragment implements onDataAvailableListener, OnSectionSelectedListener {
-	private OnOptionSelectedListener mCallback;
+public class OptionsListFragment extends ListFragment implements onDataAvailableListener, OnSectionSelectedListener,DatePickerFragment.OnDateChosenListener {
 	private SimpleAdapter optionsListAdapter;
 	private List<Map<String,String>> displayedOptions;
 	private static final String TEXT1 = "text1";
@@ -79,20 +78,22 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 	@Override
 	public void onAttach(Activity activity){
 		super.onAttach(activity);
-		mCallback = (OnOptionSelectedListener) activity;
 	}
 	
 	@Override
 	public void onListItemClick(ListView l,View v,int position, long id){
 		switch (position-1) {
 		case 0:
-			mCallback.onOptionSelected(position-1);	//-1 to eliminate the unclickable header	
+	    	DatePickerFragment date = new DatePickerFragment();
+	    	date.setListener(this);
+			date.show(getFragmentManager(), getString(R.string.datepicker));
+			//mCallback.onOptionSelected(position-1);	//-1 to eliminate the unclickable header	
 			break;
 		case 1:
 			dataSet.getApps(this);			
 			break;
 		case 2:
-			dataSet.getContext(dataSet.getSelectedDateAsTimestamp(),dataSet.getNextDayAsTimestamp(),this);
+			//dataSet.getContext(dataSet.getSelectedDateAsTimestamp(),dataSet.getNextDayAsTimestamp(),this);
 			break;
 		default:
 			break;
@@ -103,13 +104,12 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		//check if fragment is added to activity
 		if(!isAdded())
 			return;
-		if(request.equals("values")){			
+		if(request.equals(DataSet.RequestedFunction.getEventsAtDate)){			
 			SelectAppsDialogFragment apps = new SelectAppsDialogFragment();
 			apps.setStrings(Utilities.jObjValuesToArrayList(jObj).toArray(new String[0]));
 			apps.setMode(SelectAppsDialogFragment.SELECT_APPS);
 			apps.show(getFragmentManager(), getString(R.string.datepicker));
-		}
-		if(request.equals("events")){
+		}else{
 			Utilities.showDialog(jObj.toString(), getActivity());
 		}
 	}
@@ -120,7 +120,11 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		}else
 		updateOptions(pos);
 	}
-
+	
+    public void onDateChosen(int year, int month, int day){ 	
+    	dataSet.setSelectedDate(year, month, day);
+    	updateDate();
+    }
 	public void updateDate(){
 		displayedOptions.set(0, displayDate());
 		optionsListAdapter.notifyDataSetChanged();
@@ -153,7 +157,7 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 	}
 	
 	private Map<String,String> displayDate(){
-		return toMap(dataSet.getSelectedDate(),getResources().getString(R.string.options_date_text2));
+		return toMap(dataSet.getSelectedDateAsString(),getResources().getString(R.string.options_date_text2));
 	}
 	
 	private Map<String,String> toMap(String text1, String text2){

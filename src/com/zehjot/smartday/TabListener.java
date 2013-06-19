@@ -17,6 +17,9 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     public interface OnSectionSelectedListener{
     	public void onSectionSelected(int pos);
     }
+    public interface OnUpdateListener{
+    	public void onUpdate();
+    }
         
     public TabListener(Activity activity, String tag, Class<T> fragmentClass, OnSectionSelectedListener listener) {
         this.activity = activity;
@@ -34,7 +37,8 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
         		ft.add(R.id.section_fragment_container, fragment, tag);
         	}
         } else {
-        	//fragment.onResume();
+//        	if (fragment != null)
+//        		fragment.onResume();
             ft.show(fragment);
         }
         options.onSectionSelected(tab.getPosition());
@@ -47,5 +51,8 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     }
 
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
+    	((OnUpdateListener) fragment).onUpdate();/*
+    	if (fragment != null)
+    		fragment.onResume();*/
     }
 }

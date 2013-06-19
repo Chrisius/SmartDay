@@ -13,54 +13,24 @@
 		    <LinearLayout
 		        android:layout_width="wrap_content"
 		        android:layout_height="fill_parent"
-		    	android:orientation="horizontal">			    	    
-			    <LinearLayout
-			        android:layout_width="wrap_content"
-			        android:layout_height="fill_parent"
-			    	android:orientation="vertical">	
-				    <TextView 
-				        android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        android:textSize="30sp"
-				        android:text="Test"/>
-			        <LinearLayout 
-				        android:id="@+id/chart_1"
-				    	android:orientation="horizontal"
-				        android:layout_width="600dp"
-					   	android:layout_height="600dp"/>
-		    	</LinearLayout>
+		    	android:orientation="horizontal">
+		        <LinearLayout 
+			        android:id="@+id/chart_1"
+			    	android:orientation="horizontal"
+			        android:layout_width="600dp"
+				   	android:layout_height="600dp"/>
 		    	
-			    <LinearLayout
-			        android:layout_width="wrap_content"
-			        android:layout_height="fill_parent"
-			    	android:orientation="vertical">	
-				    <TextView 
-				        android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        android:textSize="30sp"
-				        android:text="Test"/>
-			        <LinearLayout 
-				        android:id="@+id/chart_4"
-				    	android:orientation="horizontal"
-				        android:layout_width="600dp"
-					   	android:layout_height="600dp"/>
-		    	</LinearLayout>
+		        <LinearLayout 
+			        android:id="@+id/chart_4"
+			    	android:orientation="vertical"
+			        android:layout_width="600dp"
+				   	android:layout_height="600dp"/>
 		    	
-			    <LinearLayout
-			        android:layout_width="wrap_content"
-			        android:layout_height="fill_parent"
-			    	android:orientation="vertical">	
-				    <TextView 
-				        android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        android:textSize="30sp"
-				        android:text="Test"/>
-			        <LinearLayout 
-				        android:id="@+id/chart_5"
-				    	android:orientation="horizontal"
-				        android:layout_width="600dp"
-					   	android:layout_height="600dp"/>
-		    	</LinearLayout>		    		    
+		        <LinearLayout 
+			        android:id="@+id/chart_5"
+			    	android:orientation="horizontal"
+			        android:layout_width="600dp"
+				   	android:layout_height="600dp"/>
 	    	</LinearLayout>
 	    </HorizontalScrollView>
 	    <LinearLayout 

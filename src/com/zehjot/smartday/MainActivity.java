@@ -19,11 +19,10 @@ import android.app.Activity;
 import android.app.FragmentManager;
 
 public class MainActivity extends Activity 
-		implements OptionsListFragment.OnOptionSelectedListener, DataSet.onDataAvailableListener,
-		DatePickerFragment.OnDateChosenListener{
+		implements OptionsListFragment.OnOptionSelectedListener, DataSet.onDataAvailableListener	{
 	private FragmentManager fm;
 	private OptionsListFragment optionsListFragment;
-	private DataSet dataSet;
+	private static DataSet dataSet;
 	private boolean isRunning = true;
 	private static Activity activity;
 	
@@ -34,22 +33,24 @@ public class MainActivity extends Activity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        fm = getFragmentManager();       
-        dataSet = DataSet.getInstance(this);   
+        fm = getFragmentManager();
+        if(savedInstanceState==null && dataSet!=null){
+        	initShit(savedInstanceState);
+        }else{
+        	dataSet = DataSet.getInstance(this);   
+        }
 
         if(savedInstanceState != null){
-        	optionsListFragment = (OptionsListFragment) fm.findFragmentByTag("optionsList");
-        }else{
-        }
-        if(savedInstanceState != null){
+        	/*
         	if(DataSet.getUser()==null)
         		return;
+        		*/
         	initShit(savedInstanceState);
         	getActionBar().setSelectedNavigationItem(0);
         	getActionBar().setSelectedNavigationItem(1);
         	getActionBar().setSelectedNavigationItem(2);
         	getActionBar().setSelectedNavigationItem(savedInstanceState.getInt(getString(R.string.start_view)));
-        }
+       }
     }
     @Override
     public void onResume(){
@@ -61,8 +62,14 @@ public class MainActivity extends Activity
     
     @Override
     public void onStop(){
+    	this.
     	isRunning = false;
     	super.onStop();
+    }
+    @Override
+    public void onPause() {
+    	// TODO Auto-generated method stub
+    	super.onPause();
     }
     
     @Override
@@ -109,14 +116,17 @@ public class MainActivity extends Activity
     @Override
     public void onSaveInstanceState(Bundle outState){
         super.onSaveInstanceState(outState);
-        outState.putInt(getString(R.string.start_view), getActionBar().getSelectedNavigationIndex());
+        if(getActionBar().getTabCount()!= 0)
+        	outState.putInt(getString(R.string.start_view), getActionBar().getSelectedNavigationIndex());
     }
     @Override
     public void onDestroy(){
     	super.onDestroy();
+    	//dataSet.delete();
     }
     
-    public void onOptionSelected(int pos){
+    @Override
+	public void onOptionSelected(int pos){
     	DatePickerFragment date = new DatePickerFragment();
     	
     	switch (pos) {
@@ -134,24 +144,22 @@ public class MainActivity extends Activity
 		}
     }
     
-    public void onDateChosen(int year, int month, int day){    	
-    	dataSet.setSelectedDate(year, month, day);
-    	((OptionsListFragment) fm.findFragmentById(R.id.options_fragment_container)).updateDate();
-    }
-    
 	@Override
 	public void onDataAvailable(JSONObject jObj, String request) {
-		if(jObj == null&& request == null)
+		if(request.equals(DataSet.RequestedFunction.initDataSet)){
 			initShit(null);
-		if(request=="allApps"){
+		}else if(request.equals(DataSet.RequestedFunction.getAllApps)){
 			SelectAppsDialogFragment ignoreAppsDialog = new SelectAppsDialogFragment();
 			ignoreAppsDialog.setStrings(Utilities.jObjValuesToArrayList(jObj).toArray(new String[0]));
 			ignoreAppsDialog.setMode(SelectAppsDialogFragment.IGNORE_APPS);
 			ignoreAppsDialog.show(fm, "nada");
+		}else if(request.equals(DataSet.RequestedFunction.getEventsAtDate) || request.equals(DataSet.RequestedFunction.updatedFilter)){
+			getActionBar().setSelectedNavigationItem(getActionBar().getSelectedNavigationIndex());
 		}
 	}
 	private void initShit(Bundle savedInstanceState){
-		if(savedInstanceState== null){
+    	optionsListFragment = (OptionsListFragment) fm.findFragmentByTag("optionsList");
+		if(optionsListFragment== null){
 	    	optionsListFragment = new OptionsListFragment();
 	    	fm.beginTransaction().add(R.id.options_fragment_container, optionsListFragment,"optionsList").commit();
 		}

@@ -30,11 +30,10 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 	private onDataAvailableListener requester;
 	private static Activity activity;
 	private String fileName = null;
-	private String fileNameBasic= null; 
-	private static onDataDownloadedListener listener = (onDataDownloadedListener) DataSet.getInstance(activity);
+	private static onDataDownloadedListener listener = DataSet.getInstance(activity);
 	
 	protected interface onDataDownloadedListener{
-		public void onDataDownloaded(int serverResponse, JSONObject jObj, String request, onDataAvailableListener requester, String fileName, String fileNameBasic);
+		public void onDataDownloaded(int serverResponse, JSONObject jObj, String request, onDataAvailableListener requester, String fileName);
 	}
 	protected DownloadTask(onDataAvailableListener requester, Activity activity){
 		this.requester = requester;
@@ -51,7 +50,7 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 //		progress.setCancelable(false);
 		progress.setCanceledOnTouchOutside(false);
 		progress.setMessage("Downloading data from server...");
-		progress.setOnCancelListener( (OnCancelListener) this);
+		progress.setOnCancelListener( this);
 		if(((MainActivity) activity).isRunning())
 			progress.show();
 	}
@@ -59,15 +58,14 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 	@Override
 	protected JSONObject doInBackground(String... url) {
 		while(!isCancelled()){
+			if(url.length>2){
+				request = url[1];
+				fileName = url[2];
+			}
 			ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 			if(networkInfo == null || !networkInfo.isConnected()){
 				return null;
-			}
-			if(url.length>2){
-				request = url[1];
-				fileName = url[2];
-				fileNameBasic = url[3];
 			}
 			try{
 				return downloadData(url[0]);
@@ -86,7 +84,7 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 		if(((MainActivity)activity).isRunning())
 			progress.cancel();
 		//}
-		listener.onDataDownloaded(serverResponse, result, request, requester, fileName, fileNameBasic);		
+		listener.onDataDownloaded(serverResponse, result, request, requester, fileName);		
 	}
 	
 	private JSONObject downloadData(String urlString) throws IOException, JSONException{
@@ -134,7 +132,7 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 	@Override
 	protected void onCancelled(JSONObject result) {
 		super.onCancelled(result);
-		listener.onDataDownloaded(-2, null, request, requester, fileName, fileNameBasic);		
+		listener.onDataDownloaded(-2, null, request, requester, fileName);		
 	}
 	@Override
 	public void onCancel(DialogInterface dialog) {

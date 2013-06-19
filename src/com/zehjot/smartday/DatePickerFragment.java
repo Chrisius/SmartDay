@@ -14,7 +14,6 @@ public class DatePickerFragment extends DialogFragment
 	
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		mCallback = (OnDateChosenListener) getActivity();
 		final Calendar c = Calendar.getInstance();
 		int day = c.get(Calendar.DAY_OF_MONTH);
 		int month = c.get(Calendar.MONTH);
@@ -27,5 +26,10 @@ public class DatePickerFragment extends DialogFragment
 	
 	public interface OnDateChosenListener{
 		public void onDateChosen(int year, int month, int day);
+	}
+
+	public void setListener(OptionsListFragment optionsListFragment) {
+		mCallback = optionsListFragment;
+		
 	}
 }

@@ -8,7 +8,7 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
 	    android:orientation="vertical"
-	    android:layout_weight="4">
+	    android:layout_weight="5">
 	    <FrameLayout
 	        android:id="@+id/section_header_container"
 	        android:layout_width="match_parent"
@@ -18,6 +18,12 @@
 	        android:id="@+id/options_fragment_container"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"/>
+        <LinearLayout 
+	        android:id="@+id/chart_test"
+	    	android:orientation="horizontal"
+	        android:layout_width="match_parent"
+		   	android:layout_height="match_parent"/>
+	    
     </LinearLayout>
     
     <FrameLayout

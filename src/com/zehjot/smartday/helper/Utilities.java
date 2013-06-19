@@ -24,7 +24,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -34,8 +33,8 @@ import com.zehjot.smartday.MainActivity;
 import com.zehjot.smartday.R;
 
 public class Utilities{
-	public static String getFileName(String request, JSONObject user,JSONObject jObj,Activity activity){
-		String fileName = request;
+	public static String getFileName(String requestedFunction, JSONObject user,JSONObject jObj,Activity activity){
+		String fileName = requestedFunction;
 		
 		try {
 			fileName += user.getString(activity.getString(R.string.user_pass));
