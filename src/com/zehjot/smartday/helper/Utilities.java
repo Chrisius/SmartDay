@@ -180,4 +180,40 @@ public class Utilities{
 			return builder.create();			 
 		}
 	}
+	public static String getTimeFromTimeStamp(long timestampInSec){
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(timestampInSec*1000);
+		String result = "";
+		int h = c.get(Calendar.HOUR_OF_DAY);
+		if(h<10)
+			result += "0"+h+":";
+		else
+			result += h+":";
+		int m = c.get(Calendar.MINUTE);
+		if(m<10)
+			result += "0"+m+":";
+		else
+			result += m+":";
+		int s = c.get(Calendar.SECOND);
+		if(s<10)
+			result += "0"+s;
+		else
+			result += s;
+		return result;
+	}
+	public static String getTimeString(long sec){
+		String durationAsString = "";
+	    int h = (int)sec/3600;
+	    int m = ((int)sec%3600)/60;
+	    int s = ((int)sec%3600)%60;
+	    if(h>0)
+	    	durationAsString += h+"h ";
+	    if(m>0)
+	    	durationAsString += m+"min ";
+	    if(s>0)
+	    	durationAsString += s+"sec";
+	    if(durationAsString.equals(""))
+	    	durationAsString = "0 sec";
+	    return durationAsString;
+	}
 }

@@ -36,6 +36,7 @@ import com.zehjot.smartday.helper.Utilities;
 public class UserData {
 	private static Activity activity = null;
 	private static JSONObject user = null;
+	private static JSONObject tmpUser = null;
 	private static OnUserDataAvailableListener mCallBack;
 	/**
 	 * Functions to handle user data (Name, Password, Email)
@@ -60,9 +61,7 @@ public class UserData {
 		if(createNew || user == null){
 			mCallBack = (OnUserDataAvailableListener) DataSet.getInstance(activity);
 			File file = activity.getFileStreamPath(Security.sha1(activity.getString(R.string.user_file)));
-//			if(file.exists())
-//				file.delete();
-			if(!file.exists()){
+			if(!file.exists()||createNew){
 				askForUserLogInData();
 			}
 			else{
@@ -98,14 +97,14 @@ public class UserData {
 			if(file.exists()){
 				file.delete();
 			}
-			user = jObj;
+			tmpUser = jObj;
 			testUserLogInData();
 		}
 		
 	}
 
 	private static void testUserLogInData(){
-		String url = Utilities.getURL(Config.Request.testuser,null,user,activity);
+		String url = Utilities.getURL(Config.Request.testuser,null,tmpUser,activity);
 		new DownloadTask().execute(url);
 	}
 
@@ -118,7 +117,7 @@ public class UserData {
 			Utilities.showDialog("JSON Object failed",activity);
 			e.printStackTrace();
 		}
-		user = jObj;
+		tmpUser = jObj;
 		testUserLogInData();
 	}
 	private static class DownloadTask extends AsyncTask<String, Void, Boolean>{
@@ -156,7 +155,8 @@ public class UserData {
 			NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 			if(networkInfo == null || !networkInfo.isConnected()){
 				Utilities.showDialog(activity.getString(R.string.info_no_data_connection), activity);
-				mCallBack.onUserDataAvailable(user);
+				mCallBack.onUserDataAvailable(tmpUser);
+				return;
 			}
 			if(result==null || result== false){
 				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -173,7 +173,9 @@ public class UserData {
 					dialog.show();
 			}
 			else{
-				Utilities.showDialog(activity.getString(R.string.info_user_data_ok), activity);
+				//Utilities.showDialog(activity.getString(R.string.info_user_data_ok), activity);
+				user = tmpUser;
+				tmpUser = null;
 				mCallBack.onUserDataAvailable(user);
 			}
 		}
@@ -254,7 +256,7 @@ public class UserData {
 		       .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 		           @Override
 		           public void onClick(DialogInterface dialog, int id) {
-		        	   	user=null;
+		        	  // 	user=null;
 		           }
 		       });
 			return builder.create();

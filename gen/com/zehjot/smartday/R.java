@@ -189,23 +189,24 @@ containing a value of this type.
         public static final int square=0x7f020019;
     }
     public static final class id {
-        public static final int action_blacklist=0x7f050017;
-        public static final int action_color_apps=0x7f05001a;
-        public static final int action_delete_files=0x7f050018;
-        public static final int action_new_user=0x7f050019;
+        public static final int action_blacklist=0x7f050018;
+        public static final int action_color_apps=0x7f05001b;
+        public static final int action_delete_files=0x7f050019;
+        public static final int action_new_user=0x7f05001a;
         public static final int auth_dialog=0x7f050009;
         public static final int auth_save_user_data=0x7f05000d;
         public static final int auth_user_email=0x7f05000c;
         public static final int auth_user_name=0x7f05000a;
         public static final int auth_user_pass=0x7f05000b;
         public static final int chart_1=0x7f050010;
-        public static final int chart_2=0x7f050014;
-        public static final int chart_3=0x7f050013;
-        public static final int chart_4=0x7f050011;
-        public static final int chart_5=0x7f050012;
+        public static final int chart_1_appDetails=0x7f050015;
+        public static final int chart_1_appNames=0x7f050014;
+        public static final int chart_1_details=0x7f050013;
+        public static final int chart_2=0x7f050012;
+        public static final int chart_3=0x7f050011;
         public static final int chart_test=0x7f050007;
         public static final int hybrid=0x7f050004;
-        public static final int map_container=0x7f050016;
+        public static final int map_container=0x7f050017;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
         public static final int option_header=0x7f05000e;
@@ -214,7 +215,7 @@ containing a value of this type.
         public static final int satellite=0x7f050002;
         public static final int section_fragment_container=0x7f050008;
         public static final int section_header_container=0x7f050005;
-        public static final int section_list_fragment=0x7f050015;
+        public static final int section_list_fragment=0x7f050016;
         public static final int terrain=0x7f050003;
     }
     public static final class layout {

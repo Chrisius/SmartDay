@@ -256,8 +256,11 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		if(user==null){//first call of DataSet
 			user = jObj;
 			initDate();
-		}else
+		}else{
 			user = jObj;
+			tmpJSONResult = null;
+			tmpJSONResultToday = null;
+		}
 	}
 
 	public void onDataDownloaded(int serverResponse, JSONObject jObj, String requestedFunction, onDataAvailableListener requester, String fileName){
