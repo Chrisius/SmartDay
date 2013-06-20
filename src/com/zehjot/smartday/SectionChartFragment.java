@@ -270,22 +270,47 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				return;
 			}
 			
-			JSONObject colorsOfApps = DataSet.getInstance(getActivity()).getColorsOfApps();
+			JSONArray colorsOfApps = DataSet.getInstance(getActivity()).getColorsOfApps().optJSONArray("colors");
+			if(colorsOfApps==null)
+				colorsOfApps = new JSONArray();
+			/**
+			 * {
+			 * 	"colors":
+			 * 		[
+			 * 			{
+			 * 				"app":String,
+			 * 				"color": int
+			 * 			}
+			 * 			...
+			 * 		]
+			 * }
+			 */
 			Random rnd = new Random();
 			colors = new int[apps.length];
+			boolean found = false;
 			try{
-				for(int i=0; i<apps.length;i++){
-					if(colorsOfApps.has(apps[i]))
-						colors[i] = colorsOfApps.getInt(apps[i]);
-					else{
-						colors[i] = rnd.nextInt();
-						colorsOfApps.put(apps[i], colors[i]);
+				for(int i=0;i<apps.length;i++){
+					found = false;
+					for(int j=0; j<colorsOfApps.length();j++){
+						JSONObject color =  colorsOfApps.getJSONObject(j);
+						if(color.getString("app").equals(apps[i])){
+							colors[i] = color.getInt("color");
+							found = true;
+							break;
+						}
+					}
+					if(!found){
+						colors[i]=rnd.nextInt();
+						colorsOfApps.put(new JSONObject()
+							.put("app",apps[i])
+							.put("color",colors[i])							
+						);
+						
 					}
 				}
-				if(!colorsOfApps.has("other"))
-					colorsOfApps.put("other", rnd.nextInt());	
 				
-				DataSet.getInstance(getActivity()).setColorsOfApps(colorsOfApps);
+				DataSet.getInstance(getActivity()).setColorsOfApps(new JSONObject()
+																	.put("colors", colorsOfApps));
 			}catch(JSONException e){
 			}
 		}

@@ -89,6 +89,8 @@ public class MainActivity extends Activity
 			dataSet.getAllApps(this);
 			break;
 		case R.id.action_color_apps:
+			ColorPickerDialog colorPicker = new ColorPickerDialog();
+			colorPicker.show(fm, "ColorPicker");
 			break;
 		case R.id.action_delete_files:
 			String[] list = getFilesDir().list();

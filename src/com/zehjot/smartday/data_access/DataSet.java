@@ -243,6 +243,19 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	public long getNextDayAsTimestamp(){	
 		return getSelectedDateAsTimestamp()+24*60*60;
 	}
+	
+	/** ColorsOfApps:
+	 * {
+	 * 	"colors":
+	 * 		[
+	 * 			{
+	 * 				"app":String,
+	 * 				"color": int
+	 * 			}
+	 * 			...
+	 * 		]
+	 * }
+	 */
 	public JSONObject getColorsOfApps() {
 		return colorsOfApps;
 	}
