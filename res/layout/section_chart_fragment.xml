@@ -32,7 +32,11 @@
 <ScrollView
     android:layout_width="wrap_content"
     android:layout_height="fill_parent"
-    android:fillViewport="true">		    	
+    android:fillViewport="true">	
+    <HorizontalScrollView 
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:fillViewport="true"> 	
 		        <LinearLayout 
 			        android:id="@+id/chart_1_details"
 			    	android:orientation="horizontal"
@@ -50,5 +54,6 @@
 				        android:layout_width="wrap_content"
 					   	android:layout_height="600dp"/>
 		        </LinearLayout>
+	</HorizontalScrollView>	   
 </ScrollView>
 </LinearLayout>

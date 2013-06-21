@@ -239,6 +239,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		private GraphicalView chartView;
 		private JSONObject rendererToArrayIndex;
 		private JSONArray otherRendererToArrayIndex;
+		private int otherColor;
 		
 		private void processData(JSONObject jObj){
 			data = jObj;
@@ -309,7 +310,27 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					}
 				}
 				
-				DataSet.getInstance(getActivity()).setColorsOfApps(new JSONObject()
+				
+				found = false;
+				for(int j=0; j<colorsOfApps.length();j++){
+					JSONObject color =  colorsOfApps.getJSONObject(j);
+					if(color.getString("app").equals("Other")){
+						otherColor = color.getInt("color");
+						found = true;
+						break;
+					}
+				}
+				if(!found){
+					otherColor=rnd.nextInt();
+					colorsOfApps.put(new JSONObject()
+						.put("app","Other")
+						.put("color",otherColor)							
+					);
+					
+				}
+				
+				
+				DataSet.getInstance(getActivity()).storeColorsOfApps(new JSONObject()
 																	.put("colors", colorsOfApps));
 			}catch(JSONException e){
 			}
@@ -356,8 +377,8 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					SimpleSeriesRenderer r = new SimpleSeriesRenderer();
 					otherTime = Math.round(otherTime*100.f);
 					otherTime /=100;
-					categories.add("other", otherTime);
-					r.setColor(DataSet.getInstance(getActivity()).getColorsOfApps().optInt("other"));
+					categories.add("Other", otherTime);
+					r.setColor(otherColor);
 					renderer.addSeriesRenderer(r);				
 				}
 				renderer.setFitLegend(true);	
@@ -418,8 +439,8 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					SimpleSeriesRenderer r = new SimpleSeriesRenderer();
 					otherTime = Math.round(otherTime*100.f);
 					otherTime /=100;
-					categories.add("other", otherTime);
-					r.setColor(DataSet.getInstance(getActivity()).getColorsOfApps().optInt("other"));
+					categories.add("Other", otherTime);
+					r.setColor(otherColor);
 					renderer.addSeriesRenderer(r);				
 				}
 				renderer.setChartTitle("Total time "+totaltime+" min");

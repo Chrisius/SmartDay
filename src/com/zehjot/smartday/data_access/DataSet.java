@@ -2,8 +2,6 @@ package com.zehjot.smartday.data_access;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.Random;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -261,9 +259,13 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	}
 	public void setColorsOfApps(JSONObject colorsOfApps) {
 		DataSet.colorsOfApps = colorsOfApps;
+		((onDataAvailableListener)activity).onDataAvailable(null, RequestedFunction.updatedFilter);
 		Utilities.writeFile(activity.getString(R.string.file_app_colors), colorsOfApps.toString(), activity);
 	}
-	
+	public void storeColorsOfApps(JSONObject jObj){
+		DataSet.colorsOfApps = jObj;
+		Utilities.writeFile(activity.getString(R.string.file_app_colors), colorsOfApps.toString(), activity);		
+	}
 	@Override
 	public void onUserDataAvailable(JSONObject jObj) {
 		if(user==null){//first call of DataSet
@@ -291,8 +293,8 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				if(requester!=null)
 					requester.onDataAvailable(constructAllAppNamesJSONObject(jObj), requestedFunction);
 				else{
-					JSONObject result = constructColorJSONObj(jObj);
-					setColorsOfApps(result);
+					//JSONObject result = constructColorJSONObj(jObj);
+					//setColorsOfApps(result);
 				}
 				return;
 			}else if(requestedFunction.equals(RequestedFunction.getEventsAtDate)){
@@ -376,21 +378,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		}
 		getData(requester, RequestedFunction.getAllApps, data);
 	}
-	private JSONObject constructColorJSONObj(JSONObject jObj) {
-		JSONArray jArrayInput;
-		JSONObject jobjOutput= new JSONObject();
-		Random rnd = new Random();
-		try {
-			jArrayInput = jObj.getJSONArray("result");
-			for(int i=0;i < jArrayInput.length();i++ ){
-				jobjOutput.put(jArrayInput.getJSONObject(i).getString("app"),rnd.nextInt());
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return jobjOutput;
-	}
-
 	private JSONObject constructBasicJSONObj(JSONObject jObj){
 		JSONArray jArrayInput=null;
 		JSONArray lastKnownPos = null;
