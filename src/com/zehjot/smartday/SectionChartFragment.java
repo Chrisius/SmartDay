@@ -267,6 +267,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			} catch (JSONException e) {
 				apps = new String[]{"No Data available"};
 				time = new double[]{1.0};
+				colors = new int[]{0xA4A4A4FF};
 				e.printStackTrace();
 				return;
 			}

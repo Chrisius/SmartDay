@@ -303,7 +303,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 					tmpJSONResult = result;					
 					if(fileName != null)
 						new StoreFileTask(activity).execute(result.toString(),fileName);
-				}else{
+				}else if(getSelectedDateAsTimestamp()==getTodayAsTimestamp()){
 					tmpJSONResultToday = result;
 				}
 				if(requester!=null)
