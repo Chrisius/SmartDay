@@ -40,6 +40,8 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
 //        	if (fragment != null)
 //        		fragment.onResume();
             ft.show(fragment);
+//            ((OnUpdateListener) fragment).onUpdate();
+            
         }
         options.onSectionSelected(tab.getPosition());
     }
@@ -51,7 +53,14 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     }
 
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
-    	((OnUpdateListener) fragment).onUpdate();/*
+        if (fragment == null) {
+        	fragment = activity.getFragmentManager().findFragmentByTag(tag);            	
+        	Log.d("TabReselected", "Fragment not found "+tag);
+    		fragment = Fragment.instantiate(activity, fragmentClass.getName());
+    		ft.add(R.id.section_fragment_container, fragment, tag);
+        }
+        else
+        	((OnUpdateListener) fragment).onUpdate();/*
     	if (fragment != null)
     		fragment.onResume();*/
     }

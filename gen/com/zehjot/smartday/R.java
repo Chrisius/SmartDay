@@ -61,6 +61,17 @@ containing a value of this type.
 <colgroup align="left" />
 <colgroup align="left" />
 <tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>left</code></td><td>0</td><td></td></tr>
+<tr><td><code>right</code></td><td>1</td><td></td></tr>
+</table>
+         */
+        public static final int lablePosition=0x7f01000f;
+        /** <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
 <tr><td><code>none</code></td><td>0</td><td></td></tr>
 <tr><td><code>normal</code></td><td>1</td><td></td></tr>
 <tr><td><code>satellite</code></td><td>2</td><td></td></tr>
@@ -69,6 +80,14 @@ containing a value of this type.
 </table>
          */
         public static final int mapType=0x7f010000;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int showText=0x7f01000e;
         /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -198,44 +217,47 @@ containing a value of this type.
         public static final int square=0x7f02001e;
     }
     public static final class id {
-        public static final int action_blacklist=0x7f060022;
-        public static final int action_color_apps=0x7f060025;
-        public static final int action_delete_files=0x7f060023;
-        public static final int action_new_user=0x7f060024;
-        public static final int ambilwarna_cursor=0x7f06000d;
-        public static final int ambilwarna_dialogView=0x7f060009;
-        public static final int ambilwarna_pref_widget_kotak=0x7f060012;
-        public static final int ambilwarna_state=0x7f06000f;
-        public static final int ambilwarna_target=0x7f06000e;
-        public static final int ambilwarna_viewContainer=0x7f06000a;
-        public static final int ambilwarna_viewHue=0x7f06000c;
-        public static final int ambilwarna_viewSatBri=0x7f06000b;
-        public static final int ambilwarna_warnaBaru=0x7f060011;
-        public static final int ambilwarna_warnaLama=0x7f060010;
-        public static final int auth_dialog=0x7f060013;
-        public static final int auth_save_user_data=0x7f060017;
-        public static final int auth_user_email=0x7f060016;
-        public static final int auth_user_name=0x7f060014;
-        public static final int auth_user_pass=0x7f060015;
-        public static final int chart_1=0x7f06001a;
-        public static final int chart_1_appDetails=0x7f06001f;
-        public static final int chart_1_appNames=0x7f06001e;
-        public static final int chart_1_details=0x7f06001d;
-        public static final int chart_2=0x7f06001c;
-        public static final int chart_3=0x7f06001b;
-        public static final int chart_test=0x7f060007;
+        public static final int action_blacklist=0x7f060025;
+        public static final int action_color_apps=0x7f060028;
+        public static final int action_delete_files=0x7f060026;
+        public static final int action_new_user=0x7f060027;
+        public static final int ambilwarna_cursor=0x7f06000f;
+        public static final int ambilwarna_dialogView=0x7f06000b;
+        public static final int ambilwarna_pref_widget_kotak=0x7f060014;
+        public static final int ambilwarna_state=0x7f060011;
+        public static final int ambilwarna_target=0x7f060010;
+        public static final int ambilwarna_viewContainer=0x7f06000c;
+        public static final int ambilwarna_viewHue=0x7f06000e;
+        public static final int ambilwarna_viewSatBri=0x7f06000d;
+        public static final int ambilwarna_warnaBaru=0x7f060013;
+        public static final int ambilwarna_warnaLama=0x7f060012;
+        public static final int auth_dialog=0x7f060015;
+        public static final int auth_save_user_data=0x7f060019;
+        public static final int auth_user_email=0x7f060018;
+        public static final int auth_user_name=0x7f060016;
+        public static final int auth_user_pass=0x7f060017;
+        public static final int chart_1=0x7f06001c;
+        public static final int chart_1_appDetails=0x7f060021;
+        public static final int chart_1_appNames=0x7f060020;
+        public static final int chart_1_details=0x7f06001f;
+        public static final int chart_2=0x7f06001e;
+        public static final int chart_3=0x7f06001d;
+        public static final int chart_test=0x7f060009;
         public static final int hybrid=0x7f060004;
-        public static final int map_container=0x7f060021;
+        public static final int left=0x7f060005;
+        public static final int map_container=0x7f060023;
         public static final int none=0x7f060000;
         public static final int normal=0x7f060001;
-        public static final int option_header=0x7f060018;
-        public static final int options_fragment_container=0x7f060006;
-        public static final int options_list=0x7f060019;
+        public static final int option_header=0x7f06001a;
+        public static final int options_fragment_container=0x7f060008;
+        public static final int options_list=0x7f06001b;
+        public static final int right=0x7f060006;
         public static final int satellite=0x7f060002;
-        public static final int section_fragment_container=0x7f060008;
-        public static final int section_header_container=0x7f060005;
-        public static final int section_list_fragment=0x7f060020;
+        public static final int section_fragment_container=0x7f06000a;
+        public static final int section_header_container=0x7f060007;
+        public static final int section_list_fragment=0x7f060022;
         public static final int terrain=0x7f060003;
+        public static final int timelinell=0x7f060024;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -665,5 +687,51 @@ containing a value of this type.
           @attr name android:zOrderOnTop
         */
         public static final int MapAttrs_zOrderOnTop = 13;
+        /** Attributes that can be used with a TimeLineView.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #TimeLineView_lablePosition com.zehjot.smartday:lablePosition}</code></td><td></td></tr>
+           <tr><td><code>{@link #TimeLineView_showText com.zehjot.smartday:showText}</code></td><td></td></tr>
+           </table>
+           @see #TimeLineView_lablePosition
+           @see #TimeLineView_showText
+         */
+        public static final int[] TimeLineView = {
+            0x7f01000e, 0x7f01000f
+        };
+        /**
+          <p>This symbol is the offset where the {@link com.zehjot.smartday.R.attr#lablePosition}
+          attribute's value can be found in the {@link #TimeLineView} array.
+
+
+          <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>left</code></td><td>0</td><td></td></tr>
+<tr><td><code>right</code></td><td>1</td><td></td></tr>
+</table>
+          @attr name android:lablePosition
+        */
+        public static final int TimeLineView_lablePosition = 1;
+        /**
+          <p>This symbol is the offset where the {@link com.zehjot.smartday.R.attr#showText}
+          attribute's value can be found in the {@link #TimeLineView} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name android:showText
+        */
+        public static final int TimeLineView_showText = 0;
     };
 }

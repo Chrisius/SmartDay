@@ -184,8 +184,7 @@ public class MainActivity extends Activity
         tab.setText("Timeline");
         tab.setTabListener(new TabListener<SectionTimelineFragment>(this, "timeline", SectionTimelineFragment.class, optionsListFragment));
         actionBar.addTab(tab);
-    	actionBar.setSelectedNavigationItem(1);
-	
+    	actionBar.setSelectedNavigationItem(0);
 
 		
 	}
