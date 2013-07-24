@@ -216,4 +216,12 @@ public class Utilities{
 	    	durationAsString = "0 sec";
 	    return durationAsString;
 	}
+	public static int getTimeOfDay(long sec){
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(sec*1000);
+		int h = c.get(Calendar.HOUR_OF_DAY);
+		int m = c.get(Calendar.MINUTE);
+		int s = c.get(Calendar.SECOND);
+		return (h*60+m)*60+s;
+	}
 }

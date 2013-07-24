@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.TextView;
 
 public class SectionTimelineFragment extends Fragment implements OnUpdateListener,onDataAvailableListener{
 	@Override
@@ -39,16 +38,17 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 		ViewGroup root = (ViewGroup) getActivity().findViewById(R.id.timelinell);
 		//ViewGroup root = (ViewGroup) getView();
 		if(root!=null){
-			root.removeAllViews();			
-			TimeLineView timeline = new TimeLineView(getActivity());/*
-			timeline.setLayoutParams(new LayoutParams(
-					LayoutParams.WRAP_CONTENT,
-		            LayoutParams.WRAP_CONTENT));
-		            */
-			timeline.setLayoutParams(new LayoutParams(
-					6000,
-		            300));
-			root.addView(timeline);
+			if(getActivity().findViewById(R.id.timelineview)==null){
+				TimeLineView timeline = new TimeLineView(getActivity());
+				timeline.setId(R.id.timelineview);
+				timeline.setLayoutParams(new LayoutParams(
+						LayoutParams.WRAP_CONTENT,
+						LayoutParams.WRAP_CONTENT));
+				timeline.setData(jObj);
+				root.addView(timeline);
+			}else{
+				((TimeLineView)getActivity().findViewById(R.id.timelineview)).setData(jObj);
+			}
 		}
 	}
 }
