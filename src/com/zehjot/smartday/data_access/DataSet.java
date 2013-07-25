@@ -2,6 +2,8 @@ package com.zehjot.smartday.data_access;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.Random;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -257,6 +259,38 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	public JSONObject getColorsOfApps() {
 		return colorsOfApps;
 	}
+	public JSONObject getColorsOfApps(JSONObject jObj){
+		if(colorsOfApps==null)
+			colorsOfApps = new JSONObject();
+		try {
+			JSONArray apps = jObj.getJSONArray("result");
+			JSONArray colors = colorsOfApps.getJSONArray("colors");
+			String appName;
+			int color;
+			Random rnd = new Random();
+			for(int i=0;i<apps.length();i++){
+				appName = apps.getJSONObject(i).getString("app");
+				boolean found = false;
+				for(int j=0;j<colors.length();j++){
+					if(colors.getJSONObject(j).getString("app").equals(appName)){
+						found = true;
+						break;
+					}
+				}
+				if(!found){
+					color = rnd.nextInt();
+					colors.put(new JSONObject().put("app", appName).put("color", color));
+				}
+			}
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return colorsOfApps;
+	}
+	
+	
+	
 	public void setColorsOfApps(JSONObject colorsOfApps) {
 		DataSet.colorsOfApps = colorsOfApps;
 		((onDataAvailableListener)activity).onDataAvailable(null, RequestedFunction.updatedFilter);
