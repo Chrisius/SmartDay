@@ -1,5 +1,8 @@
 package com.zehjot.smartday;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,16 +17,26 @@ import android.view.View;
 public class TimeLineDetailView extends View {
 	private JSONObject jObj;
 	private Paint mTextPaint;
+	private float textSize;
 	private JSONObject colors;
+	private long totalDuration;
+	private JSONObject[] orderedApps;
 
 	public TimeLineDetailView(Context context) {
 		super(context);
+		textSize = 18;
+		
 		mTextPaint = new Paint();
-		mTextPaint.setTextSize(18);
+		mTextPaint.setTextSize(textSize);
 		mTextPaint.setColor(getResources().getColor(android.R.color.white));
 	}
 	@Override
 	protected void onDraw(Canvas canvas) {
+		float xpad = (float) (getPaddingLeft()+getPaddingRight());
+		float ypad = (float) (getPaddingTop()+getPaddingBottom());
+		for(int i=0;i<orderedApps.length;i++){
+			canvas.drawText(orderedApps[i].optString("app", "Error"), xpad+20, ypad+(i+1)*textSize+(textSize/4.f)*i, mTextPaint);			
+		}
 	}
 	
 	public void setData(JSONObject jObj){
@@ -33,7 +46,32 @@ public class TimeLineDetailView extends View {
 		/**
 		 * Get App Bar Length
 		 */
-		
+		try{
+			JSONArray apps = jObj.getJSONArray("result");
+			totalDuration=0;
+			orderedApps = new JSONObject[apps.length()];
+			for(int i=0;i<apps.length();i++){
+				totalDuration += apps.getJSONObject(i).optLong("duration", 0);
+				orderedApps[i] = (new JSONObject()
+					.put("app", apps.getJSONObject(i).getString("app"))
+					.put("duration", apps.getJSONObject(i).optLong("duration", 0))
+				);
+			}
+			
+			Arrays.sort(orderedApps, new Comparator<JSONObject>() {
+				@Override
+				public int compare(JSONObject lhs, JSONObject rhs) {
+					int i= ((Long)rhs.optLong("duration", 0)).compareTo(lhs.optLong("duration",0));
+					return i;
+				}
+			});
+			
+			for(int i=0;i<orderedApps.length;i++){
+				orderedApps[i].put("barLength",orderedApps[i].getLong("duration")/totalDuration);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 		/**
 		 * GetColors for Bars
 		 */

@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Scroller;
@@ -51,6 +52,7 @@ public class TimeLineView extends View {
 	private String selectedApp = "No App selected";
 	
 	private JSONArray rectangles;
+	private JSONObject jObj;
 	
 	public TimeLineView(Context context) {
 		super(context);
@@ -143,7 +145,8 @@ public class TimeLineView extends View {
 		lineWidth *= scaleFactor;///(width-width*24.f/25.f)*0.5f;
 		lineWidth -= 2.f*offset;//*= 24.f/25.f;
 		debugDrawCounter +=1;
-		canvas.drawText("height="+this.getHeight()+" width="+this.getWidth()+" calls="+debugDrawCounter+" scale="+scaleFactor+" scrollX="+scrollX+" Selected App= "+selectedApp, xpad-scrollX, ypad+mTextSize, mDebugTextPaint);
+		canvas.drawText(DataSet.getInstance(getContext()).getSelectedDateAsString(), xpad-scrollX+10, ypad+mTextSize, mDebugTextPaint);
+//		canvas.drawText("height="+this.getHeight()+" width="+this.getWidth()+" calls="+debugDrawCounter+" scale="+scaleFactor+" scrollX="+scrollX+" Selected App= "+selectedApp, xpad-scrollX, ypad+mTextSize, mDebugTextPaint);
 		/**
 		 * Line with hourdisplay
 		 */
@@ -196,6 +199,8 @@ public class TimeLineView extends View {
 		if(jObj == null)
 			return;
 		try {
+			this.jObj = jObj;
+			rectangles=new JSONArray();
 			String appName;
 			long start;
 			long end;
@@ -379,14 +384,18 @@ public class TimeLineView extends View {
 				selectedApp = getAppAtPos(e);
 				invalidate();
 				if(((LinearLayout)getParent()).getChildAt(1)==null){
+					TimeLineDetailView detail=new TimeLineDetailView(getContext());
+					detail.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 600));
+					detail.setData(jObj);
+					((LinearLayout)getParent()).addView(detail);/*
 					TextView tv;
 					for(int i = 0;i<10;i++){
 						tv = new TextView(getContext());
 						tv.setText("Test"+i);
 						((LinearLayout)getParent()).addView(tv);					
-					}
+					}*/
 				}else{
-					((LinearLayout)getParent()).removeViews(1, 10);
+					((LinearLayout)getParent()).removeViewAt(1);
 				}
 					
 			}

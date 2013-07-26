@@ -260,11 +260,15 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		return colorsOfApps;
 	}
 	public JSONObject getColorsOfApps(JSONObject jObj){
-		if(colorsOfApps==null)
+		if(colorsOfApps==null){
 			colorsOfApps = new JSONObject();
+		}
 		try {
 			JSONArray apps = jObj.getJSONArray("result");
-			JSONArray colors = colorsOfApps.getJSONArray("colors");
+			JSONArray colors = colorsOfApps.optJSONArray("colors");
+			if(colors == null){
+				colorsOfApps.put("colors", new JSONArray());				
+			}
 			String appName;
 			int color;
 			Random rnd = new Random();
@@ -417,6 +421,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		JSONArray lastKnownPos = null;
 		JSONArray jArrayOutput= new JSONArray();
 		JSONObject result=new JSONObject();
+		long totalDuration=0;
 		try{
 			result.put("dateTimestamp", getSelectedDateAsTimestamp());
 			result.put("downloadTimestamp", Utilities.getSystemTime());
@@ -445,6 +450,8 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 								JSONObject usage = usages.getJSONObject(k);
 								if(usage.getString("session").equals(appSession)){
 									usage.put("end", time);
+									jObjOutput.put("duration", jObjOutput.optLong("duration", 0)+time-usage.optLong("start",time));
+									totalDuration += time-usage.optLong("start",time);
 									found = true;
 									break;
 								}
@@ -494,6 +501,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				}
 			}
 			result.put("result", jArrayOutput);
+			result.put("totalDuration", totalDuration);
 		}catch(JSONException e){
 			
 		}
