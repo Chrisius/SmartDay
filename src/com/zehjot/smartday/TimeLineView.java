@@ -8,19 +8,21 @@ import com.zehjot.smartday.data_access.DataSet;
 import com.zehjot.smartday.helper.Utilities;
 
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
-import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.widget.ImageView;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Scroller;
+import android.widget.TextView;
 /**
  * Dont put inside scrollview or else the timeline cant be scrolled and zooming works like crap
  *
@@ -74,10 +76,6 @@ public class TimeLineView extends View {
 		
         mScroller = new Scroller(getContext(), null, true);
         
-        // The scroller doesn't have any built-in animation functions--it just supplies
-        // values when we ask it to. So we have to have a way to call it every frame
-        // until the fling ends. This code (ab)uses a ValueAnimator object to generate
-        // a callback on every animation frame. We don't use the animated value at all.
         mScrollAnimator = ValueAnimator.ofFloat(0, 1);
         mScrollAnimator.addUpdateListener(new AnimatorTick());
         rectangles = new JSONArray();
@@ -192,51 +190,6 @@ public class TimeLineView extends View {
 				canvas.drawRect(xpad+1+offset+pxForSecond*startInSec,ypad+height*0.3f,xpad-1+offset+pxForSecond*endInSec,ypad+height*0.7f,mRectanglePaint);
 			}
 		}
-		
-//		if(jObj!=null){
-//			JSONArray jArray;
-//			try {
-//				jArray = jObj.getJSONArray("result");
-//				String appName;
-//				long start;
-//				long end;
-//				int startInSec;
-//				int endInSec;
-//				for(int i=0; i<jArray.length();i++){
-//					JSONObject app = jArray.getJSONObject(i);
-//					appName = app.getString("app");
-//					JSONArray usages = app.getJSONArray("usage");
-//					for(int j=0;j<usages.length();j++){
-//						JSONObject usage = usages.getJSONObject(j);
-//						start = usage.optLong("start",-1);
-//						end = usage.optLong("end",-1);
-//						if(start!=-1&&end!=-1){
-//							startInSec = Utilities.getTimeOfDay(start);
-//							endInSec = Utilities.getTimeOfDay(end);
-//							/**
-//							 * width/24.f = pixels for one hour = h
-//							 * h/60.f = pixels for one minute = m
-//							 * m/60.f = pixels for one second = s
-//							 * 
-//							 */
-//							float pxForSecond = ((lineWidth/24.f)/60.f)/60.f;
-//							mRectanglePaint.setColor(colors.getInt(appName));
-//							canvas.drawRect(xpad+1+offset+pxForSecond*startInSec,ypad+height*0.3f,xpad-1+offset+pxForSecond*endInSec,ypad+height*0.7f,mRectanglePaint);
-//							
-//							rectangles.put(new JSONObject().put("start",startInSec).put("length", endInSec-startInSec).put("app", appName));
-//							/*
-//							mRectanglePaint.setColor(getResources().getColor(android.R.color.darker_gray));
-//							canvas.drawRect(xpad+offset+pxForSecond*startInSec,ypad+height*0.3f,xpad+offset+pxForSecond*endInSec,ypad+height*0.7f,mRectanglePaint);
-//							mRectanglePaint.setColor(colors.getInt(appName));
-//							canvas.drawRect(xpad+1+offset+pxForSecond*startInSec,ypad+1+height*0.3f,xpad-1+offset+pxForSecond*endInSec,ypad-1+height*0.7f,mRectanglePaint);
-//							*/
-//						}
-//					}
-//				}
-//			} catch (JSONException e) {
-//				e.printStackTrace();
-//			}
-//		}
 	}
 	
 	public void setData(JSONObject jObj){
@@ -258,24 +211,9 @@ public class TimeLineView extends View {
 					end = usage.optLong("end",-1);
 					if(start!=-1&&end!=-1){
 						startInSec = Utilities.getTimeOfDay(start);
-						endInSec = Utilities.getTimeOfDay(end);
-						/**
-						 * width/24.f = pixels for one hour = h
-						 * h/60.f = pixels for one minute = m
-						 * m/60.f = pixels for one second = s
-						 * 
-						 */
-						//float pxForSecond = ((lineWidth/24.f)/60.f)/60.f;
-						//mRectanglePaint.setColor(colors.getInt(appName));
-						//canvas.drawRect(xpad+1+offset+pxForSecond*startInSec,ypad+height*0.3f,xpad-1+offset+pxForSecond*endInSec,ypad+height*0.7f,mRectanglePaint);
-						
+						endInSec = Utilities.getTimeOfDay(end);						
 						rectangles.put(new JSONObject().put("start",startInSec).put("length", endInSec-startInSec).put("app", appName));
-						/*
-						mRectanglePaint.setColor(getResources().getColor(android.R.color.darker_gray));
-						canvas.drawRect(xpad+offset+pxForSecond*startInSec,ypad+height*0.3f,xpad+offset+pxForSecond*endInSec,ypad+height*0.7f,mRectanglePaint);
-						mRectanglePaint.setColor(colors.getInt(appName));
-						canvas.drawRect(xpad+1+offset+pxForSecond*startInSec,ypad+1+height*0.3f,xpad-1+offset+pxForSecond*endInSec,ypad-1+height*0.7f,mRectanglePaint);
-						*/
+
 					}
 				}
 			}
@@ -378,9 +316,13 @@ public class TimeLineView extends View {
 				scrollerKilled=false;
 			return true;
 		}
-		
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+			if(velocityX>velocityY){
+				disableVerticalScroll();
+			}else{
+				enableVerticalScroll();
+			}
             mScroller.fling(
                     (int)e1.getX(),
                     0,
@@ -395,12 +337,16 @@ public class TimeLineView extends View {
             
             mScrollAnimator.setDuration(mScroller.getDuration());
             mScrollAnimator.start();
-            
             return true;
 		};
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
+			if(Math.abs(distanceX)>Math.abs(distanceY*.8f)){
+				disableVerticalScroll();
+			}else{
+				enableVerticalScroll();
+			}
 			scrollX-=distanceX;
 			if(scrollX>0)
 				scrollX=0.f;
@@ -432,6 +378,17 @@ public class TimeLineView extends View {
 				Log.d("Time tapped",""+time);
 				selectedApp = getAppAtPos(e);
 				invalidate();
+				if(((LinearLayout)getParent()).getChildAt(1)==null){
+					TextView tv;
+					for(int i = 0;i<10;i++){
+						tv = new TextView(getContext());
+						tv.setText("Test"+i);
+						((LinearLayout)getParent()).addView(tv);					
+					}
+				}else{
+					((LinearLayout)getParent()).removeViews(1, 10);
+				}
+					
 			}
 			return true;
 		}
@@ -484,5 +441,28 @@ public class TimeLineView extends View {
 		}catch(JSONException ex){
 		}
 		return ""+timeInSec;
+	}
+	
+	private void disableVerticalScroll(){
+		ViewGroup root = (ViewGroup) ((Activity)getContext()).findViewById(R.id.timelinell);
+		((ScrollView)root.getParent()).requestDisallowInterceptTouchEvent(true);/*
+		if(root!=null&&root.getParent().getClass().getSimpleName().equals("ScrollView")){
+			((ScrollView)root.getParent()).setOnTouchListener(new OnTouchListener() {
+				
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					
+					return true;
+				}
+			});
+		}*/
+	}
+	private void enableVerticalScroll(){
+		ViewGroup root = (ViewGroup) ((Activity)getContext()).findViewById(R.id.timelinell);
+		if(root!=null&&root.getParent().getClass().getSimpleName().equals("ScrollView")){
+//			((ScrollView)root.getParent()).setOnTouchListener(null);
+			((ScrollView)root.getParent()).requestDisallowInterceptTouchEvent(false);
+			Log.d("ScrollView","enabled");
+		}
 	}
 }
