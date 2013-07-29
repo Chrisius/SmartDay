@@ -646,6 +646,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		            LayoutParams.MATCH_PARENT,
 		            LayoutParams.WRAP_CONTENT));
 			header.setTextSize(18);
+			header.setTextColor(getResources().getColor(android.R.color.white));
 			return header;
 		}
 	}

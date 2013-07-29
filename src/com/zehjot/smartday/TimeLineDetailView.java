@@ -33,6 +33,8 @@ public class TimeLineDetailView extends View {
 	private JSONObject[] orderedApps;
 	private int pxLongestWord = 0;
 	private int maxBarLength;
+	private float yOffset;
+	private float xOffset;
 
 	private Paint mRectanglePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	private String selectedApp;
@@ -42,7 +44,8 @@ public class TimeLineDetailView extends View {
 	public TimeLineDetailView(Context context) {
 		super(context);
 		textSize = 18;
-		
+		yOffset = textSize/3.f;
+		xOffset = 20;
 		
 		mTextPaint = new Paint();
 		mTextPaint.setTextSize(textSize);
@@ -95,33 +98,43 @@ public class TimeLineDetailView extends View {
 		}	
 		setMeasuredDimension(width, height);
 	}
-	*/
+*/	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		float xpad = (float) (getPaddingLeft()+getPaddingRight());
-		float ypad = (float) (getPaddingTop()+getPaddingBottom());
+		float ypad = (float) (getPaddingTop()+getPaddingBottom())+yOffset/2.f;
+		if(maxBarLength<0){
+			maxBarLength = (int)(getWidth()/2.f)+maxBarLength; // width available after after setData
+		}
 		String appName;
 		float relativeBarLength;
 		for(int i=0;i<orderedApps.length;i++){
 			if(orderedApps[i].optString("app").equals(selectedApp)){
 				mRectanglePaint.setColor(getResources().getColor(android.R.color.holo_blue_light));
-				canvas.drawRect(xpad+15, ypad+(i)*textSize+(textSize/4.f)*i, xpad+20+pxLongestWord, ypad+(i+1)*textSize+(textSize/4.f)*(i+1), mRectanglePaint);
+				canvas.drawRect(
+						xpad+xOffset-5, 
+						ypad+(i)*(textSize+yOffset)+Math.round(textSize*0.2f+0.5)-yOffset/2.f,
+						xpad+xOffset+pxLongestWord, 
+						ypad+(i+1)*textSize+(yOffset)*i+Math.round(textSize*0.2f+0.5)+yOffset/2.f,
+						mRectanglePaint);
 			}
-			canvas.drawText(orderedApps[i].optString("app", "Error"), xpad+20, ypad+(i+1)*textSize+(textSize/4.f)*i, mTextPaint);
+
+			float y=ypad+(i+1)*textSize+i*yOffset;
+			canvas.drawText(orderedApps[i].optString("app", "Error"), xpad+20, y, mTextPaint);
 			
 			appName = orderedApps[i].optString("app", "Error");
 			relativeBarLength = orderedApps[i].optLong("duration")/longestDuration;
 			mRectanglePaint.setColor(colors.optInt(appName));
 			canvas.drawRect(
-					xpad+pxLongestWord+20,
-					ypad+(i)*textSize+(textSize/4.f)*i+textSize*0.1f,
-					xpad+pxLongestWord+20+relativeBarLength*maxBarLength,
-					ypad+(i+1)*textSize+(textSize/4.f)*i+textSize*0.1f,
+					xpad+pxLongestWord+xOffset,
+					ypad+(i)*(textSize+yOffset)+Math.round(textSize*0.2f+0.5),
+					xpad+pxLongestWord+xOffset+relativeBarLength*maxBarLength,
+					ypad+(i+1)*textSize+(yOffset)*i+Math.round(textSize*0.2f+0.5),//crazy way to find top and bottom of drawn Text
 					mRectanglePaint);
 			float percent = ((float)orderedApps[i].optLong("duration")/totalDuration)*100.f;
 			percent = Math.round(percent*100.f);
 			percent /= 100.f;
-			canvas.drawText(percent+"%", xpad+20+10+pxLongestWord+relativeBarLength*maxBarLength, ypad+(i+1)*textSize+(textSize/4.f)*i, mTextPaint);
+			canvas.drawText(percent+"%", xpad+20+10+pxLongestWord+relativeBarLength*maxBarLength, ypad+(i+1)*textSize+(yOffset)*i, mTextPaint);
 		}
 	}
 	
@@ -185,7 +198,7 @@ public class TimeLineDetailView extends View {
 		int percentageSize = bounds.width();
 		int offset = 10 ;
 		
-		maxBarLength = (int)(getWidth()/2.f)-pxLongestWord-percentageSize-offset;
+		maxBarLength = -pxLongestWord-percentageSize-offset-(int)xOffset;
 		/**
 		 * GetColors for Bars
 		 */
@@ -208,7 +221,7 @@ public class TimeLineDetailView extends View {
 		}
 		getParent().requestLayout();
 		if(orderedApps!=null){
-			int height = (int) ((orderedApps.length)*textSize+(textSize/4.f)*orderedApps.length);
+			int height = (int) ((orderedApps.length)*textSize+(yOffset)*(orderedApps.length+1));
 			this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, height));
 			//requestLayout();
 		}
@@ -237,6 +250,10 @@ public class TimeLineDetailView extends View {
 		
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
+			String app = getAppAtPos(e);
+			selectApp(app);
+			LinearLayout linearLayout = (LinearLayout)getParent();
+			((TimeLineView)linearLayout.getChildAt(0)).selectApp(app);
 			return true;
 		}
 	}
@@ -244,5 +261,17 @@ public class TimeLineDetailView extends View {
 		selectedApp = app;
 		invalidate();
 	}
-	
+	private String getAppAtPos(MotionEvent e){
+		float ypad = (float) (getPaddingTop()+getPaddingBottom())+yOffset/2.f;
+		float y = e.getY();
+		for(int i=0;i<orderedApps.length;i++){
+			float start = ypad+(i)*(textSize+yOffset)+Math.round(textSize*0.2f+0.5)-yOffset/2.f;
+			float end = ypad+(i+1)*textSize+(yOffset)*i+Math.round(textSize*0.2f+0.5)+yOffset/2.f;
+			if(y>=start && y<=end){
+				return orderedApps[i].optString("app");
+			}
+			//canvas.drawText(orderedApps[i].optString("app", "Error"), xpad+20, ypad+(i+1)*textSize+(yOffset)*i, mTextPaint);
+		}
+		return "";
+	}
 }
