@@ -9,18 +9,14 @@ import org.json.JSONObject;
 
 import com.zehjot.smartday.data_access.DataSet;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.MeasureSpec;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 
 public class TimeLineDetailView extends View {
@@ -143,11 +139,11 @@ public class TimeLineDetailView extends View {
 		tapDetector.onTouchEvent(event);
 		return true;
 	}
-	
 	public void setData(JSONObject jObj){
 		if(jObj == null)
 			return;
 		this.jObj = jObj;
+		JSONObject selectedApps = DataSet.getInstance(getContext()).getSelectedApps();
 		/**
 		 * Get App Bar Length
 		 */
@@ -155,27 +151,34 @@ public class TimeLineDetailView extends View {
 			JSONArray apps = jObj.getJSONArray("result");
 			totalDuration=0;
 			longestDuration=0;
-			orderedApps = new JSONObject[apps.length()];
+			int numberSelectedApps=0;
 			for(int i=0;i<apps.length();i++){
-				totalDuration += apps.getJSONObject(i).optLong("duration", 0);
-				orderedApps[i] = (new JSONObject()
-					.put("app", apps.getJSONObject(i).getString("app"))
-					.put("duration", apps.getJSONObject(i).optLong("duration", 0))
-				);
-				
-				
-				Rect bounds = new Rect();
-				String text = apps.getJSONObject(i).getString("app");
-				mTextPaint.getTextBounds(text, 0, text.length(), bounds);
-				if(bounds.width()>pxLongestWord){
-					pxLongestWord = bounds.width();
-				}
-				
-				if(apps.getJSONObject(i).optLong("duration", 0)>longestDuration){
-					longestDuration = apps.getJSONObject(i).optLong("duration", 0);
+				if(selectedApps.optBoolean(apps.getJSONObject(i).getString("app"),true))
+					numberSelectedApps += 1;
+			}
+			int j=0;
+			orderedApps = new JSONObject[numberSelectedApps];
+			for(int i=0;i<apps.length();i++){
+				if(selectedApps.optBoolean(apps.getJSONObject(i).getString("app"),true)){
+					totalDuration += apps.getJSONObject(i).optLong("duration", 0);
+					orderedApps[j] = (new JSONObject()
+						.put("app", apps.getJSONObject(i).getString("app"))
+						.put("duration", apps.getJSONObject(i).optLong("duration", 0))
+					);
+					j++;
+					
+					Rect bounds = new Rect();
+					String text = apps.getJSONObject(i).getString("app");
+					mTextPaint.getTextBounds(text, 0, text.length(), bounds);
+					if(bounds.width()>pxLongestWord){
+						pxLongestWord = bounds.width();
+					}
+					
+					if(apps.getJSONObject(i).optLong("duration", 0)>longestDuration){
+						longestDuration = apps.getJSONObject(i).optLong("duration", 0);
+					}
 				}
 			}
-			
 			Arrays.sort(orderedApps, new Comparator<JSONObject>() {
 				@Override
 				public int compare(JSONObject lhs, JSONObject rhs) {
@@ -242,9 +245,9 @@ public class TimeLineDetailView extends View {
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
 			setId(1);
-			LinearLayout linearLayout = (LinearLayout)getParent();
+			LinearLayout linearLayout = (LinearLayout)getParent().getParent();
 			((TimeLineView)linearLayout.getChildAt(0)).selectApp("");
-			linearLayout.removeView(linearLayout.findViewById(1));
+			linearLayout.removeView(linearLayout.getChildAt(1));
 			return true;
 		}
 		
@@ -252,9 +255,15 @@ public class TimeLineDetailView extends View {
 		public boolean onSingleTapConfirmed(MotionEvent e) {
 			String app = getAppAtPos(e);
 			selectApp(app);
-			LinearLayout linearLayout = (LinearLayout)getParent();
+			LinearLayout linearLayout = (LinearLayout)getParent().getParent();
 			((TimeLineView)linearLayout.getChildAt(0)).selectApp(app);
+			addDetails();
 			return true;
+		}
+
+		private void addDetails() {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 	public void selectApp(String app){

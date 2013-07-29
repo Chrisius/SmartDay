@@ -222,18 +222,21 @@ public class TimeLineView extends View {
 			long end;
 			int startInSec;
 			int endInSec;
-			for(int i=0; i<jObj.getJSONArray("result").length();i++){
+			JSONObject selectedApps = DataSet.getInstance(getContext()).getSelectedApps();
+			for(int i=0; i<jObj.getJSONArray("result").length();i++){				
 				JSONObject app = jObj.getJSONArray("result").getJSONObject(i);
 				appName = app.getString("app");
-				JSONArray usages = app.getJSONArray("usage");
-				for(int j=0;j<usages.length();j++){
-					JSONObject usage = usages.getJSONObject(j);
-					start = usage.optLong("start",-1);
-					end = usage.optLong("end",-1);
-					if(start!=-1&&end!=-1){
-						startInSec = Utilities.getTimeOfDay(start);
-						endInSec = Utilities.getTimeOfDay(end);						
-						rectangles.put(new JSONObject().put("start",startInSec).put("length", endInSec-startInSec).put("app", appName));
+				if(selectedApps.optBoolean(appName,true)){				
+					JSONArray usages = app.getJSONArray("usage");
+					for(int j=0;j<usages.length();j++){
+						JSONObject usage = usages.getJSONObject(j);
+						start = usage.optLong("start",-1);
+						end = usage.optLong("end",-1);
+						if(start!=-1&&end!=-1){
+							startInSec = Utilities.getTimeOfDay(start);
+							endInSec = Utilities.getTimeOfDay(end);						
+							rectangles.put(new JSONObject().put("start",startInSec).put("length", endInSec-startInSec).put("app", appName));
+						}
 					}
 				}
 			}
@@ -403,8 +406,11 @@ public class TimeLineView extends View {
 				appSessionCount = getAppSessionCount(selectedApp);
 				invalidate();
 				if(((LinearLayout)getParent()).getChildAt(1)==null){
+					LinearLayout lLayout = new LinearLayout(getContext());
+					lLayout.setOrientation(LinearLayout.HORIZONTAL);
+					((LinearLayout)getParent()).addView(lLayout);					
 					detail=new TimeLineDetailView(getContext());
-					((LinearLayout)getParent()).addView(detail);
+					lLayout.addView(detail);
 				}else{
 				}
 				detail.setData(jObj);

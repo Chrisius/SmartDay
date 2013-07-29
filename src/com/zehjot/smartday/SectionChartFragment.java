@@ -21,6 +21,7 @@ import com.zehjot.smartday.helper.Utilities;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -502,6 +503,23 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 								long start = appUsage.optLong("start");
 								long duration = appUsage.optLong("duration");
 								TextView view = getView("Used at "+ Utilities.getTimeFromTimeStamp(start));
+								view.setOnClickListener(new View.OnClickListener() {									
+									@Override
+									public void onClick(View v) {
+										String time = ((TextView)v).getText().toString();
+										String times[] = time.split("Used at ");
+										times = times[1].split(":");
+										for(int i=0;i<times.length;i++){
+											Log.d("Time Strings",times[i]);
+										}
+										int h = new Integer(times[0]);
+										int m = new Integer(times[1]);
+										int s = new Integer(times[2]);
+										int timestamp = h*60*60 + m*60 + s;
+										Log.d("Time selected",""+timestamp);
+										
+									}
+								});
 								/*		
 										new TextView(getActivity());
 								view.setText("Used at "+ Utilities.getTimeFromTimeStamp(start));
@@ -510,16 +528,37 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 							            LayoutParams.WRAP_CONTENT));
 								view.setTextSize(18);*/
 								view.setPadding(10, 5, 10, 0);
+								view.setId((i*2));
 							    details.addView(view);
-							    
+							
 							    view = getView("    for "+Utilities.getTimeString(duration));/*
 							    String durationAsString = Utilities.getTimeString(duration);
 							    view.setText("    for "+durationAsString);
 							    view.setLayoutParams(new LayoutParams(
 							            LayoutParams.MATCH_PARENT,
 							            LayoutParams.WRAP_CONTENT));
-								view.setTextSize(18);	*/
-								view.setPadding(10, 0, 10, 5);						    
+								view.setTextSize(18);	*/								
+							    view.setOnClickListener(new View.OnClickListener() {									
+									@Override
+									public void onClick(View v) {
+										int id = v.getId();
+										v = ((LinearLayout)v.getParent()).findViewById(id-1);
+										String time = ((TextView)v).getText().toString();
+										String times[] = time.split("Used at ");
+										times = times[1].split(":");
+										for(int i=0;i<times.length;i++){
+											Log.d("Time Strings",times[i]);
+										}
+										int h = new Integer(times[0]);
+										int m = new Integer(times[1]);
+										int s = new Integer(times[2]);
+										int timestamp = h*60*60 + m*60 + s;
+										Log.d("Time selected",""+timestamp);
+										
+									}
+								});
+								view.setPadding(10, 0, 10, 5);
+								view.setId((i*2)+1);						    
 							    details.addView(view);
 							}
 							
@@ -572,8 +611,26 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					view.setLayoutParams(new LayoutParams(
 				            LayoutParams.MATCH_PARENT,
 				            LayoutParams.WRAP_CONTENT));
-					view.setTextSize(18);*/
+					view.setTextSize(18);*/								
+					view.setOnClickListener(new View.OnClickListener() {									
+						@Override
+						public void onClick(View v) {
+							String time = ((TextView)v).getText().toString();
+							String times[] = time.split("Used at ");
+							times = times[1].split(":");
+							for(int i=0;i<times.length;i++){
+								Log.d("Time Strings",times[i]);
+							}
+							int h = new Integer(times[0]);
+							int m = new Integer(times[1]);
+							int s = new Integer(times[2]);
+							int timestamp = h*60*60 + m*60 + s;
+							Log.d("Time selected",""+timestamp);
+							
+						}
+					});
 					view.setPadding(10, 5, 10, 0);
+					view.setId((i*2));
 				    details.addView(view);
 				    
 				    view = getView("    for "+Utilities.getTimeString(duration));/*
@@ -582,8 +639,27 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				    view.setLayoutParams(new LayoutParams(
 				            LayoutParams.MATCH_PARENT,
 				            LayoutParams.WRAP_CONTENT));
-					view.setTextSize(18);	*/
-					view.setPadding(10, 0, 10, 5);						    
+					view.setTextSize(18);	*/							    view.setOnClickListener(new View.OnClickListener() {									
+						@Override
+						public void onClick(View v) {
+							int id = v.getId();
+							v = ((LinearLayout)v.getParent()).findViewById(id-1);
+							String time = ((TextView)v).getText().toString();
+							String times[] = time.split("Used at ");
+							times = times[1].split(":");
+							for(int i=0;i<times.length;i++){
+								Log.d("Time Strings",times[i]);
+							}
+							int h = new Integer(times[0]);
+							int m = new Integer(times[1]);
+							int s = new Integer(times[2]);
+							int timestamp = h*60*60 + m*60 + s;
+							Log.d("Time selected",""+timestamp);
+							
+						}
+					});
+					view.setPadding(10, 0, 10, 5);
+					view.setId((i*2)+1);				    
 				    details.addView(view);
 				}
 				
