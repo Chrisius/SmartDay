@@ -212,7 +212,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		chart1.draw(jObj, R.id.chart_1,R.id.chart_1_details);
 	}
 
-	public void onUpdate() {
+	public void onUpdate(JSONObject jObj) {
 		DataSet.getInstance(getActivity()).getApps(this);		
 	}
 	/*
@@ -242,6 +242,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		private JSONObject rendererToArrayIndex;
 		private JSONArray otherRendererToArrayIndex;
 		private int otherColor;
+		private String selectedApp;
 		
 		private void processData(JSONObject jObj){
 			data = jObj;
@@ -475,6 +476,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						@Override
 						public void onClick(View v) {
 							String appName = ((TextView)v).getText().toString();
+							selectedApp = appName;
 							LinearLayout apps = (LinearLayout)v.getParent();
 							for(int i=0;i<apps.getChildCount();i++){
 								apps.getChildAt(i).setBackgroundResource(0);
@@ -512,10 +514,17 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 										for(int i=0;i<times.length;i++){
 											Log.d("Time Strings",times[i]);
 										}
-										int h = new Integer(times[0]);
-										int m = new Integer(times[1]);
-										int s = new Integer(times[2]);
+										int h = Integer.valueOf(times[0]);
+										int m = Integer.valueOf(times[1]);
+										int s = Integer.valueOf(times[2]);
 										int timestamp = h*60*60 + m*60 + s;
+										JSONObject jObject = new JSONObject();
+										try {
+											jObject.put("time", timestamp).put("app", selectedApp );
+										} catch (JSONException e) {
+											e.printStackTrace();
+										}
+										((MainActivity)getActivity()).switchTab(2, jObject);
 										Log.d("Time selected",""+timestamp);
 										
 									}
@@ -549,10 +558,17 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 										for(int i=0;i<times.length;i++){
 											Log.d("Time Strings",times[i]);
 										}
-										int h = new Integer(times[0]);
-										int m = new Integer(times[1]);
-										int s = new Integer(times[2]);
+										int h = Integer.valueOf(times[0]);
+										int m = Integer.valueOf(times[1]);
+										int s = Integer.valueOf(times[2]);
 										int timestamp = h*60*60 + m*60 + s;
+										JSONObject jObject = new JSONObject();
+										try {
+											jObject.put("time", timestamp).put("app", selectedApp );
+										} catch (JSONException e) {
+											e.printStackTrace();
+										}
+										((MainActivity)getActivity()).switchTab(2, jObject);
 										Log.d("Time selected",""+timestamp);
 										
 									}
@@ -579,6 +595,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			    
 
 				String appName = ((TextView)valueTV).getText().toString();
+				selectedApp = appName;
 				valueTV.setBackgroundResource(android.R.color.holo_blue_dark);
 				LinearLayout details = (LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).getChildAt(0);
 				details.removeAllViews();
@@ -621,10 +638,17 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 							for(int i=0;i<times.length;i++){
 								Log.d("Time Strings",times[i]);
 							}
-							int h = new Integer(times[0]);
-							int m = new Integer(times[1]);
-							int s = new Integer(times[2]);
+							int h = Integer.valueOf(times[0]);
+							int m = Integer.valueOf(times[1]);
+							int s = Integer.valueOf(times[2]);
 							int timestamp = h*60*60 + m*60 + s;
+							JSONObject jObject = new JSONObject();
+							try {
+								jObject.put("time", timestamp).put("app", selectedApp );
+							} catch (JSONException e) {
+								e.printStackTrace();
+							}
+							((MainActivity)getActivity()).switchTab(2, jObject);
 							Log.d("Time selected",""+timestamp);
 							
 						}
@@ -639,7 +663,8 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				    view.setLayoutParams(new LayoutParams(
 				            LayoutParams.MATCH_PARENT,
 				            LayoutParams.WRAP_CONTENT));
-					view.setTextSize(18);	*/							    view.setOnClickListener(new View.OnClickListener() {									
+					view.setTextSize(18);	*/							    
+				    view.setOnClickListener(new View.OnClickListener() {									
 						@Override
 						public void onClick(View v) {
 							int id = v.getId();
@@ -650,10 +675,17 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 							for(int i=0;i<times.length;i++){
 								Log.d("Time Strings",times[i]);
 							}
-							int h = new Integer(times[0]);
-							int m = new Integer(times[1]);
-							int s = new Integer(times[2]);
+							int h = Integer.valueOf(times[0]);
+							int m = Integer.valueOf(times[1]);
+							int s = Integer.valueOf(times[2]);
 							int timestamp = h*60*60 + m*60 + s;
+							JSONObject jObject = new JSONObject();
+							try {
+								jObject.put("time", timestamp).put("app", selectedApp );
+							} catch (JSONException e) {
+								e.printStackTrace();
+							}
+							((MainActivity)getActivity()).switchTab(2, jObject);
 							Log.d("Time selected",""+timestamp);
 							
 						}

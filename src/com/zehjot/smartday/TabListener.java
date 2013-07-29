@@ -1,5 +1,7 @@
 package com.zehjot.smartday;
 
+import org.json.JSONObject;
+
 import android.app.ActionBar.Tab;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -18,7 +20,7 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     	public void onSectionSelected(int pos);
     }
     public interface OnUpdateListener{
-    	public void onUpdate();
+    	public void onUpdate(JSONObject jObj);
     }
         
     public TabListener(Activity activity, String tag, Class<T> fragmentClass, OnSectionSelectedListener listener) {
@@ -37,10 +39,7 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
         		ft.add(R.id.section_fragment_container, fragment, tag);
         	}
         } else {
-//        	if (fragment != null)
-//        		fragment.onResume();
             ft.show(fragment);
-//            ((OnUpdateListener) fragment).onUpdate();
             
         }
         options.onSectionSelected(tab.getPosition());
@@ -60,8 +59,11 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     		ft.add(R.id.section_fragment_container, fragment, tag);
         }
         else
-        	((OnUpdateListener) fragment).onUpdate();/*
-    	if (fragment != null)
-    		fragment.onResume();*/
+        	((OnUpdateListener) fragment).onUpdate(null);
+    }
+    
+    
+    public void switchTab(JSONObject jObj){
+    	((OnUpdateListener) fragment).onUpdate(jObj);    	
     }
 }

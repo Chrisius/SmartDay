@@ -1,5 +1,7 @@
 package com.zehjot.smartday;
 
+import org.json.JSONObject;
+
 import com.google.android.gms.maps.MapFragment;
 import com.zehjot.smartday.TabListener.OnUpdateListener;
 
@@ -18,7 +20,7 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener{
 		
 	}
 
-	public void onUpdate() {
+	public void onUpdate(JSONObject jObj) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -48,6 +48,7 @@ public class TimeLineView extends View {
 	private float height=0;
 	
 	private String selectedApp = "No App selected";
+	private int selectedTime=-1;
 	
 	private JSONArray rectangles;
 	private JSONObject jObj;
@@ -194,12 +195,19 @@ public class TimeLineView extends View {
 				appName = rect.optString("app");
 				mRectanglePaint.setColor(colors.optInt(appName));
 				float selectedOffset = 0;
-				if(appName.equals(selectedApp))
-					selectedOffset = height*0.1f;
+				if(appName.equals(selectedApp)){
+					if(startInSec==selectedTime)
+						selectedOffset = height*0.1f;
+					else
+						selectedOffset = height*0.05f;					
+				}
+				int extraPixel=0;
+				if((int)(xpad+1+offset+pxForSecond*startInSec)-(int)(xpad-1+offset+pxForSecond*endInSec)<1)
+					extraPixel=1;
 				canvas.drawRect(
 						xpad+1+offset+pxForSecond*startInSec,
 						ypad+height*0.3f+selectedOffset,
-						xpad-1+offset+pxForSecond*endInSec,
+						xpad-1+offset+pxForSecond*endInSec+extraPixel,
 						ypad+height*0.7f+selectedOffset,
 						mRectanglePaint);
 			}
@@ -209,6 +217,21 @@ public class TimeLineView extends View {
 	public void selectApp(String appName){
 		selectedApp = appName;
 		invalidate();
+	}
+	public void selectApp(String appName,int time){
+		selectedApp = appName;
+		selectedTime = time;
+		if(time!=-1&&scaleFactor>1){
+			scrollX = 10 - time*(lineWidth/24.f)-offset;
+		}
+		invalidate();
+	}
+	public void selectApp(int time){
+		selectedTime = time;
+		if(time!=-1&&scaleFactor>1){
+			scrollX = 10 - (time/(60.f*60.f))*(lineWidth/24.f)-offset;
+		}
+		invalidate();		
 	}
 	
 	public void setData(JSONObject jObj){
@@ -241,7 +264,7 @@ public class TimeLineView extends View {
 				}
 			}
 			if(this.getParent()!=null&&((LinearLayout)getParent()).getChildAt(1)!=null){
-				((TimeLineDetailView)((LinearLayout)this.getParent()).getChildAt(1)).setData(jObj);
+				((TimeLineDetailView)((LinearLayout)((LinearLayout)this.getParent()).getChildAt(1)).getChildAt(0)).setData(jObj);
 			}
 				
 		} catch (JSONException e) {
@@ -402,7 +425,15 @@ public class TimeLineView extends View {
 			if(!scrollerKilled){ //needed so you dont tap if you want to stop the fling
 				float time = ((e.getX()-offset-scrollX)/lineWidth)*24.f;
 				Log.d("Time tapped",""+time);
-				selectedApp = getAppAtPos(e);
+				JSONObject app;
+				time=-1;
+				selectedApp="";
+				app = getAppAtPos(e);
+				if(app!=null){
+					selectedApp = app.optString("app");
+					time = app.optInt("start");
+					selectedTime = (int) time;
+				}
 				appSessionCount = getAppSessionCount(selectedApp);
 				invalidate();
 				if(((LinearLayout)getParent()).getChildAt(1)==null){
@@ -414,7 +445,7 @@ public class TimeLineView extends View {
 				}else{
 				}
 				detail.setData(jObj);
-				detail.selectApp(selectedApp);
+				detail.selectApp(selectedApp,(int)time);
 			}
 			return true;
 		}
@@ -453,13 +484,7 @@ public class TimeLineView extends View {
 	        invalidate();
 	    }
 	}
-	private String getAppAtPos(MotionEvent e){/*
-		ImageView iv = (ImageView) ((View)this);
-		Bitmap  bitmap = ((BitmapDrawable)iv.getDrawable()).getBitmap();
-		if(bitmap.getPixel((int)e.getX(), (int)e.getY())==0){
-			selectedApp = "No App Selected";
-			return "No App Selected";
-		}*/
+	private JSONObject getAppAtPos(MotionEvent e){
 		float nearest = 10*24*60*60/lineWidth;
 		int nearestI=-1;
 		float time = ((e.getX()-offset-scrollX)/lineWidth)*24.f;
@@ -473,7 +498,7 @@ public class TimeLineView extends View {
 				start = rect.getInt("start");
 				length = rect.getInt("length");
 				if(timeInSec-start>=0 && timeInSec-start<=length){
-					return rect.getString("app");
+					return rect;
 				}
 				else{
 					if(timeInSec-start<0&&Math.abs(timeInSec-start)<nearest){
@@ -488,10 +513,10 @@ public class TimeLineView extends View {
 				}
 			}
 			if(nearestI!=-1)
-				return rectangles.getJSONObject(nearestI).getString("app");
+				return rectangles.getJSONObject(nearestI);
 		}catch(JSONException ex){
 		}
-		return ""+timeInSec;
+		return null;
 	}
 	
 	private void disableVerticalScroll(){

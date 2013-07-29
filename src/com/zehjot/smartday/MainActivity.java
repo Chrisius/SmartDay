@@ -25,6 +25,11 @@ public class MainActivity extends Activity
 	private static DataSet dataSet;
 	private boolean isRunning = true;
 	private static Activity activity;
+	private TabListener<SectionMapFragment> map;
+	private TabListener<SectionChartFragment> chart;
+	private TabListener<SectionTimelineFragment> time;
+	
+	
 	
     public boolean isRunning(){
 		return isRunning;
@@ -159,6 +164,27 @@ public class MainActivity extends Activity
 			getActionBar().setSelectedNavigationItem(getActionBar().getSelectedNavigationIndex());
 		}
 	}
+	
+	public void switchTab(int tab, JSONObject jObj){
+        ActionBar actionBar = getActionBar();
+        if(tab>=actionBar.getTabCount()||tab<0)
+        	return;
+        actionBar.setSelectedNavigationItem(tab);
+        switch (tab) {
+		case 0:
+			map.switchTab(jObj);
+			break;
+		case 1:
+			chart.switchTab(jObj);
+			break;
+		case 2:
+			time.switchTab(jObj);
+			break;
+		default:
+			break;
+		}
+	}
+	
 	private void initShit(Bundle savedInstanceState){
     	optionsListFragment = (OptionsListFragment) fm.findFragmentByTag("optionsList");
 		if(optionsListFragment== null){
@@ -172,17 +198,20 @@ public class MainActivity extends Activity
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         Tab tab = actionBar.newTab();
         tab.setText("MapView");
-        tab.setTabListener(new TabListener<SectionMapFragment>(this, "mapView", SectionMapFragment.class, optionsListFragment));
+        map = new TabListener<SectionMapFragment>(this, "mapView", SectionMapFragment.class, optionsListFragment);
+        tab.setTabListener(map);
         actionBar.addTab(tab);
         
         tab = actionBar.newTab();
         tab.setText("ChartView");
-        tab.setTabListener(new TabListener<SectionChartFragment>(this, "chartView", SectionChartFragment.class, optionsListFragment));
+        chart = new TabListener<SectionChartFragment>(this, "chartView", SectionChartFragment.class, optionsListFragment);
+        tab.setTabListener(chart);
         actionBar.addTab(tab);
         
         tab = actionBar.newTab();
         tab.setText("Timeline");
-        tab.setTabListener(new TabListener<SectionTimelineFragment>(this, "timeline", SectionTimelineFragment.class, optionsListFragment));
+        time = new TabListener<SectionTimelineFragment>(this, "timeline", SectionTimelineFragment.class, optionsListFragment);
+        tab.setTabListener(time);
         actionBar.addTab(tab);
     	actionBar.setSelectedNavigationItem(0);
 

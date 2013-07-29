@@ -30,8 +30,9 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 		DataSet.getInstance(getActivity()).getApps(this);	
 	}
 	
-	public void onUpdate() {
-		DataSet.getInstance(getActivity()).getApps(this);		
+	public void onUpdate(JSONObject jObj) {
+		if(getActivity()!=null&&getActivity().findViewById(R.id.timelinell)!=null)
+			DataSet.getInstance(getActivity()).getApps(this);
 	}
 	
 	@Override

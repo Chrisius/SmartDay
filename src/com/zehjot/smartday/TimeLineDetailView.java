@@ -8,16 +8,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.zehjot.smartday.data_access.DataSet;
+import com.zehjot.smartday.helper.Utilities;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 public class TimeLineDetailView extends View {
 	private JSONObject jObj;
@@ -95,12 +99,14 @@ public class TimeLineDetailView extends View {
 		setMeasuredDimension(width, height);
 	}
 */	
+	
+	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		float xpad = (float) (getPaddingLeft()+getPaddingRight());
 		float ypad = (float) (getPaddingTop()+getPaddingBottom())+yOffset/2.f;
 		if(maxBarLength<0){
-			maxBarLength = (int)(getWidth()/2.f)+maxBarLength; // width available after after setData
+			maxBarLength = (int)(getWidth())+maxBarLength; // width available after after setData
 		}
 		String appName;
 		float relativeBarLength;
@@ -225,7 +231,7 @@ public class TimeLineDetailView extends View {
 		getParent().requestLayout();
 		if(orderedApps!=null){
 			int height = (int) ((orderedApps.length)*textSize+(yOffset)*(orderedApps.length+1));
-			this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, height));
+			this.setLayoutParams(new LinearLayout.LayoutParams(500, height));
 			//requestLayout();
 		}
 		invalidate();
@@ -257,17 +263,17 @@ public class TimeLineDetailView extends View {
 			selectApp(app);
 			LinearLayout linearLayout = (LinearLayout)getParent().getParent();
 			((TimeLineView)linearLayout.getChildAt(0)).selectApp(app);
-			addDetails();
 			return true;
 		}
-
-		private void addDetails() {
-			// TODO Auto-generated method stub
-			
-		}
+	}
+	public void selectApp(String app, int time){
+		selectedApp = app;
+		addDetails(app,time);
+		invalidate();
 	}
 	public void selectApp(String app){
 		selectedApp = app;
+		addDetails(app,-1);
 		invalidate();
 	}
 	private String getAppAtPos(MotionEvent e){
@@ -282,5 +288,116 @@ public class TimeLineDetailView extends View {
 			//canvas.drawText(orderedApps[i].optString("app", "Error"), xpad+20, ypad+(i+1)*textSize+(yOffset)*i, mTextPaint);
 		}
 		return "";
+	}		
+	private TextView createTextView(String headerString){			
+		TextView header = new TextView(getContext());
+		header.setText(headerString);
+		header.setLayoutParams(new LayoutParams(
+	            LayoutParams.MATCH_PARENT,
+	            LayoutParams.WRAP_CONTENT));
+		header.setTextSize(18);
+		header.setTextColor(getResources().getColor(android.R.color.white));
+		return header;
+	}
+
+
+	private void addDetails(String appName, int time) {
+		LinearLayout layout = (LinearLayout) getParent();	//Check if extra layouts for time and location are initialized - if not, do so
+		if(layout.getChildAt(1)==null){
+			LinearLayout tmp = new LinearLayout(getContext());
+			tmp.setOrientation(LinearLayout.VERTICAL);
+			layout.addView(tmp);
+			tmp = new LinearLayout(getContext());
+			tmp.setOrientation(LinearLayout.VERTICAL);
+			layout.addView(tmp);
+		}
+		LinearLayout details = (LinearLayout) layout.getChildAt(1);
+		details.removeAllViews();
+		JSONArray apps = jObj.optJSONArray("result"); //find the JSONObj which represents appName
+		JSONObject app=null;
+		for(int i=0;i<apps.length();i++){
+			if(apps.optJSONObject(i).optString("app").equals(appName)){
+				app = apps.optJSONObject(i);
+				break;
+			}
+		}
+		if(app==null)
+			return;
+		TextView header = createTextView("Total time:"+"\n"+"    "+Utilities.getTimeString(app.optLong("duration")));
+		header.setPadding(10, 0, 10, 2);
+	    details.addView(header);
+		JSONArray usages = app.optJSONArray("usage"); //iterate over all usages 
+		for(int i=0;i<usages.length();i++){
+			JSONObject appUsage = usages.optJSONObject(i);
+			long start = appUsage.optLong("start");
+			long duration = appUsage.optLong("end")-start;
+			TextView view = createTextView("Used at "+ Utilities.getTimeFromTimeStamp(start));
+			start = Utilities.getTimeOfDay(start);
+			view.setOnClickListener(new View.OnClickListener() {									
+				@Override
+				public void onClick(View v) {
+					LinearLayout apps = (LinearLayout)v.getParent();
+					for(int i=0;i<apps.getChildCount();i++){
+						apps.getChildAt(i).setBackgroundResource(0);
+					}
+					
+					v.setBackgroundResource(android.R.color.holo_blue_dark);
+					String time = ((TextView)v).getText().toString();
+					String times[] = time.split("Used at ");
+					times = times[1].split(":");
+					for(int i=0;i<times.length;i++){
+						Log.d("Time Strings",times[i]);
+					}
+					int h = Integer.valueOf(times[0]);
+					int m = Integer.valueOf(times[1]);
+					int s = Integer.valueOf(times[2]);
+					int timestamp = h*60*60 + m*60 + s;
+					LinearLayout linearLayout = (LinearLayout)getParent().getParent();
+					((TimeLineView)linearLayout.getChildAt(0)).selectApp(timestamp);
+					int id = v.getId();
+					v = ((LinearLayout)v.getParent()).findViewById(id+1);
+					v.setBackgroundResource(android.R.color.holo_blue_dark);
+				}
+			});
+			view.setPadding(10, 2, 10, 0);
+			view.setId((i*2));
+			if(time==start)
+				view.setBackgroundResource(android.R.color.holo_blue_dark);
+		    details.addView(view);
+		
+		    view = createTextView("    for "+Utilities.getTimeString(duration));					
+		    view.setOnClickListener(new View.OnClickListener() {									
+				@Override
+				public void onClick(View v) {
+					LinearLayout apps = (LinearLayout)v.getParent();
+					for(int i=0;i<apps.getChildCount();i++){
+						apps.getChildAt(i).setBackgroundResource(0);
+					}
+					
+					v.setBackgroundResource(android.R.color.holo_blue_dark);
+					int id = v.getId();
+					v = ((LinearLayout)v.getParent()).findViewById(id-1);
+					v.setBackgroundResource(android.R.color.holo_blue_dark);
+					String time = ((TextView)v).getText().toString();
+					String times[] = time.split("Used at ");
+					times = times[1].split(":");
+					for(int i=0;i<times.length;i++){
+						Log.d("Time Strings",times[i]);
+					}
+					int h = Integer.valueOf(times[0]);
+					int m = Integer.valueOf(times[1]);
+					int s = Integer.valueOf(times[2]);
+					int timestamp = h*60*60 + m*60 + s;
+					LinearLayout linearLayout = (LinearLayout)getParent().getParent();
+					((TimeLineView)linearLayout.getChildAt(0)).selectApp(timestamp);
+					
+				}
+			});
+			view.setPadding(10, 0, 10, 2);
+			view.setId((i*2)+1);					
+			if(time==start)
+				view.setBackgroundResource(android.R.color.holo_blue_dark);	    
+		    details.addView(view);	
+		}
 	}
 }
