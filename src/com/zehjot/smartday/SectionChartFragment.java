@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class SectionChartFragment extends Fragment implements onDataAvailableListener, OnUpdateListener{
@@ -339,8 +340,8 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		
 		public void draw(JSONObject jObj, int drawContainer, final int detailContainer){
 			processData(jObj);
-			((LinearLayout)((LinearLayout) getActivity().findViewById(detailContainer)).getChildAt(0)).removeAllViews();
-			((LinearLayout)((LinearLayout) getActivity().findViewById(detailContainer)).getChildAt(1)).removeAllViews();
+			((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailContainer)).getChildAt(0)).getChildAt(0)).removeAllViews();
+			((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailContainer)).getChildAt(1)).getChildAt(0)).removeAllViews();
 			rendererToArrayIndex = new JSONObject();
 			otherRendererToArrayIndex = new JSONArray();
 			double totaltime = 0;
@@ -449,9 +450,11 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			}
 		}
 		private void addDetail(int selectedSeries,int detailViewContainer){
+			((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0)).getChildAt(0)).removeAllViews();
+			((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).getChildAt(0)).removeAllViews();/*
 			((LinearLayout)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0)).removeAllViews();
-			((LinearLayout)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).removeAllViews();
-			LinearLayout appNames = (LinearLayout) ((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0);		
+			((LinearLayout)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).removeAllViews();*/
+			LinearLayout appNames = (LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0)).getChildAt(0);		
 			if(selectedSeries==renderer.getSeriesRendererCount()-1&&otherRendererToArrayIndex.length()>0){
 				String[] sortedArray = new String[otherRendererToArrayIndex.length()];
 				for(int i = 0; i<otherRendererToArrayIndex.length(); i++){
@@ -476,7 +479,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 								apps.getChildAt(i).setBackgroundResource(0);
 							}
 							v.setBackgroundResource(android.R.color.holo_blue_dark);
-							LinearLayout details = (LinearLayout) ((LinearLayout)v.getParent().getParent()).getChildAt(1);
+							LinearLayout details = (LinearLayout)((ScrollView)((LinearLayout) v.getParent().getParent().getParent()).getChildAt(1)).getChildAt(0);
 							details.removeAllViews();
 							JSONObject appTime = getTimesOfApp(appName);
 							JSONArray appUsages = appTime.optJSONArray("times");
@@ -538,7 +541,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 
 				String appName = ((TextView)valueTV).getText().toString();
 				valueTV.setBackgroundResource(android.R.color.holo_blue_dark);
-				LinearLayout details = (LinearLayout) ((LinearLayout)valueTV.getParent().getParent()).getChildAt(1);
+				LinearLayout details = (LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).getChildAt(0);
 				details.removeAllViews();
 				JSONObject appTime = getTimesOfApp(appName);
 				if(appTime == null)
@@ -626,13 +629,14 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						}
 						result.put("times", output);
 						result.put("total", totalTime);
+						return result;
 					} catch (JSONException e) {
 						e.printStackTrace();
+						return null;
 					}	
-					return result;
 				}					
 			}
-			return null;
+			return result;
 		}
 		
 		private TextView getView(String headerString){			

@@ -19,11 +19,9 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Scroller;
-import android.widget.TextView;
 /**
  * Dont put inside scrollview or else the timeline cant be scrolled and zooming works like crap
  *
@@ -53,6 +51,9 @@ public class TimeLineView extends View {
 	
 	private JSONArray rectangles;
 	private JSONObject jObj;
+	private int appSessionCount=0;
+	
+	private TimeLineDetailView detail;
 	
 	public TimeLineView(Context context) {
 		super(context);
@@ -73,14 +74,16 @@ public class TimeLineView extends View {
 		mLinePaint.setColor(textColor);
 		
 		zoomDetector=new ScaleGestureDetector(getContext(), new ZoomListener());
-		scrollDetector= new GestureDetector(getContext(), new PanListener());
+		scrollDetector= new GestureDetector(getContext(), new TapListener());
 		
 		
         mScroller = new Scroller(getContext(), null, true);
         
         mScrollAnimator = ValueAnimator.ofFloat(0, 1);
         mScrollAnimator.addUpdateListener(new AnimatorTick());
-        rectangles = new JSONArray();
+        rectangles = new JSONArray();        
+
+		detail=null;
 	}
 	
 	@Override
@@ -145,8 +148,8 @@ public class TimeLineView extends View {
 		lineWidth *= scaleFactor;///(width-width*24.f/25.f)*0.5f;
 		lineWidth -= 2.f*offset;//*= 24.f/25.f;
 		debugDrawCounter +=1;
-		canvas.drawText(DataSet.getInstance(getContext()).getSelectedDateAsString(), xpad-scrollX+10, ypad+mTextSize, mDebugTextPaint);
-//		canvas.drawText("height="+this.getHeight()+" width="+this.getWidth()+" calls="+debugDrawCounter+" scale="+scaleFactor+" scrollX="+scrollX+" Selected App= "+selectedApp, xpad-scrollX, ypad+mTextSize, mDebugTextPaint);
+//		canvas.drawText(DataSet.getInstance(getContext()).getSelectedDateAsString(), xpad-scrollX+10, ypad+mTextSize, mDebugTextPaint);
+		canvas.drawText("height="+this.getHeight()+" width="+this.getWidth()+" calls="+debugDrawCounter+" scale="+scaleFactor+" scrollX="+scrollX+" Selected App= "+selectedApp+" AppSessions="+appSessionCount, xpad-scrollX, ypad+mTextSize, mDebugTextPaint);
 		/**
 		 * Line with hourdisplay
 		 */
@@ -190,9 +193,22 @@ public class TimeLineView extends View {
 				endInSec = startInSec+rect.optInt("length");
 				appName = rect.optString("app");
 				mRectanglePaint.setColor(colors.optInt(appName));
-				canvas.drawRect(xpad+1+offset+pxForSecond*startInSec,ypad+height*0.3f,xpad-1+offset+pxForSecond*endInSec,ypad+height*0.7f,mRectanglePaint);
+				float selectedOffset = 0;
+				if(appName.equals(selectedApp))
+					selectedOffset = height*0.1f;
+				canvas.drawRect(
+						xpad+1+offset+pxForSecond*startInSec,
+						ypad+height*0.3f+selectedOffset,
+						xpad-1+offset+pxForSecond*endInSec,
+						ypad+height*0.7f+selectedOffset,
+						mRectanglePaint);
 			}
 		}
+	}
+	
+	public void selectApp(String appName){
+		selectedApp = appName;
+		invalidate();
 	}
 	
 	public void setData(JSONObject jObj){
@@ -218,10 +234,13 @@ public class TimeLineView extends View {
 						startInSec = Utilities.getTimeOfDay(start);
 						endInSec = Utilities.getTimeOfDay(end);						
 						rectangles.put(new JSONObject().put("start",startInSec).put("length", endInSec-startInSec).put("app", appName));
-
 					}
 				}
 			}
+			if(this.getParent()!=null&&((LinearLayout)getParent()).getChildAt(1)!=null){
+				((TimeLineDetailView)((LinearLayout)this.getParent()).getChildAt(1)).setData(jObj);
+			}
+				
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -290,6 +309,7 @@ public class TimeLineView extends View {
 		}
 		@Override
 		public boolean onScale(ScaleGestureDetector detector) {
+			disableVerticalScroll();
 			scaleFactor *= detector.getScaleFactor();
 			if(scaleFactor<1.f){
 				scrollX =0;
@@ -303,13 +323,11 @@ public class TimeLineView extends View {
 		}
 		@Override
 		public void onScaleEnd(ScaleGestureDetector detector) {
-			zoomStart = true;
-
-			
+			zoomStart = true;			
 			super.onScaleEnd(detector);
 		}
 	}
-	private class PanListener extends GestureDetector.SimpleOnGestureListener{
+	private class TapListener extends GestureDetector.SimpleOnGestureListener{
 		boolean scrollerKilled=false;
 		@Override
 		public boolean onDown(MotionEvent e) {
@@ -347,7 +365,7 @@ public class TimeLineView extends View {
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
-			if(Math.abs(distanceX)>Math.abs(distanceY*.8f)){
+			if(Math.abs(distanceX)>Math.abs(distanceY*.2f)){
 				disableVerticalScroll();
 			}else{
 				enableVerticalScroll();
@@ -368,7 +386,7 @@ public class TimeLineView extends View {
 				scrollX = 0;
 			}
 			else{
-				scaleFactor =5.f;
+				scaleFactor =8.f;
 				float time = ((e.getX()-offset-scrollX)/lineWidth)*24.f;
 				scrollX = e.getX()-time*((getWidth()*scaleFactor-2.f*offset)/24.f)-offset;
 			}
@@ -382,24 +400,27 @@ public class TimeLineView extends View {
 				float time = ((e.getX()-offset-scrollX)/lineWidth)*24.f;
 				Log.d("Time tapped",""+time);
 				selectedApp = getAppAtPos(e);
+				appSessionCount = getAppSessionCount(selectedApp);
 				invalidate();
 				if(((LinearLayout)getParent()).getChildAt(1)==null){
-					TimeLineDetailView detail=new TimeLineDetailView(getContext());
-					detail.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 600));
-					detail.setData(jObj);
-					((LinearLayout)getParent()).addView(detail);/*
-					TextView tv;
-					for(int i = 0;i<10;i++){
-						tv = new TextView(getContext());
-						tv.setText("Test"+i);
-						((LinearLayout)getParent()).addView(tv);					
-					}*/
+					detail=new TimeLineDetailView(getContext());
+					((LinearLayout)getParent()).addView(detail);
 				}else{
-					((LinearLayout)getParent()).removeViewAt(1);
 				}
-					
+				detail.setData(jObj);
+				detail.selectApp(selectedApp);
 			}
 			return true;
+		}
+		private int getAppSessionCount(String selectedApp) {
+			JSONArray apps = jObj.optJSONArray("result");
+			if(apps==null)
+				return 0;
+			for(int i=0; i<apps.length();i++){
+				if(apps.optJSONObject(i).optString("app").equals(selectedApp))
+					return apps.optJSONObject(i).optInt("sessionCount");
+			}
+			return 0;
 		}
 	}
 	private class AnimatorTick implements ValueAnimator.AnimatorUpdateListener{
@@ -433,6 +454,8 @@ public class TimeLineView extends View {
 			selectedApp = "No App Selected";
 			return "No App Selected";
 		}*/
+		float nearest = 10*24*60*60/lineWidth;
+		int nearestI=-1;
 		float time = ((e.getX()-offset-scrollX)/lineWidth)*24.f;
 		int timeInSec = (int)(time*3600.f);
 		try{
@@ -446,7 +469,20 @@ public class TimeLineView extends View {
 				if(timeInSec-start>=0 && timeInSec-start<=length){
 					return rect.getString("app");
 				}
+				else{
+					if(timeInSec-start<0&&Math.abs(timeInSec-start)<nearest){
+						nearest = Math.abs(timeInSec-start);
+						nearestI = i;
+					}
+					else if(Math.abs(timeInSec-start-length)<nearest){
+						nearest = Math.abs(timeInSec-start-length);
+						nearestI = i;
+					}
+						
+				}
 			}
+			if(nearestI!=-1)
+				return rectangles.getJSONObject(nearestI).getString("app");
 		}catch(JSONException ex){
 		}
 		return ""+timeInSec;

@@ -459,6 +459,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 							if(!found){
 								JSONObject usage = new JSONObject();
 								//usage.put("end", Utilities.getSystemTime()/1000);
+								jObjOutput.put("sessionCount", jObjOutput.optInt("sessionCount",0)+1);
 								usage.put("start", time);
 								usage.put("session",appSession);
 								usages.put(usage);
@@ -476,6 +477,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 							usages.put(usage);
 						app.put("usage",usages);
 						app.put("app", appName);
+						app.put("sessionCount", 1);
 						jArrayOutput.put(app);
 					}
 				}else if(jObjInput.getString("type").equals("POSITION")){

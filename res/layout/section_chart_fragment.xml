@@ -29,31 +29,31 @@
 	
 	</LinearLayout>
 </ScrollView>
-<ScrollView
-    android:layout_width="wrap_content"
-    android:layout_height="fill_parent"
-    android:fillViewport="true">	
-    <HorizontalScrollView 
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:fillViewport="true"> 	
 		        <LinearLayout 
 			        android:id="@+id/chart_1_details"
 			    	android:orientation="horizontal"
 			        android:layout_width="wrap_content"
 				   	android:layout_height="wrap_content">
-			        <LinearLayout 
-				        android:id="@+id/chart_1_appNames"
-				    	android:orientation="vertical"
-				        android:layout_width="wrap_content"
-					   	android:layout_height="600dp"/>
-			    	
-			        <LinearLayout 
-				        android:id="@+id/chart_1_appDetails"
-				    	android:orientation="vertical"
-				        android:layout_width="wrap_content"
-					   	android:layout_height="600dp"/>
+					<ScrollView
+					    android:layout_width="wrap_content"
+					    android:layout_height="fill_parent"
+					    android:fillViewport="true">	
+				        <LinearLayout 
+					        android:id="@+id/chart_1_appNames"
+					    	android:orientation="vertical"
+					        android:layout_width="wrap_content"
+						   	android:layout_height="wrap_content"/>
+				       </ScrollView>
+			    
+					<ScrollView
+					    android:layout_width="wrap_content"
+					    android:layout_height="fill_parent"
+					    android:fillViewport="true">		
+				        <LinearLayout 
+					        android:id="@+id/chart_1_appDetails"
+					    	android:orientation="vertical"
+					        android:layout_width="wrap_content"
+						   	android:layout_height="wrap_content"/>
+				       </ScrollView>
 		        </LinearLayout>
-	</HorizontalScrollView>	   
-</ScrollView>
 </LinearLayout>
