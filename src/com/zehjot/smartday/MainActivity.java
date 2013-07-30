@@ -166,23 +166,36 @@ public class MainActivity extends Activity
 	}
 	
 	public void switchTab(int tab, JSONObject jObj){
+		/**
+		 * jObj
+		 * { "app":String
+		 * 	 "time":int //time in sec -- start off app
+		 * 	 "date":long //date as timestamp at 00:00
+		 * 	 "long": long -- longitude
+		 *   "lat": long -- latitude
+		 * }
+		 */
         ActionBar actionBar = getActionBar();
+        	
         if(tab>=actionBar.getTabCount()||tab<0)
         	return;
         actionBar.setSelectedNavigationItem(tab);
-        switch (tab) {
-		case 0:
-			map.switchTab(jObj);
-			break;
-		case 1:
-			chart.switchTab(jObj);
-			break;
-		case 2:
-			time.switchTab(jObj);
-			break;
-		default:
-			break;
-		}
+
+        if(jObj!=null){
+	        switch (tab) {
+			case 0:
+				map.switchTab(jObj);
+				break;
+			case 1:
+				chart.switchTab(jObj);
+				break;
+			case 2:
+				time.switchTab(jObj);
+				break;
+			default:
+				break;
+			}
+        }
 	}
 	
 	private void initShit(Bundle savedInstanceState){

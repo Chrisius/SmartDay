@@ -20,7 +20,8 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     	public void onSectionSelected(int pos);
     }
     public interface OnUpdateListener{
-    	public void onUpdate(JSONObject jObj);
+    	public void onUpdate();
+    	public void putExtra(JSONObject jObj);
     }
         
     public TabListener(Activity activity, String tag, Class<T> fragmentClass, OnSectionSelectedListener listener) {
@@ -59,11 +60,11 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     		ft.add(R.id.section_fragment_container, fragment, tag);
         }
         else
-        	((OnUpdateListener) fragment).onUpdate(null);
+        	((OnUpdateListener) fragment).onUpdate();
     }
     
     
     public void switchTab(JSONObject jObj){
-    	((OnUpdateListener) fragment).onUpdate(jObj);    	
+    	((OnUpdateListener) fragment).putExtra(jObj);    	
     }
 }

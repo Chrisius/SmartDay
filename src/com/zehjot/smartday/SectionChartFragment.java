@@ -212,8 +212,14 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		chart1.draw(jObj, R.id.chart_1,R.id.chart_1_details);
 	}
 
-	public void onUpdate(JSONObject jObj) {
+	public void onUpdate() {
 		DataSet.getInstance(getActivity()).getApps(this);		
+	}
+	
+	@Override
+	public void putExtra(JSONObject jObj) {
+		// TODO Auto-generated method stub
+		
 	}
 	/*
 	private void addDetails(){
@@ -363,7 +369,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					if(selectedApps.optBoolean(apps[i], true)){
 						if(time[i]/totaltime>minTimeinPercent){
 						SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-						categories.add(apps[i], time[i]);
+						categories.add(apps[i], Math.round((time[i]/totaltime)*10000.f)/100);
 						r.setColor(colors[i]);
 						renderer.addSeriesRenderer(r);						
 						try {
@@ -379,7 +385,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				}
 				if(otherTime > 0){
 					SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-					otherTime = Math.round(otherTime*100.f);
+					otherTime = Math.round((otherTime/totaltime)*10000.f);
 					otherTime /=100;
 					categories.add("Other", otherTime);
 					r.setColor(otherColor);
@@ -425,7 +431,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					if(selectedApps.optBoolean(apps[i], true)){
 						if(time[i]/totaltime>minTimeinPercent){
 						SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-						categories.add(apps[i], time[i]);
+						categories.add(apps[i],  Math.round((time[i]/totaltime)*10000.f)/100);
 						r.setColor(colors[i]);
 						renderer.addSeriesRenderer(r);						
 						try {
@@ -441,7 +447,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				}
 				if(otherTime > 0){
 					SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-					otherTime = Math.round(otherTime*100.f);
+					otherTime = Math.round((otherTime/totaltime)*10000.f);
 					otherTime /=100;
 					categories.add("Other", otherTime);
 					r.setColor(otherColor);

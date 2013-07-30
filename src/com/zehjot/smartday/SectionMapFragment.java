@@ -20,9 +20,13 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener{
 		
 	}
 
-	public void onUpdate(JSONObject jObj) {
+	public void onUpdate() {
 		// TODO Auto-generated method stub
 		
 	}
-	
+	 @Override
+	public void putExtra(JSONObject jObj) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -7,6 +7,7 @@ import com.zehjot.smartday.TabListener.OnUpdateListener;
 import com.zehjot.smartday.data_access.DataSet;
 import com.zehjot.smartday.data_access.DataSet.onDataAvailableListener;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 
 public class SectionTimelineFragment extends Fragment implements OnUpdateListener,onDataAvailableListener{
+	private JSONObject extra=null;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		Log.d("Timeline", "CreateView");
@@ -30,9 +33,23 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 		DataSet.getInstance(getActivity()).getApps(this);	
 	}
 	
-	public void onUpdate(JSONObject jObj) {
+	public void onUpdate() {
 		if(getActivity()!=null&&getActivity().findViewById(R.id.timelinell)!=null)
 			DataSet.getInstance(getActivity()).getApps(this);
+	}
+	
+	@Override
+	public void putExtra(JSONObject jObj) {
+		Activity act = getActivity();
+		extra = jObj;
+		if(act!=null){
+			View tl = getActivity().findViewById(R.id.timelineview);
+			if(tl!=null){
+				((TimeLineView) tl).setExtra(jObj);
+				extra=null;
+			}				
+		}
+		
 	}
 	
 	@Override
@@ -53,9 +70,17 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 				timeline.setLayoutParams(new LayoutParams(
 						LayoutParams.WRAP_CONTENT,
 						LayoutParams.WRAP_CONTENT));
+				if(extra!=null){
+					timeline.setExtra(extra);
+					extra=null;
+				}
 				timeline.setData(jObj);
 				linearLayout.addView(timeline);
-			}else{
+			}else{				
+				if(extra!=null){
+					((TimeLineView)getActivity().findViewById(R.id.timelineview)).setExtra(extra);
+					extra=null;
+				}
 				((TimeLineView)getActivity().findViewById(R.id.timelineview)).setData(jObj);
 			}
 			
@@ -68,10 +93,18 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 					timeline.setLayoutParams(new LayoutParams(
 							LayoutParams.WRAP_CONTENT,
 							LayoutParams.WRAP_CONTENT));
+					if(extra!=null){
+						timeline.setExtra(extra);
+						extra=null;
+					}
 					timeline.setData(jObj);
 					timeline.setId(101);
 					linearLayout.addView(timeline);
 			}else{
+				if(extra!=null){
+					((TimeLineView)getActivity().findViewById(R.id.timelineview)).setExtra(extra);
+					extra=null;
+				}
 				((TimeLineView)root.findViewById(101)).setData(jObj);
 			}
 			
@@ -84,10 +117,18 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 					timeline.setLayoutParams(new LayoutParams(
 							LayoutParams.WRAP_CONTENT,
 							LayoutParams.WRAP_CONTENT));
+					if(extra!=null){
+						timeline.setExtra(extra);
+						extra=null;
+					}
 					timeline.setData(jObj);
 					timeline.setId(102);
 					linearLayout.addView(timeline);
 			}else{
+				if(extra!=null){
+					((TimeLineView)getActivity().findViewById(R.id.timelineview)).setExtra(extra);
+					extra=null;
+				}
 				((TimeLineView)root.findViewById(102)).setData(jObj);
 			}
 		}

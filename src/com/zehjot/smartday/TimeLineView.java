@@ -52,6 +52,7 @@ public class TimeLineView extends View {
 	
 	private JSONArray rectangles;
 	private JSONObject jObj;
+	private JSONObject extra;
 	private int appSessionCount=0;
 	
 	private TimeLineDetailView detail;
@@ -137,7 +138,22 @@ public class TimeLineView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		
+		if(extra!=null){
+			Log.d("TimeLineView", "extra available");
+			selectedApp=extra.optString("app");
+			selectedTime=extra.optInt("time",-1);
+			scaleFactor = 4;
+			if(selectedTime!=-1){
+				height = this.getHeight();
+				offset = height*0.2f;
+				lineWidth = this.getWidth();
+				lineWidth *= scaleFactor;///(width-width*24.f/25.f)*0.5f;
+				lineWidth -= 2.f*offset;//*= 24.f/25.f;
+				scrollX = getWidth()/4.f - (selectedTime/(60.f*60.f))*(lineWidth/24.f)-offset;
+			}
+			extra = null;
+			addDetail();
+		}
 		//canvas.scale(scaleFactor, scaleFactor);
 		canvas.translate(scrollX, 0);
 		//canvas.drawColor(getResources().getColor(android.R.color.holo_green_light));
@@ -222,16 +238,20 @@ public class TimeLineView extends View {
 		selectedApp = appName;
 		selectedTime = time;
 		if(time!=-1&&scaleFactor>1){
-			scrollX = 10 - time*(lineWidth/24.f)-offset;
+			scrollX = getWidth()/4.f - (time/(60.f*60.f))*(lineWidth/24.f)-offset;
 		}
 		invalidate();
 	}
 	public void selectApp(int time){
 		selectedTime = time;
 		if(time!=-1&&scaleFactor>1){
-			scrollX = 10 - (time/(60.f*60.f))*(lineWidth/24.f)-offset;
+			scrollX = getWidth()/4.f - (time/(60.f*60.f))*(lineWidth/24.f)-offset;
 		}
 		invalidate();		
+	}
+	public void setExtra(JSONObject jObj){
+		extra = jObj;
+		invalidate();
 	}
 	
 	public void setData(JSONObject jObj){
@@ -436,16 +456,7 @@ public class TimeLineView extends View {
 				}
 				appSessionCount = getAppSessionCount(selectedApp);
 				invalidate();
-				if(((LinearLayout)getParent()).getChildAt(1)==null){
-					LinearLayout lLayout = new LinearLayout(getContext());
-					lLayout.setOrientation(LinearLayout.HORIZONTAL);
-					((LinearLayout)getParent()).addView(lLayout);					
-					detail=new TimeLineDetailView(getContext());
-					lLayout.addView(detail);
-				}else{
-				}
-				detail.setData(jObj);
-				detail.selectApp(selectedApp,(int)time);
+				addDetail();
 			}
 			return true;
 		}
@@ -540,5 +551,18 @@ public class TimeLineView extends View {
 			((ScrollView)root.getParent()).requestDisallowInterceptTouchEvent(false);
 			Log.d("ScrollView","enabled");
 		}
+	}
+	
+	private void addDetail(){
+		if(((LinearLayout)getParent()).getChildAt(1)==null){
+			LinearLayout lLayout = new LinearLayout(getContext());
+			lLayout.setOrientation(LinearLayout.HORIZONTAL);
+			((LinearLayout)getParent()).addView(lLayout);					
+			detail=new TimeLineDetailView(getContext());
+			lLayout.addView(detail);
+		}else{
+		}
+		detail.setData(jObj);
+		detail.selectApp(selectedApp,selectedTime);
 	}
 }
