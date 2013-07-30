@@ -248,7 +248,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		private JSONObject rendererToArrayIndex;
 		private JSONArray otherRendererToArrayIndex;
 		private int otherColor;
-		private String selectedApp;
+		private String selectedApp="";
 		
 		private void processData(JSONObject jObj){
 			data = jObj;
@@ -383,13 +383,19 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						}
 					}
 				}
-				if(otherTime > 0){
-					SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-					otherTime = Math.round((otherTime/totaltime)*10000.f);
-					otherTime /=100;
-					categories.add("Other", otherTime);
-					r.setColor(otherColor);
-					renderer.addSeriesRenderer(r);				
+				if(apps.length>0){
+					if(otherTime > 0){
+						SimpleSeriesRenderer r = new SimpleSeriesRenderer();
+						otherTime = Math.round((otherTime/totaltime)*10000.f);
+						otherTime /=100;
+						categories.add("Other", otherTime);
+						r.setColor(otherColor);
+						r.setHighlighted(true);
+						renderer.addSeriesRenderer(r);				
+					}else{						
+						renderer.getSeriesRendererAt(apps.length-1).setHighlighted(true);
+					}
+					addDetail(renderer.getSeriesRendererCount()-1, detailContainer);
 				}
 				renderer.setFitLegend(true);	
 				renderer.setDisplayValues(true);
@@ -399,7 +405,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				renderer.setInScroll(true);
 				renderer.setChartTitle("Total time "+totaltime+" min");
 				chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);	
-				
 				chartView.setOnClickListener(new View.OnClickListener() {
 					
 					@Override
@@ -424,14 +429,22 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				LinearLayout layout = (LinearLayout) getActivity().findViewById(drawContainer);
 				layout.addView(chartView);
 			}else{
+				
 				double otherTime = 0;
 				categories.clear();
-				renderer.removeAllRenderers();	
+				renderer.removeAllRenderers();
+				boolean highlighted=false;
+				int selectedRenderer = -1;
 				for(int i=0; i < apps.length; i++){
 					if(selectedApps.optBoolean(apps[i], true)){
 						if(time[i]/totaltime>minTimeinPercent){
 						SimpleSeriesRenderer r = new SimpleSeriesRenderer();
 						categories.add(apps[i],  Math.round((time[i]/totaltime)*10000.f)/100);
+						if(apps[i].equals(selectedApp)){
+							r.setHighlighted(true);
+							highlighted=true;
+							selectedRenderer = renderer.getSeriesRendererCount();
+						}
 						r.setColor(colors[i]);
 						renderer.addSeriesRenderer(r);						
 						try {
@@ -445,14 +458,28 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						}
 					}
 				}
-				if(otherTime > 0){
-					SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-					otherTime = Math.round((otherTime/totaltime)*10000.f);
-					otherTime /=100;
-					categories.add("Other", otherTime);
-					r.setColor(otherColor);
-					renderer.addSeriesRenderer(r);				
+				if(apps.length>0){
+					if(otherTime > 0){
+						SimpleSeriesRenderer r = new SimpleSeriesRenderer();
+						otherTime = Math.round((otherTime/totaltime)*10000.f);
+						otherTime /=100;
+						categories.add("Other", otherTime);
+						r.setColor(otherColor);
+						if(!highlighted){
+							r.setHighlighted(true);
+							highlighted=true;
+							selectedRenderer =renderer.getSeriesRendererCount();
+							selectedApp="";
+						}
+						renderer.addSeriesRenderer(r);				
+					}else if(!highlighted){
+						renderer.getSeriesRendererAt(apps.length-1).setHighlighted(true);
+						highlighted=true;
+						selectedRenderer = renderer.getSeriesRendererCount()-1;
+						selectedApp="";
+					}
 				}
+				addDetail(selectedRenderer, detailContainer);
 				renderer.setChartTitle("Total time "+totaltime+" min");
 				chartView.repaint();
 			}
@@ -464,6 +491,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			((LinearLayout)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).removeAllViews();*/
 			LinearLayout appNames = (LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0)).getChildAt(0);		
 			if(selectedSeries==renderer.getSeriesRendererCount()-1&&otherRendererToArrayIndex.length()>0){
+				selectedApp="";
 				String[] sortedArray = new String[otherRendererToArrayIndex.length()];
 				for(int i = 0; i<otherRendererToArrayIndex.length(); i++){
 					sortedArray[i]=apps[otherRendererToArrayIndex.optInt(i)];

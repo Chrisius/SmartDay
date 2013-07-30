@@ -232,6 +232,7 @@ public class TimeLineView extends View {
 	
 	public void selectApp(String appName){
 		selectedApp = appName;
+		selectedTime = -1;
 		invalidate();
 	}
 	public void selectApp(String appName,int time){
