@@ -415,7 +415,7 @@ public class TimeLineDetailView extends View {
 		    if(location!=null){
 		    	JSONObject tmpJObj = location.optJSONObject(0);
 		    	if(tmpJObj!=null){
-			    	if(tmpJObj.optString("titel").equals("lat")){
+			    	if(tmpJObj.optString("key").equals("lat")){
 			    		lat=tmpJObj.optDouble("value");
 			    		lng=location.optJSONObject(1).optDouble("value");
 			    	}else{

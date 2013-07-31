@@ -226,7 +226,7 @@ public class MainActivity extends Activity
         time = new TabListener<SectionTimelineFragment>(this, "timeline", SectionTimelineFragment.class, optionsListFragment);
         tab.setTabListener(time);
         actionBar.addTab(tab);
-    	actionBar.setSelectedNavigationItem(0);
+    	//actionBar.setSelectedNavigationItem(0);
 
 		
 	}
