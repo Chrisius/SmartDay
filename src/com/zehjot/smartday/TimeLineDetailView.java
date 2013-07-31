@@ -311,7 +311,9 @@ public class TimeLineDetailView extends View {
 			layout.addView(tmp);
 		}
 		LinearLayout details = (LinearLayout) layout.getChildAt(1);
+		LinearLayout places = (LinearLayout) layout.getChildAt(2);
 		details.removeAllViews();
+		places.removeAllViews();
 		JSONArray apps = jObj.optJSONArray("result"); //find the JSONObj which represents appName
 		JSONObject app=null;
 		for(int i=0;i<apps.length();i++){
@@ -319,12 +321,18 @@ public class TimeLineDetailView extends View {
 				app = apps.optJSONObject(i);
 				break;
 			}
-		}
+		}	
 		if(app==null)
 			return;
+		/**
+		 * Time and duration with onClickListener
+		 */	
 		TextView header = createTextView("Total time:"+"\n"+"    "+Utilities.getTimeString(app.optLong("duration")));
 		header.setPadding(10, 0, 10, 2);
 	    details.addView(header);
+	    header = createTextView("Locations:"+"\n"+"    ");
+		header.setPadding(10, 0, 10, 2);
+	    places.addView(header);
 		JSONArray usages = app.optJSONArray("usage"); //iterate over all usages 
 		for(int i=0;i<usages.length();i++){
 			JSONObject appUsage = usages.optJSONObject(i);
@@ -396,7 +404,43 @@ public class TimeLineDetailView extends View {
 			view.setId((i*2)+1);					
 			if(time==start)
 				view.setBackgroundResource(android.R.color.holo_blue_dark);	    
-		    details.addView(view);	
+		    details.addView(view);
+		    view.getHeight();
+		    /**
+		     * Locations
+		     */
+		    JSONArray location = appUsage.optJSONArray("location");
+		    double lat=0;
+		    double lng=0;
+		    if(location!=null){
+		    	JSONObject tmpJObj = location.optJSONObject(0);
+		    	if(tmpJObj!=null){
+			    	if(tmpJObj.optString("titel").equals("lat")){
+			    		lat=tmpJObj.optDouble("value");
+			    		lng=location.optJSONObject(1).optDouble("value");
+			    	}else{
+			    		lng=tmpJObj.optDouble("value");
+			    		lat=location.optJSONObject(1).optDouble("value");
+			    	}
+		    	}
+		    }
+		    view = createTextView("show location");
+		    view.setOnClickListener(new LocationClickListener(lng, lat));
+		    view.setPadding(10, 11, 10, 18);//TODO maybe not just trail and error...
+		    places.addView(view);
+		}		
+	}
+	private class LocationClickListener implements View.OnClickListener{
+    	private double lng;
+    	private double lat;
+		public LocationClickListener(double lng,double lat) {
+    		this.lng = lng;
+    		this.lat = lat;
 		}
+		@Override
+		public void onClick(View v) {
+			Log.d("location clicked", "lng"+lng+"lat"+lat);
+		}
+		
 	}
 }

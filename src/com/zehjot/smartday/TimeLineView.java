@@ -200,7 +200,7 @@ public class TimeLineView extends View {
 		 * App Bars
 		 */
 		if(rectangles!=null){
-			float pxForSecond = ((lineWidth/24.f)/60.f)/60.f;
+			float pxForSecond = lineWidth/(24.f*60.f*60.f);
 			int startInSec;
 			int endInSec;
 			String appName;
@@ -208,24 +208,28 @@ public class TimeLineView extends View {
 				JSONObject rect = rectangles.optJSONObject(i);
 				startInSec = rect.optInt("start");
 				endInSec = startInSec+rect.optInt("length");
-				appName = rect.optString("app");
-				mRectanglePaint.setColor(colors.optInt(appName));
-				float selectedOffset = 0;
-				if(appName.equals(selectedApp)){
-					if(startInSec==selectedTime)
-						selectedOffset = height*0.1f;
-					else
-						selectedOffset = height*0.05f;					
+				float xEnd= xpad-1+offset+pxForSecond*endInSec;
+				float xStart = xpad+1+offset+pxForSecond*startInSec;
+				if(xEnd+scrollX>=0||xStart+scrollX-getWidth()>=0){				
+					appName = rect.optString("app");
+					mRectanglePaint.setColor(colors.optInt(appName));
+					float selectedOffset = 0;
+					if(appName.equals(selectedApp)){
+						if(startInSec==selectedTime)
+							selectedOffset = height*0.1f;
+						else
+							selectedOffset = height*0.05f;					
+					}
+					int extraPixel=0;
+					if(pxForSecond*endInSec-pxForSecond*startInSec-2<1)
+						extraPixel=(int) Math.round((1-(pxForSecond*endInSec-pxForSecond*startInSec-2))+0.5f);
+					canvas.drawRect(
+							xStart,
+							ypad+height*0.3f+selectedOffset,
+							xEnd+extraPixel,
+							ypad+height*0.7f+selectedOffset,
+							mRectanglePaint);
 				}
-				int extraPixel=0;
-				if((int)(xpad+1+offset+pxForSecond*startInSec)-(int)(xpad-1+offset+pxForSecond*endInSec)<1)
-					extraPixel=1;
-				canvas.drawRect(
-						xpad+1+offset+pxForSecond*startInSec,
-						ypad+height*0.3f+selectedOffset,
-						xpad-1+offset+pxForSecond*endInSec+extraPixel,
-						ypad+height*0.7f+selectedOffset,
-						mRectanglePaint);
 			}
 		}
 	}
