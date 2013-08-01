@@ -2,6 +2,7 @@ package com.zehjot.smartday.data_access;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Random;
 
 import org.json.JSONArray;
@@ -557,6 +558,8 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		JSONArray output = new JSONArray();
 		try{
 			result = new JSONObject(jObj, new String[]{"locations","downloadTimestamp","dateTimestamp","totalDuration"});
+			JSONArray locations = jObj.getJSONArray("locations");			
+			result.put("locations", locations);
 			for(int i=0; i<jObj.getJSONArray("result").length();i++){
 				JSONObject app = jObj.getJSONArray("result").getJSONObject(i);
 				if(!ignoreApps.optBoolean(app.getString("app")))

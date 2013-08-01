@@ -70,6 +70,9 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 				for(int i=0; i<markerList.size();i++){
 					markerList.get(i).remove();
 				}
+				
+				JSONArray locations = jObj.getJSONArray("locations");
+				
 				constructMarker(jObj);
 				markerList = new ArrayList<Marker>();
 				JSONArray positions = marker.optJSONArray("positions");
