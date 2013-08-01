@@ -45,6 +45,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		public static final String getEventsAtDate= "getEventsAtDate";
 		public static final String initDataSet= "initDataSet";
 		public static final String updatedFilter= "updatedFilter";
+		public static final String getPositions = "getPositions";
 	}
 	
 	protected DataSet(){
@@ -357,6 +358,8 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 					tmpJSONResult = result;
 				((onDataAvailableListener) activity).onDataAvailable(null, requestedFunction);
 				return;
+			}else if(requestedFunction.equals(RequestedFunction.getPositions)){
+				requester.onDataAvailable(constructPositionJSONObject(jObj), requestedFunction);
 			}
 		}
 	}
@@ -417,10 +420,29 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		}
 		getData(requester, RequestedFunction.getAllApps, data);
 	}
+	public void getPositions(onDataAvailableListener requester){
+		long start=getSelectedDateAsTimestamp();
+		long end=getNextDayAsTimestamp();
+		
+		JSONObject data = new JSONObject();
+		try {
+			data.put("model", "SPECIFIC");
+			data.put("start", start);
+			data.put("end", end);
+			data.put("source", "MOBILE");
+			data.put("type", "POSITION");
+//			data.put("key", "app");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		getData(requester, RequestedFunction.getPositions, data);
+	}
+	
 	private JSONObject constructBasicJSONObj(JSONObject jObj){
 		JSONArray jArrayInput=null;
 		JSONArray lastKnownPos = null;
 		JSONArray jArrayOutput= new JSONArray();
+		JSONArray locations = new JSONArray();
 		JSONObject result=new JSONObject();
 		long totalDuration=0;
 		try{
@@ -485,6 +507,25 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 					long time = jObjInput.getLong("timestamp");
 					JSONArray location = jObjInput.getJSONArray("entities");
 					lastKnownPos = location;
+					/**
+					 * for separate location array
+					 */
+					double lng=0;
+					double lat=0;
+					if(location.getJSONObject(0).getString("key").equals("lat")){
+						lat=location.getJSONObject(0).getDouble("value");
+						lng=location.getJSONObject(1).getDouble("value");
+					}else{
+						lng=location.getJSONObject(0).getDouble("value");
+						lat=location.getJSONObject(1).getDouble("value");
+					}
+					locations.put(new JSONObject()
+						.put("timestamp", time)
+						.put("lng",lng)
+						.put("lat", lat)						
+					);		
+					
+					
 					for(int j = 0; j<jArrayOutput.length();j++){
 						JSONArray appUsages = jArrayOutput.getJSONObject(j).getJSONArray("usage");
 						for(int k = 0; k<appUsages.length();k++){
@@ -505,11 +546,28 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 			}
 			result.put("result", jArrayOutput);
 			result.put("totalDuration", totalDuration);
+			result.put("locations",locations);
 		}catch(JSONException e){
 			
 		}
 		return result;
 	}
+	private JSONObject filterIgnoredApps(JSONObject jObj){
+		JSONObject result = null;
+		JSONArray output = new JSONArray();
+		try{
+			result = new JSONObject(jObj, new String[]{"locations","downloadTimestamp","dateTimestamp","totalDuration"});
+			for(int i=0; i<jObj.getJSONArray("result").length();i++){
+				JSONObject app = jObj.getJSONArray("result").getJSONObject(i);
+				if(!ignoreApps.optBoolean(app.getString("app")))
+					output.put(app);
+			}
+			return result.put("result",output);
+		}catch(JSONException e){
+			return result;
+		}
+	}
+
 	/*
 	private JSONObject constructAppNameJSONObj(JSONObject jObj){
 		JSONObject result= new JSONObject();
@@ -581,22 +639,42 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				String url = Utilities.getURL(Config.Request.events, jObj.toString(), user, activity);
 				new DownloadTask(requester,activity).execute(url,requestedFunction,fileName);
 			}
+		}else if(requestedFunction.equals(RequestedFunction.getPositions)){
+			String url = Utilities.getURL(Config.Request.events, jObj.toString(), user, activity);
+			new DownloadTask(requester,activity).execute(url,requestedFunction,null);				
 		}
 	}
-	private JSONObject filterIgnoredApps(JSONObject jObj){
+	private JSONObject constructPositionJSONObject(JSONObject jObj){
 		JSONObject result = new JSONObject();
-		JSONArray output = new JSONArray();
-		try{
-		for(int i=0; i<jObj.getJSONArray("result").length();i++){
-			JSONObject app = jObj.getJSONArray("result").getJSONObject(i);
-			if(!ignoreApps.optBoolean(app.getString("app")))
-				output.put(app);
+		try {
+			result.put("result",new JSONArray());
+			JSONArray positions = result.getJSONArray("result");
+			JSONArray events = jObj.getJSONArray("events");
+			for(int i=0; i<events.length();i++){
+				JSONObject event = events.getJSONObject(i);
+				JSONArray lnglat = event.getJSONArray("entities");
+				double lng=0;
+				double lat=0;
+				if(lnglat.getJSONObject(0).getString("key").equals("lat")){
+					lat=lnglat.getJSONObject(0).getDouble("value");
+					lng=lnglat.getJSONObject(1).getDouble("value");
+				}else{
+					lng=lnglat.getJSONObject(0).getDouble("value");
+					lat=lnglat.getJSONObject(1).getDouble("value");
+				}
+				long timestamp = event.getLong("timestamp");
+				positions.put(new JSONObject()
+					.put("timestamp", timestamp)
+					.put("lng",lng)
+					.put("lat", lat)
+				);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
-		return result.put("result",output);
-		}catch(JSONException e){
-			return result;
-		}
+		return result;
 	}
+	
 	private void downloadTaskErrorHandler(JSONObject jObj, int serverResponse, String requestedFunction){
 		ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();

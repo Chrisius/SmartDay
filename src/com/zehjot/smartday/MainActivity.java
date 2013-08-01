@@ -160,7 +160,7 @@ public class MainActivity extends Activity
 			ignoreAppsDialog.setStrings(Utilities.jObjValuesToArrayList(jObj).toArray(new String[0]));
 			ignoreAppsDialog.setMode(SelectAppsDialogFragment.IGNORE_APPS);
 			ignoreAppsDialog.show(fm, "nada");
-		}else if(request.equals(DataSet.RequestedFunction.getEventsAtDate) || request.equals(DataSet.RequestedFunction.updatedFilter)){
+		}else if(request.equals(DataSet.RequestedFunction.getEventsAtDate) || request.equals(DataSet.RequestedFunction.updatedFilter)||request.equals(DataSet.RequestedFunction.getPositions)){
 			getActionBar().setSelectedNavigationItem(getActionBar().getSelectedNavigationIndex());
 		}
 	}

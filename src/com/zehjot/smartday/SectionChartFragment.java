@@ -425,7 +425,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					}
 				});
 				
-				
 				LinearLayout layout = (LinearLayout) getActivity().findViewById(drawContainer);
 				layout.addView(chartView);
 			}else{
@@ -486,7 +485,10 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		}
 		private void addDetail(int selectedSeries,int detailViewContainer){
 			((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0)).getChildAt(0)).removeAllViews();
-			((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).getChildAt(0)).removeAllViews();/*
+			((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).getChildAt(0)).removeAllViews();
+			if(apps.length<1)
+				return;
+			/*
 			((LinearLayout)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0)).removeAllViews();
 			((LinearLayout)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).removeAllViews();*/
 			LinearLayout appNames = (LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0)).getChildAt(0);		
@@ -617,7 +619,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				    appNames.addView(valueTV);
 				}
 			}else{
-			    TextView valueTV = getView(apps[rendererToArrayIndex.optInt(""+selectedSeries)]);
+				TextView valueTV = getView(apps[rendererToArrayIndex.optInt(""+selectedSeries)]);
 			   /* valueTV.setText(apps[rendererToArrayIndex.optInt(""+selectedSeries)]);
 			    valueTV.setLayoutParams(new LayoutParams(
 			            LayoutParams.WRAP_CONTENT,
@@ -625,7 +627,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			    valueTV.setTextSize(18);			*/
 			    valueTV.setPadding(10, 5, 10, 5);	
 			    appNames.addView(valueTV);
-			    
 			    
 
 				String appName = ((TextView)valueTV).getText().toString();

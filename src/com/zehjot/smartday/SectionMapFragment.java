@@ -35,10 +35,11 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 	}
 	
 	public void onUpdate() {
-		DataSet.getInstance(getActivity()).getApps(this);		
+		DataSet.getInstance(getActivity()).getApps(this);
 	}
 	 @Override
 	public void putExtra(JSONObject jObj) {
+		//DataSet.getInstance(getActivity()).getPositions(this);
 		double lat = jObj.optDouble("lat",0);
 		double lng = jObj.optDouble("lng",0);
 		if(getMap()!=null){
