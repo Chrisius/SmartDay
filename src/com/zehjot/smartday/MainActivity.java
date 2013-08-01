@@ -171,8 +171,8 @@ public class MainActivity extends Activity
 		 * { "app":String
 		 * 	 "time":int //time in sec -- start off app
 		 * 	 "date":long //date as timestamp at 00:00
-		 * 	 "long": long -- longitude
-		 *   "lat": long -- latitude
+		 * 	 "lng": double -- longitude
+		 *   "lat": double -- latitude
 		 * }
 		 */
         ActionBar actionBar = getActionBar();

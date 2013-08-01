@@ -439,7 +439,16 @@ public class TimeLineDetailView extends View {
 		}
 		@Override
 		public void onClick(View v) {
-			Log.d("location clicked", "lng"+lng+"lat"+lat);
+			Log.d("location clicked", "lng"+lng+"lat"+lat);										
+			JSONObject jObject = new JSONObject();
+			try {
+				jObject.put("date", DataSet.getInstance(getContext()).getSelectedDateAsTimestamp());
+				jObject.put("lng",lng);
+				jObject.put("lat",lat);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			((MainActivity)getContext()).switchTab(0, jObject);
 		}
 		
 	}

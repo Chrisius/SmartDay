@@ -267,7 +267,8 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 			JSONArray apps = jObj.getJSONArray("result");
 			JSONArray colors = colorsOfApps.optJSONArray("colors");
 			if(colors == null){
-				colorsOfApps.put("colors", new JSONArray());				
+				colorsOfApps.put("colors", new JSONArray());	
+				colors = colorsOfApps.optJSONArray("colors");
 			}
 			String appName;
 			int color;
