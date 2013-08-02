@@ -391,9 +391,12 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						categories.add("Other", otherTime);
 						r.setColor(otherColor);
 						r.setHighlighted(true);
-						renderer.addSeriesRenderer(r);				
-					}else{						
-						renderer.getSeriesRendererAt(apps.length-1).setHighlighted(true);
+						renderer.addSeriesRenderer(r);	
+					}else{					
+//						if(apps.length-1<0)
+//							renderer.getSeriesRendererAt(apps.length).setHighlighted(true);
+//						else
+							renderer.getSeriesRendererAt(renderer.getSeriesRendererCount()-1).setHighlighted(true);
 					}
 					addDetail(renderer.getSeriesRendererCount()-1, detailContainer);
 				}

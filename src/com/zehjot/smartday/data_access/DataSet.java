@@ -2,7 +2,6 @@ package com.zehjot.smartday.data_access;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Random;
 
 import org.json.JSONArray;
