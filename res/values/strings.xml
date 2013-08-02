@@ -55,8 +55,8 @@
     </string-array>
     
 <!-- Option Names -->    
-    <string name="options_map_text1">Photos</string>   
-    <string name="options_map_text2">show photolocations</string>   
+    <string name="options_map_text1">Hightlight</string>   
+    <string name="options_map_text2">highlight app locations</string>   
     <string name="options_chart_text1">Places</string> 
     <string name="options_chart_text2">select places to be displayed</string>
 	<string name="options_app_text1">Apps</string>	

@@ -475,7 +475,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						}
 						renderer.addSeriesRenderer(r);				
 					}else if(!highlighted){
-						renderer.getSeriesRendererAt(apps.length-1).setHighlighted(true);
+						renderer.getSeriesRendererAt(renderer.getSeriesRendererCount()-1).setHighlighted(true);
 						highlighted=true;
 						selectedRenderer = renderer.getSeriesRendererCount()-1;
 						selectedApp="";

@@ -35,6 +35,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	private static long queryStart;
 	private static JSONObject selectedApps = null;
 	private static JSONObject ignoreApps = null;
+	private static JSONObject selectedHighlightApps=null;
 	private static JSONObject tmpJSONResult = null;
 	private static JSONObject tmpJSONResultToday = null;
 	private static long todayCacheMin = 5*60*1000;
@@ -47,6 +48,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		public static final String updatedFilter= "updatedFilter";
 		public static final String getPositions = "getPositions";
 	}
+
 	
 	protected DataSet(){
 		//For Singleton
@@ -62,6 +64,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		selectedApps = null;
 		ignoreApps = null;
 		tmpJSONResult = null;
+		selectedHighlightApps =null;
 	}
 	
 	public static DataSet getInstance(Context context){
@@ -89,6 +92,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		sharedPreferences = activity.getPreferences(MainActivity.MODE_PRIVATE);
 		editor = sharedPreferences.edit();
 		selectedApps = new JSONObject();
+		selectedHighlightApps = new JSONObject();
 		//File file = new File(activity.getString(R.string.file_ignored_apps));
 		if( activity.getFileStreamPath(activity.getString(R.string.file_ignored_apps)).exists()){
 			try {
@@ -181,7 +185,9 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	public JSONObject getSelectedApps(){
 		return selectedApps;
 	}
-	
+	public JSONObject getSelectedHighlightApps(){
+		return selectedHighlightApps;
+	}
 	public JSONObject getIgnoreApps() {
 		return ignoreApps;
 	}
@@ -204,7 +210,12 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		DataSet.selectedApps = selectedApps;
 		((onDataAvailableListener)activity).onDataAvailable(null, RequestedFunction.updatedFilter);
 	}
-
+	
+	public void setSelectedHighlightApps(JSONObject selectedHighlightApps){
+		DataSet.selectedHighlightApps = selectedHighlightApps;
+		((onDataAvailableListener)activity).onDataAvailable(null, RequestedFunction.updatedFilter);
+	}
+	
 	public String getSelectedDateAsString(){
 		String date = getSharedString(R.string.key_date);
 		String default_date = sharedPreferences.getString(activity.getString(R.string.key_date_default), activity.getString(R.string.key_date_default));

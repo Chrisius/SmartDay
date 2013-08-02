@@ -16,6 +16,7 @@ import android.os.Bundle;
 public class SelectAppsDialogFragment extends DialogFragment{
 	public static final int SELECT_APPS=0;
 	public static final int IGNORE_APPS=1;
+	public static final int SELECT_HIGHLIGHT_APPS=2;
 	private DataSet dataSet = null;
 	private String[]strings = {"No Data Available"};
 	private int mode=0;
@@ -44,8 +45,10 @@ public class SelectAppsDialogFragment extends DialogFragment{
 			try{
 				if(mode == SELECT_APPS){
 					selectedApps = /*dataSet.getSelectedApps();*/new JSONObject(dataSet.getSelectedApps().toString());
-				}else{
+				}else if(mode == IGNORE_APPS){
 					selectedApps = /*dataSet.getIgnoreApps();*/new JSONObject(dataSet.getIgnoreApps().toString());
+				}else if(mode == SELECT_HIGHLIGHT_APPS){
+					selectedApps = new JSONObject(dataSet.getSelectedHighlightApps().toString());
 				}
 			}catch(JSONException e){
 				selectedApps = new JSONObject();
@@ -56,7 +59,11 @@ public class SelectAppsDialogFragment extends DialogFragment{
 				for(int i=0 ; i<strings.length;i++){
 					boolSelectedApps[i] = selectedApps.optBoolean(strings[i],true);
 				}
-			}else{
+			}else if(mode == IGNORE_APPS){
+				for(int i=0 ; i<strings.length;i++){
+					boolSelectedApps[i] = selectedApps.optBoolean(strings[i]);
+				}
+			}else if(mode == SELECT_HIGHLIGHT_APPS){
 				for(int i=0 ; i<strings.length;i++){
 					boolSelectedApps[i] = selectedApps.optBoolean(strings[i]);
 				}
@@ -90,8 +97,10 @@ public class SelectAppsDialogFragment extends DialogFragment{
 			public void onClick(DialogInterface dialog, int which) {
 				if(mode == SELECT_APPS)
 					dataSet.setSelectedApps(selectedApps);
-				else
+				else if(mode == IGNORE_APPS)
 					dataSet.setIgnoreApps(selectedApps);
+				else if(mode == SELECT_HIGHLIGHT_APPS)
+					dataSet.setSelectedHighlightApps(selectedApps);
 			}
 		})
 		.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

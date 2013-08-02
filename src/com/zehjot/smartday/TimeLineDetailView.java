@@ -425,7 +425,7 @@ public class TimeLineDetailView extends View {
 		    	}
 		    }
 		    view = createTextView("show location");
-		    view.setOnClickListener(new LocationClickListener(lng, lat));
+		    view.setOnClickListener(new LocationClickListener(lng, lat, appUsage.optLong("start")));
 		    view.setPadding(10, 11, 10, 18);//TODO maybe not just trail and error...
 		    places.addView(view);
 		}		
@@ -433,9 +433,11 @@ public class TimeLineDetailView extends View {
 	private class LocationClickListener implements View.OnClickListener{
     	private double lng;
     	private double lat;
-		public LocationClickListener(double lng,double lat) {
+    	private long start;
+		public LocationClickListener(double lng,double lat, long start) {
     		this.lng = lng;
     		this.lat = lat;
+    		this.start = start;
 		}
 		@Override
 		public void onClick(View v) {
@@ -443,6 +445,7 @@ public class TimeLineDetailView extends View {
 			JSONObject jObject = new JSONObject();
 			try {
 				jObject.put("date", DataSet.getInstance(getContext()).getSelectedDateAsTimestamp());
+				jObject.put("time", start);
 				jObject.put("lng",lng);
 				jObject.put("lat",lat);
 			} catch (JSONException e) {
@@ -451,5 +454,11 @@ public class TimeLineDetailView extends View {
 			((MainActivity)getContext()).switchTab(0, jObject);
 		}
 		
+	}
+	public void close(){
+		setId(1);
+		LinearLayout linearLayout = (LinearLayout)getParent().getParent();
+		((TimeLineView)linearLayout.getChildAt(0)).selectApp("");
+		linearLayout.removeView(linearLayout.getChildAt(1));		
 	}
 }

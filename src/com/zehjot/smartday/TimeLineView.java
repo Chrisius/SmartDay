@@ -289,6 +289,9 @@ public class TimeLineView extends View {
 				}
 			}
 			if(this.getParent()!=null&&((LinearLayout)getParent()).getChildAt(1)!=null){
+				if(jObj.getJSONArray("result").length()==0)
+					((TimeLineDetailView)((LinearLayout)((LinearLayout)this.getParent()).getChildAt(1)).getChildAt(0)).close();
+				else
 				((TimeLineDetailView)((LinearLayout)((LinearLayout)this.getParent()).getChildAt(1)).getChildAt(0)).setData(jObj);
 			}
 				

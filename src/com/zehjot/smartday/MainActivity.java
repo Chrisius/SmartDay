@@ -19,7 +19,7 @@ import android.app.Activity;
 import android.app.FragmentManager;
 
 public class MainActivity extends Activity 
-		implements OptionsListFragment.OnOptionSelectedListener, DataSet.onDataAvailableListener	{
+		implements  DataSet.onDataAvailableListener	{
 	private FragmentManager fm;
 	private OptionsListFragment optionsListFragment;
 	private static DataSet dataSet;
@@ -132,24 +132,7 @@ public class MainActivity extends Activity
     	//dataSet.delete();
     }
     
-    @Override
-	public void onOptionSelected(int pos){
-    	DatePickerFragment date = new DatePickerFragment();
-    	
-    	switch (pos) {
-		case 0:
-			date.show(fm, getString(R.string.datepicker));
-			break;
-		case 1:
-//			SelectAppsDialogFragment apps = new SelectAppsDialogFragment();
-//			String[] foo = {"asd","123","sfhpio"};
-//			apps.setStrings(foo);
-//			apps.show(fm, getString(R.string.datepicker));
-			break;
-		default:
-			break;
-		}
-    }
+
     
 	@Override
 	public void onDataAvailable(JSONObject jObj, String request) {

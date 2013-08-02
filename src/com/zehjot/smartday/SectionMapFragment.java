@@ -10,12 +10,13 @@ import org.json.JSONObject;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.zehjot.smartday.TabListener.OnUpdateListener;
@@ -23,7 +24,6 @@ import com.zehjot.smartday.data_access.DataSet;
 import com.zehjot.smartday.data_access.DataSet.onDataAvailableListener;
 import com.zehjot.smartday.helper.Utilities;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,7 +32,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class SectionMapFragment extends MapFragment implements OnUpdateListener,onDataAvailableListener, InfoWindowAdapter{
+public class SectionMapFragment extends MapFragment implements OnUpdateListener,onDataAvailableListener, InfoWindowAdapter, OnInfoWindowClickListener{
 	private GoogleMap mMap;
 	private List<Marker> markerList = new ArrayList<Marker>();
 	private JSONObject marker;
@@ -54,10 +54,21 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 		//DataSet.getInstance(getActivity()).getPositions(this);
 		double lat = jObj.optDouble("lat",0);
 		double lng = jObj.optDouble("lng",0);
+		long start = jObj.optLong("time",0);
 		if(getMap()!=null){
 			if(mMap==null)
 				mMap = this.getMap();
 			zoomTo(lat, lng,15);
+		}
+		if(start != 0){
+			JSONArray positions = marker.optJSONArray("positions");
+			for(int i=0; i<positions.length(); i++){
+				JSONObject position = positions.optJSONObject(i);
+				if(start >= position.optLong("start") && start <= position.optLong("end")){
+					markerList.get(i).showInfoWindow();
+					break;
+				}
+			}
 		}
 	}
 	@Override
@@ -79,6 +90,10 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 			if(mMap==null)
 				mMap = this.getMap();
 			mMap.setInfoWindowAdapter(this);
+			mMap.setOnInfoWindowClickListener(this);
+			double zoomLat=0;
+			double zoomLng=0;
+			CameraPosition camera = mMap.getCameraPosition();
 			try{
 				for(int i=0; i<markerList.size();i++){
 					markerList.get(i).remove();
@@ -88,18 +103,12 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 				}
 
 				PolylineOptions polylineOptions = new PolylineOptions();
-//				PolygonOptions polyOptions = new PolygonOptions();
 				JSONArray locations = jObj.getJSONArray("locations");
-//				LatLng latlng[]=new LatLng[locations.length()];
 				for(int i=0;i<locations.length();i++){
 					polylineOptions.add(new LatLng(locations.getJSONObject(i).getDouble("lat"),locations.getJSONObject(i).getDouble("lng")));
-//					latlng[i]= new LatLng(locations.getJSONObject(i).getDouble("lat"),locations.getJSONObject(i).getDouble("lng"));
 				}
 				polyline = mMap.addPolyline(polylineOptions);
 				int color = getResources().getColor(android.R.color.holo_blue_light);
-//				color = (color<<8);
-//				color = (color>>8);
-//				color = color&0x7fffffff;
 				polyline.setColor(color);
 				polyline.setWidth(4);
 				constructMarker(jObj);
@@ -109,9 +118,11 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 					JSONObject position = positions.getJSONObject(i);
 					double lat = position.optDouble("lat",-1);
 					double lng = position.optDouble("lng", -1);
+					zoomLat =lat;
+					zoomLng =lng;
 					MarkerOptions markerOptions = new MarkerOptions()
 						.position(new LatLng(lat, lng))
-						.title("Apps used from "+Utilities.getTimeFromTimeStamp(position.getLong("start"))+" to "+Utilities.getTimeFromTimeStamp(position.getLong("end")));
+						.title(position.getLong("start")+"!!..!!"+position.getLong("end"));
 					JSONArray apps = position.optJSONArray("apps");
 					for(int j=0; j<apps.length();j++){
 						JSONObject app = apps.optJSONObject(j);
@@ -120,61 +131,20 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 						if(oldApps==null)
 							oldApps = "";
 						else 
-							appName = ", "+appName;
+							appName = "!!..!!"+appName;
 						markerOptions.snippet(oldApps+appName);
-						markerOptions.icon(null);
+						if(app.optBoolean("highlight"))
+							markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 					}
 					Marker mMarker = mMap.addMarker(markerOptions);
+					
 					markerList.add(mMarker);
-				}/*
-				Marker mMarker= mMap.addMarker(new MarkerOptions()
-				.position(new LatLng(lat, lng))
-				.title(appName));
-				markerList.add(mMarker);
-				
-				
-				JSONArray apps = jObj.getJSONArray("result");
-				for(int i=0;i<apps.length();i++){
-					JSONObject app = apps.getJSONObject(i);
-					String appName = app.getString("app");
-					JSONArray usages = app.getJSONArray("usage");
-					for(int j=0;j<usages.length();j++){
-						JSONObject usage = usages.getJSONObject(j);
-						JSONArray location = usage.getJSONArray("location");
-						double lat;
-						double lng;
-						if(location.getJSONObject(0).getString("key").equals("lng")){
-							lng = location.getJSONObject(0).getDouble("value");
-							lat = location.getJSONObject(1).getDouble("value");
-						}else{
-							lat = location.getJSONObject(0).getDouble("value");
-							lng = location.getJSONObject(1).getDouble("value");						
-						}
-						boolean found = false;
-						for(int k=0; k<markerList.size();k++){
-							Marker tmpMarker = markerList.get(k);
-							double markerLat = (int)(tmpMarker.getPosition().latitude*1000000+1);
-							markerLat/=1000000.f;
-							double markerLng = (int)(tmpMarker.getPosition().longitude*1000000+1);
-							markerLng /= 1000000.f;
-							if(markerLat==lat&&markerLng==lng){
-								String oldTitle = tmpMarker.getTitle();
-								tmpMarker.setTitle(oldTitle+appName);
-								found = true;
-								break;
-							}
-						}
-						if(!found){
-							Marker mMarker= mMap.addMarker(new MarkerOptions()
-							.position(new LatLng(lat, lng))
-							.title(appName));
-							markerList.add(mMarker);
-						}
-					}
-				}*/
+				}
 			}catch (JSONException e){
 				e.printStackTrace();
 			}
+			if(camera.target.latitude==0&&camera.target.longitude==0)
+				zoomTo(zoomLat, zoomLng);
 		}
 	}
 	/**
@@ -182,8 +152,11 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 	 *  positions:
 	 *  [
 	 *    {
+	 *    	"highlight":bool
 	 *  	"lat":double
 	 *  	"lng":double
+	 *  	"start":long
+	 *  	"end":long
 	 *  	"apps":
 	 *  	[
 	 *  	  {
@@ -204,11 +177,10 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 	 * }
 	 */
 	private JSONObject constructMarker(JSONObject jObj){
-		double testlat=50.7783846;
-		double testlng=6.060978;
 		if(jObj == null)
 			return null;
 		try {
+			JSONObject highlightApps = DataSet.getInstance(getActivity()).getSelectedHighlightApps();
 			JSONArray apps = jObj.getJSONArray("result");
 			marker = new JSONObject();
 			JSONArray positions = new JSONArray();
@@ -233,8 +205,6 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 								lng = location.getJSONObject(0).getDouble("value");
 								lat = location.getJSONObject(1).getDouble("value");						
 							}
-							testlat=lat;
-							testlng=lng;
 							boolean found = false;
 							for(int k=0;k<positions.length();k++){
 								JSONObject position = positions.getJSONObject(k);
@@ -252,6 +222,7 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 									}
 									if(!found){
 										markerApps.put(new JSONObject()
+											.put("highlight",highlightApps.optBoolean(appName))
 											.put("app", appName)
 											.put("usage", new JSONArray()
 												.put(new JSONObject()
@@ -305,26 +276,30 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 			for(int i=0; i<positions.length();i++){
 				JSONObject position = positions.getJSONObject(i);
 				long markerEnd = position.getLong("end");
-				if(markerEnd==-1){
+				long markerStart = position.getLong("start");
 					JSONArray tmpApps = position.getJSONArray("apps");
 					for(int j = 0; j<tmpApps.length();j++){
 						JSONObject tmpApp = tmpApps.getJSONObject(j);
 						JSONArray tmpUsages = tmpApp.getJSONArray("usage");
 						for(int k=0;k<tmpUsages.length();k++){
 							JSONObject tmpUsage = tmpUsages.getJSONObject(k);
+							long tmpStart = tmpUsage.optLong("start",-1);
 							long tmpEnd = tmpUsage.optLong("end", -1);
-							if(tmpEnd!=-1 && markerEnd<tmpEnd){
+							if(markerEnd==-1&&tmpEnd!=-1 && markerEnd<tmpEnd){
 								markerEnd = tmpEnd;
+							}
+							if(markerStart>tmpStart&&tmpStart!=-1){
+								markerStart = tmpStart;
 							}
 						}
 					}
 					position.put("end", markerEnd);
-				}
+					position.put("start", markerStart);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		zoomTo(testlat, testlng);
+		//zoomTo(testlat, testlng);
 		return marker;
 	}
 
@@ -338,20 +313,46 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 
 	@Override
 	public View getInfoContents(Marker arg0) {
-		String title = arg0.getTitle();
-		String apps[]= arg0.getSnippet().split(", ");
+		String times[] = arg0.getTitle().split("!!..!!");
+		long start =Long.valueOf(times[0]);
+		long end = Long.valueOf(times[1]);
+		String title = "Apps used from "+Utilities.getTimeFromTimeStamp(start)+" to "+Utilities.getTimeFromTimeStamp(end);
+		String apps[]= arg0.getSnippet().split("!!..!!");
 		LinearLayout ll = new LinearLayout(getActivity());
 		ll.setOrientation(LinearLayout.VERTICAL);
 		TextView tv = new TextView(getActivity());
+		tv.setTextColor(getResources().getColor(android.R.color.black));
+		tv.setTextSize(12);
 		tv.setText(title);
 		ll.addView(tv);
 		for(int i=0; i<apps.length;i++){
 			tv= new TextView(getActivity());
-			tv.setText(apps[i]);
+			tv.setText("  "+apps[i]);
+			tv.setTextColor(getResources().getColor(android.R.color.black));
 			ll.addView(tv);			
 		}
 		return ll;
 	}
+
+
+
+	@Override
+	public void onInfoWindowClick(Marker arg0) {
+		String times[] = arg0.getTitle().split("!!..!!");
+		long start = Long.valueOf(times[0]);
+		Log.d("marker time", ""+start);
+		JSONObject jObject = new JSONObject();
+		try {
+			jObject.put("time", Utilities.getTimeOfDay(start));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		((MainActivity)getActivity()).switchTab(2, jObject);
+		
+	}
+
+
+
 
 
 
