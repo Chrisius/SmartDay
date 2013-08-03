@@ -11,6 +11,7 @@ import android.widget.DatePicker;
 public class DatePickerFragment extends DialogFragment 
 					implements DatePickerDialog.OnDateSetListener {
 	OnDateChosenListener mCallback;
+	String whichDate;
 	
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -21,15 +22,16 @@ public class DatePickerFragment extends DialogFragment
 		return new DatePickerDialog(getActivity(), this, year, month, day);
 	}
 	public void onDateSet(DatePicker view, int year, int month, int day){
-		mCallback.onDateChosen(year, month, day);
+		mCallback.onDateChosen(year, month, day, whichDate);
 	}
 	
 	public interface OnDateChosenListener{
-		public void onDateChosen(int year, int month, int day);
+		public void onDateChosen(int year, int month, int day,String whichDate);
 	}
 
-	public void setListener(OptionsListFragment optionsListFragment) {
+	public void setListener(OptionsListFragment optionsListFragment,String whichDate) {
 		mCallback = optionsListFragment;
+		this.whichDate=whichDate;
 		
 	}
 }

@@ -223,7 +223,15 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 			return activity.getString(R.string.today);
 		return date;
 	}
-
+	
+	public String getSelectedDateStartAsString(){
+		String date = getSharedString(R.string.key_date_start);
+		String default_date = sharedPreferences.getString(activity.getString(R.string.key_date_start_default), activity.getString(R.string.key_date_start_default));
+		if(date.equals(default_date))
+			return activity.getString(R.string.today);
+		return date;
+	}
+	
 	public long getTodayAsTimestamp(){
 		return sharedPreferences.getLong(activity.getString(R.string.key_date_end_default_timestamp), -1);
 	}
@@ -234,6 +242,15 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		editor.putInt(activity.getString(R.string.key_date_end_day), day);
 		editor.putInt(activity.getString(R.string.key_date_end_month), month);
 		editor.putInt(activity.getString(R.string.key_date_end_year), year);
+		editor.commit();
+		getApps((onDataAvailableListener) activity);
+	}
+	public void setSelectedDateStart(int year,  int month, int day){
+		//TODO notify
+		editor.putString(activity.getString(R.string.key_date_start), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
+		editor.putInt(activity.getString(R.string.key_date_start_day), day);
+		editor.putInt(activity.getString(R.string.key_date_start_month), month);
+		editor.putInt(activity.getString(R.string.key_date_start_year), year);
 		editor.commit();
 		getApps((onDataAvailableListener) activity);
 	}
@@ -250,6 +267,12 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		int year = getSharedInt(R.string.key_date_end_year);
 		int month = getSharedInt(R.string.key_date_end_month);
 		int day = getSharedInt(R.string.key_date_end_day);		
+		return Utilities.getTimestamp(year, month, day, 0, 0, 0);
+	}
+	public long getSelectedDateStartAsTimestamp(){
+		int year = getSharedInt(R.string.key_date_start_year);
+		int month = getSharedInt(R.string.key_date_start_month);
+		int day = getSharedInt(R.string.key_date_start_day);		
 		return Utilities.getTimestamp(year, month, day, 0, 0, 0);
 	}
 	public long getNextDayAsTimestamp(){	
