@@ -46,8 +46,8 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 	
 	
 	
-	public void onUpdate() {
-		DataSet.getInstance(getActivity()).getApps(this);
+	public void onUpdate(JSONObject[] jObjs) {
+		onDataAvailable(jObjs, "");
 	}
 	 @Override
 	public void putExtra(JSONObject jObj) {
@@ -74,7 +74,7 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 	@Override
 	public void onResume() {
 		super.onResume();
-		DataSet.getInstance(getActivity()).getApps(this);	
+		DataSet.getInstance(getActivity()).getApps((onDataAvailableListener) getActivity());	
 	}
 	
 	public void zoomTo(double lat, double lng, float zoom){
@@ -85,10 +85,12 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 	}
 	
 	@Override
-	public void onDataAvailable(JSONObject jObj, String requestedFunction) {
+	public void onDataAvailable(JSONObject[] jObjs, String requestedFunction) {
 		if(getMap()!=null){
 			if(mMap==null)
 				mMap = this.getMap();
+			if(jObjs==null)
+				return;
 			mMap.setInfoWindowAdapter(this);
 			mMap.setOnInfoWindowClickListener(this);
 			double zoomLat=50.45;
@@ -103,7 +105,7 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 				}
 
 				PolylineOptions polylineOptions = new PolylineOptions();
-				JSONArray locations = jObj.getJSONArray("locations");
+				JSONArray locations = jObjs[0].getJSONArray("locations");
 				for(int i=0;i<locations.length();i++){
 					polylineOptions.add(new LatLng(locations.getJSONObject(i).getDouble("lat"),locations.getJSONObject(i).getDouble("lng")));
 				}
@@ -111,7 +113,7 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 				int color = getResources().getColor(android.R.color.holo_blue_light);
 				polyline.setColor(color);
 				polyline.setWidth(4);
-				constructMarker(jObj);
+				constructMarker(jObjs[0]);
 				markerList = new ArrayList<Marker>();
 				JSONArray positions = marker.optJSONArray("positions");
 				for(int i=0;i<positions.length();i++){

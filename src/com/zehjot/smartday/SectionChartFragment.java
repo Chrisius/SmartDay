@@ -41,7 +41,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 	@Override
 	public void onResume(){
 		super.onResume();
-		DataSet.getInstance(getActivity()).getApps(this);	
+		DataSet.getInstance(getActivity()).getApps((onDataAvailableListener) getActivity());	
 	}
 	@Override
 	public void onDestroy(){
@@ -206,14 +206,14 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 	}
 
 	@Override
-	public void onDataAvailable(JSONObject jObj, String request) {
+	public void onDataAvailable(JSONObject[] jObjs, String request) {
 		if(chart1 == null)
 			chart1 = new MyChart();
-		chart1.draw(jObj, R.id.chart_1,R.id.chart_1_details);
+		chart1.draw(jObjs[0], R.id.chart_1,R.id.chart_1_details);
 	}
 
-	public void onUpdate() {
-		DataSet.getInstance(getActivity()).getApps(this);		
+	public void onUpdate(JSONObject[] jObjs) {
+		onDataAvailable(jObjs, "");
 	}
 	
 	@Override

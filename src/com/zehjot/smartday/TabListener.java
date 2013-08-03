@@ -15,12 +15,13 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     private final String tag;
     private final Class<T> fragmentClass;
     private static OnSectionSelectedListener options;
+    private static JSONObject[] jObjs;
     
     public interface OnSectionSelectedListener{
     	public void onSectionSelected(int pos);
     }
     public interface OnUpdateListener{
-    	public void onUpdate();
+    	public void onUpdate(JSONObject[]jObjs);
     	public void putExtra(JSONObject jObj);
     }
         
@@ -41,7 +42,7 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
         	}
         } else {
             ft.show(fragment);
-        	((OnUpdateListener) fragment).onUpdate();            
+        	((OnUpdateListener) fragment).onUpdate(jObjs);            
         }
         options.onSectionSelected(tab.getPosition());
     }
@@ -60,11 +61,14 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     		ft.add(R.id.section_fragment_container, fragment, tag);
         }
         else
-        	((OnUpdateListener) fragment).onUpdate();
+        	((OnUpdateListener) fragment).onUpdate(jObjs);
     }
     
+    public static void addData(JSONObject[] jObjs){
+    	TabListener.jObjs = jObjs;
+    }
     
     public void switchTab(JSONObject jObj){
-    	((OnUpdateListener) fragment).putExtra(jObj);    	
+        	((OnUpdateListener) fragment).putExtra(jObj);    	
     }
 }

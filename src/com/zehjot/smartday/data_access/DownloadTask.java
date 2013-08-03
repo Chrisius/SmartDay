@@ -27,13 +27,14 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 	private int serverResponse = -1;
 	private ProgressDialog progress;
 	private String request;
+	private long timestamp;
 	private onDataAvailableListener requester;
 	private static Activity activity;
 	private String fileName = null;
 	private static onDataDownloadedListener listener = DataSet.getInstance(activity);
 	
 	protected interface onDataDownloadedListener{
-		public void onDataDownloaded(int serverResponse, JSONObject jObj, String request, onDataAvailableListener requester, String fileName);
+		public void onDataDownloaded(int serverResponse, JSONObject jObj, long timestamp,String request, onDataAvailableListener requester, String fileName);
 	}
 	protected DownloadTask(onDataAvailableListener requester, Activity activity){
 		this.requester = requester;
@@ -61,6 +62,10 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 			if(url.length>2){
 				request = url[1];
 				fileName = url[2];
+				if(url.length>3)
+					timestamp = Long.valueOf(url[3]);
+				else
+					timestamp=-1;
 			}
 			ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -84,7 +89,7 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 		if(((MainActivity)activity).isRunning())
 			progress.cancel();
 		//}
-		listener.onDataDownloaded(serverResponse, result, request, requester, fileName);		
+		listener.onDataDownloaded(serverResponse, result, timestamp,request, requester, fileName);		
 	}
 	
 	private JSONObject downloadData(String urlString) throws IOException, JSONException{
@@ -132,7 +137,7 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 	@Override
 	protected void onCancelled(JSONObject result) {
 		super.onCancelled(result);
-		listener.onDataDownloaded(-2, null, request, requester, fileName);		
+		listener.onDataDownloaded(-2, null, timestamp,request, requester, fileName);		
 	}
 	@Override
 	public void onCancel(DialogInterface dialog) {

@@ -40,6 +40,10 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	private static JSONObject tmpJSONResultToday = null;
 	private static long todayCacheMin = 5*60*1000;
 	private static JSONObject colorsOfApps = null;
+	private static boolean changedIgnoreApps=false;
+	
+	private static int numberSelectedDays;
+	private static JSONObject[] days;
 	
 	public static class RequestedFunction{
 		public static final String getAllApps= "getAllApps";
@@ -48,6 +52,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		public static final String updatedFilter= "updatedFilter";
 		public static final String getPositions = "getPositions";
 	}
+
 
 	
 	protected DataSet(){
@@ -123,13 +128,21 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		int month = c.get(Calendar.MONTH);
 		int year = c.get(Calendar.YEAR);
 		editor.putString(activity.getString(R.string.key_date_end_default), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
+		editor.putString(activity.getString(R.string.key_date_start_default), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
 		editor.putLong(activity.getString(R.string.key_date_end_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();
+		editor.putLong(activity.getString(R.string.key_date_start_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();
 		//editor.putString(activity.getString(R.string.key_date_selected_apps),"not Initialized"); //Sets String for selectDate to "not Initialized"
 		editor.commit();
 		editor.putString(activity.getString(R.string.key_date_end), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
 		editor.putInt(activity.getString(R.string.key_date_end_day), day);
 		editor.putInt(activity.getString(R.string.key_date_end_month), month);
 		editor.putInt(activity.getString(R.string.key_date_end_year), year);
+
+		editor.putString(activity.getString(R.string.key_date_start), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
+		editor.putInt(activity.getString(R.string.key_date_start_day), day);
+		editor.putInt(activity.getString(R.string.key_date_start_month), month);
+		editor.putInt(activity.getString(R.string.key_date_start_year), year);
+		
 		editor.commit();
 		instance.getApps(null);
 	}
@@ -154,11 +167,28 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	}
 	
 	public interface onDataAvailableListener{
-		public void onDataAvailable(JSONObject jObj, String requestedFunction);
+		public void onDataAvailable(JSONObject[] results, String requestedFunction);
 	}
 	
 	public void getApps(onDataAvailableListener listener){
-		getAppsAtDate(getSelectedDateEndAsTimestamp(),listener);
+		long sec = (getSelectedDateEndAsTimestamp()-getSelectedDateStartAsTimestamp());
+		int numberOfdays = (int) (sec/(24*60*60))+1;
+		numberSelectedDays = numberOfdays;/*
+		if(days!=null &&days[0].optLong("dateTimestamp")==getSelectedDateStartAsTimestamp()&&days[days.length-1].optLong("dateTimestamp")==getSelectedDateEndAsTimestamp()){
+			listener.onDataAvailable(days, RequestedFunction.getEventsAtDate);
+			return;
+		}	*/
+		if(days!=null &&!changedIgnoreApps&&days[0].optLong("dateTimestamp")==getSelectedDateStartAsTimestamp()&&days[days.length-1].optLong("dateTimestamp")==getSelectedDateEndAsTimestamp()){
+			listener.onDataAvailable(days, RequestedFunction.getEventsAtDate);
+			return;
+		}
+		changedIgnoreApps=false;
+		DataSet.days = new JSONObject[numberSelectedDays];
+		for(int i=0;i<numberOfdays;i++){
+			long date=getSelectedDateStartAsTimestamp()+(24*60*60*i);
+			getAppsAtDate(date,listener);
+		}
+		//getAppsAtDate(getSelectedDateEndAsTimestamp(),listener);
 	}
 	
 	private void getAppsAtDate(long timestamp, onDataAvailableListener listener){
@@ -195,7 +225,8 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	public void setIgnoreApps(JSONObject ignoreApps) {
 		DataSet.ignoreApps = ignoreApps;
 		Utilities.writeFile(activity.getString(R.string.file_ignored_apps), ignoreApps.toString(), activity);
-		((onDataAvailableListener)activity).onDataAvailable(null, RequestedFunction.updatedFilter);
+		changedIgnoreApps=true;
+		getApps((onDataAvailableListener) activity);//(null, RequestedFunction.updatedFilter);
 	}
 /*
 	public boolean[] getSelectedApps(ArrayList<String> apps){
@@ -237,7 +268,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	}
 
 	public void setSelectedDateEnd(int year,  int month, int day){
-		//TODO notify
 		editor.putString(activity.getString(R.string.key_date_end), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
 		editor.putInt(activity.getString(R.string.key_date_end_day), day);
 		editor.putInt(activity.getString(R.string.key_date_end_month), month);
@@ -245,8 +275,22 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		editor.commit();
 		getApps((onDataAvailableListener) activity);
 	}
+	
+	public void setSelectedDates(int startyear, int startmonth, int startday, int endyear, int endmonth, int endday){
+		editor.putString(activity.getString(R.string.key_date_start), startday+". "+activity.getResources().getStringArray(R.array.months)[startmonth]+" "+startyear);
+		editor.putInt(activity.getString(R.string.key_date_start_day), startday);
+		editor.putInt(activity.getString(R.string.key_date_start_month), startmonth);
+		editor.putInt(activity.getString(R.string.key_date_start_year), startyear);
+		editor.putString(activity.getString(R.string.key_date_end), endday+". "+activity.getResources().getStringArray(R.array.months)[endmonth]+" "+endyear);
+		editor.putInt(activity.getString(R.string.key_date_end_day), endday);
+		editor.putInt(activity.getString(R.string.key_date_end_month), endmonth);
+		editor.putInt(activity.getString(R.string.key_date_end_year), endyear);
+		editor.commit();
+		getApps((onDataAvailableListener) activity);
+		
+	}
+	
 	public void setSelectedDateStart(int year,  int month, int day){
-		//TODO notify
 		editor.putString(activity.getString(R.string.key_date_start), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
 		editor.putInt(activity.getString(R.string.key_date_start_day), day);
 		editor.putInt(activity.getString(R.string.key_date_start_month), month);
@@ -352,7 +396,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		}
 	}
 
-	public void onDataDownloaded(int serverResponse, JSONObject jObj, String requestedFunction, onDataAvailableListener requester, String fileName){
+	public void onDataDownloaded(int serverResponse, JSONObject jObj, long timestamp, String requestedFunction, onDataAvailableListener requester, String fileName){
 		/**
 		 * Gets called after server has send data
 		 * if result jObj is null it will ask for new Login data
@@ -365,7 +409,8 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		}else{
 			if(requestedFunction.equals(RequestedFunction.getAllApps)){
 				if(requester!=null)
-					requester.onDataAvailable(constructAllAppNamesJSONObject(jObj), requestedFunction);
+					
+					requester.onDataAvailable(new JSONObject[]{constructAllAppNamesJSONObject(jObj)}, requestedFunction);
 				else{
 					//JSONObject result = constructColorJSONObj(jObj);
 					//setColorsOfApps(result);
@@ -373,17 +418,31 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				return;
 			}else if(requestedFunction.equals(RequestedFunction.getEventsAtDate)){
 				JSONObject result = constructBasicJSONObj(jObj);
-				if(getSelectedDateEndAsTimestamp()<getTodayAsTimestamp()){
+				if(timestamp<getTodayAsTimestamp()){
 					tmpJSONResult = result;					
 					if(fileName != null)
 						new StoreFileTask(activity).execute(result.toString(),fileName);
-				}else if(getSelectedDateEndAsTimestamp()==getTodayAsTimestamp()){
+				}else if(timestamp==getTodayAsTimestamp()){
 					tmpJSONResultToday = result;
 				}
-				if(requester!=null)
+				if(requester!=null){
 					result = filterIgnoredApps(result);
-				requester.onDataAvailable(result, requestedFunction);
-				return;				
+					for(int i=0;i<numberSelectedDays;i++){
+						if(days[i]==null){
+							try {
+								days[i]=new JSONObject(result.toString());
+							} catch (JSONException e) {
+								e.printStackTrace();
+							}
+							if(i==numberSelectedDays-1)
+								break;
+							else
+								return;
+						}
+					}
+					requester.onDataAvailable(days, requestedFunction);
+					return;				
+				}
 			}else if(requestedFunction.equals(RequestedFunction.initDataSet)){
 				JSONObject result = constructBasicJSONObj(jObj);
 				if(getSelectedDateEndAsTimestamp()==getTodayAsTimestamp())
@@ -393,7 +452,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				((onDataAvailableListener) activity).onDataAvailable(null, requestedFunction);
 				return;
 			}else if(requestedFunction.equals(RequestedFunction.getPositions)){
-				requester.onDataAvailable(constructPositionJSONObject(jObj), requestedFunction);
+				requester.onDataAvailable(new JSONObject[]{constructPositionJSONObject(jObj)}, requestedFunction);
 			}
 		}
 	}
@@ -403,7 +462,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		 * deletes file if jObj==null
 		 * else calls the requester
 		 */
-
+		
 		if(jObj == null && fileName!= null){
 			File file = activity.getFileStreamPath(fileName);
 			if(file.exists())
@@ -413,9 +472,23 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				Log.d("InternalLoadtime", "Load time: "+(Utilities.getSystemTime()-queryStart)+"ms");
 				tmpJSONResult = jObj;
 			}
-			if(requester!=null)
+			if(requester!=null){
 				jObj = filterIgnoredApps(jObj);
-			requester.onDataAvailable(jObj, requestedFunction);
+				for(int i=0;i<numberSelectedDays;i++){
+					if(days[i]==null){
+						try {
+							days[i]=new JSONObject(jObj.toString());
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+						if(i==numberSelectedDays-1)
+							break;
+						else
+							return;
+					}
+				}
+				requester.onDataAvailable(days, requestedFunction);
+			}
 		}
 	}
 	/*
@@ -638,6 +711,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	private void getData(onDataAvailableListener requester, String requestedFunction, JSONObject jObj){
 		queryStart = Utilities.getSystemTime();
 		if(requestedFunction.equals(RequestedFunction.initDataSet)){
+			days=null;
 			String fileName = Utilities.getFileName(requestedFunction, user, jObj,activity);
 			String url = Utilities.getURL(Config.Request.events, jObj.toString(), user, activity);
 			new DownloadTask(requester,activity).execute(url,requestedFunction,fileName);			
@@ -652,14 +726,15 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 			 * Checks if requested data is offline available and loads it.
 			 * If it's not available the server is requested.
 			 */			
-			//Check cached data
+			//Check cached data	
+
 			if(tmpJSONResultToday!=null 
-					&& getSelectedDateEndAsTimestamp() == getTodayAsTimestamp() 
+					&& jObj.optLong("start",-1) == getTodayAsTimestamp() 
 					&& (Utilities.getSystemTime()-tmpJSONResultToday.optLong("downloadTimestamp"))<todayCacheMin ){
 				onDataLoaded(tmpJSONResultToday, requestedFunction, requester, null);
 				return;
 			}else if(tmpJSONResult!=null 
-					&& tmpJSONResult.optLong(("dateTimestamp"),-1)==getSelectedDateEndAsTimestamp()){
+					&& tmpJSONResult.optLong(("dateTimestamp"),-1)==jObj.optLong("start",1)){
 				onDataLoaded(tmpJSONResult, requestedFunction, requester, null);
 				return;				
 			}
@@ -673,11 +748,11 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				new LoadFileTask(requester, activity).execute(fileName, requestedFunction);
 			}else{
 				String url = Utilities.getURL(Config.Request.events, jObj.toString(), user, activity);
-				new DownloadTask(requester,activity).execute(url,requestedFunction,fileName);
+				new DownloadTask(requester,activity).execute(url,requestedFunction,fileName,jObj.optLong("start",1)+"");
 			}
 		}else if(requestedFunction.equals(RequestedFunction.getPositions)){
-			String url = Utilities.getURL(Config.Request.events, jObj.toString(), user, activity);
-			new DownloadTask(requester,activity).execute(url,requestedFunction,null);				
+//			String url = Utilities.getURL(Config.Request.events, jObj.toString(), user, activity);
+//			new DownloadTask(requester,activity).execute(url,requestedFunction,null);				
 		}
 	}
 	private JSONObject constructPositionJSONObject(JSONObject jObj){

@@ -30,12 +30,11 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 	@Override
 	public void onResume(){
 		super.onResume();
-		DataSet.getInstance(getActivity()).getApps(this);	
+		DataSet.getInstance(getActivity()).getApps((onDataAvailableListener) getActivity());	
 	}
 	
-	public void onUpdate() {
-		if(getActivity()!=null&&getActivity().findViewById(R.id.timelinell)!=null)
-			DataSet.getInstance(getActivity()).getApps(this);
+	public void onUpdate(JSONObject[] jObjs) {
+		onDataAvailable(jObjs,"");
 	}
 	
 	@Override
@@ -53,7 +52,7 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 	}
 	
 	@Override
-	public void onDataAvailable(JSONObject jObj, String requestedFunction) {
+	public void onDataAvailable(JSONObject[] jObjs, String requestedFunction) {
 		ViewGroup root = (ViewGroup) getActivity().findViewById(R.id.timelinell);			
 		
 		if(root!=null){
@@ -74,14 +73,14 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 					timeline.setExtra(extra);
 					extra=null;
 				}
-				timeline.setData(jObj);
+				timeline.setData(jObjs[0]);
 				linearLayout.addView(timeline);
 			}else{				
 				if(extra!=null){
 					((TimeLineView)getActivity().findViewById(R.id.timelineview)).setExtra(extra);
 					extra=null;
 				}
-				((TimeLineView)getActivity().findViewById(R.id.timelineview)).setData(jObj);
+				((TimeLineView)getActivity().findViewById(R.id.timelineview)).setData(jObjs[0]);
 			}
 			
 			if(root.findViewById(101)==null){
@@ -97,7 +96,7 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 						timeline.setExtra(extra);
 						extra=null;
 					}
-					timeline.setData(jObj);
+					timeline.setData(jObjs[0]);
 					timeline.setId(101);
 					linearLayout.addView(timeline);
 			}else{
@@ -105,7 +104,7 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 					((TimeLineView)getActivity().findViewById(R.id.timelineview)).setExtra(extra);
 					extra=null;
 				}
-				((TimeLineView)root.findViewById(101)).setData(jObj);
+				((TimeLineView)root.findViewById(101)).setData(jObjs[0]);
 			}
 			
 			if(root.findViewById(102)==null){
@@ -121,7 +120,7 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 						timeline.setExtra(extra);
 						extra=null;
 					}
-					timeline.setData(jObj);
+					timeline.setData(jObjs[0]);
 					timeline.setId(102);
 					linearLayout.addView(timeline);
 			}else{
@@ -129,7 +128,7 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 					((TimeLineView)getActivity().findViewById(R.id.timelineview)).setExtra(extra);
 					extra=null;
 				}
-				((TimeLineView)root.findViewById(102)).setData(jObj);
+				((TimeLineView)root.findViewById(102)).setData(jObjs[0]);
 			}
 		}
 	}

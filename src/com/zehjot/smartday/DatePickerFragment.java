@@ -29,7 +29,7 @@ public class DatePickerFragment extends DialogFragment
 		public void onDateChosen(int year, int month, int day,String whichDate);
 	}
 
-	public void setListener(OptionsListFragment optionsListFragment,String whichDate) {
+	public void setListener(OnDateChosenListener optionsListFragment,String whichDate) {
 		mCallback = optionsListFragment;
 		this.whichDate=whichDate;
 		

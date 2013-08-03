@@ -135,15 +135,17 @@ public class MainActivity extends Activity
 
     
 	@Override
-	public void onDataAvailable(JSONObject jObj, String request) {
+	public void onDataAvailable(JSONObject[] jObjs, String request) {
 		if(request.equals(DataSet.RequestedFunction.initDataSet)){
 			initShit(null);
 		}else if(request.equals(DataSet.RequestedFunction.getAllApps)){
 			SelectAppsDialogFragment ignoreAppsDialog = new SelectAppsDialogFragment();
-			ignoreAppsDialog.setStrings(Utilities.jObjValuesToArrayList(jObj).toArray(new String[0]));
+			ignoreAppsDialog.setStrings(Utilities.jObjValuesToArrayList(jObjs).toArray(new String[0]));
 			ignoreAppsDialog.setMode(SelectAppsDialogFragment.IGNORE_APPS);
 			ignoreAppsDialog.show(fm, "nada");
 		}else if(request.equals(DataSet.RequestedFunction.getEventsAtDate) || request.equals(DataSet.RequestedFunction.updatedFilter)||request.equals(DataSet.RequestedFunction.getPositions)){
+			if(jObjs!=null)
+				TabListener.addData(jObjs);
 			getActionBar().setSelectedNavigationItem(getActionBar().getSelectedNavigationIndex());
 		}
 	}

@@ -144,16 +144,19 @@ public class Utilities{
 			return null;
 		}
 	}
-	public static ArrayList<String> jObjValuesToArrayList(JSONObject jObj){
+	public static ArrayList<String> jObjValuesToArrayList(JSONObject[] jObjs){
 		ArrayList<String> list = new ArrayList<String>();
-		JSONArray jArray;
-		try {
-			jArray = jObj.getJSONArray("result");
-			for(int i=0;i < jArray.length();i++ ){
-				list.add(jArray.getJSONObject(i).getString("app"));
+		for(int h=0;h<jObjs.length;h++){
+			JSONObject jObj = jObjs[h];
+			JSONArray jArray;
+			try {
+				jArray = jObj.getJSONArray("result");
+				for(int i=0;i < jArray.length();i++ ){
+					list.add(jArray.getJSONObject(i).getString("app"));
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
-		} catch (JSONException e) {
-			e.printStackTrace();
 		}
 		return list;
 	}

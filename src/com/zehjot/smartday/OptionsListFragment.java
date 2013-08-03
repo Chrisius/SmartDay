@@ -21,7 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
-public class OptionsListFragment extends ListFragment implements onDataAvailableListener, OnSectionSelectedListener,DatePickerFragment.OnDateChosenListener {
+public class OptionsListFragment extends ListFragment implements onDataAvailableListener, OnSectionSelectedListener,TimespanDialog.OnDateChosenListener {
 	private SimpleAdapter optionsListAdapter;
 	private List<Map<String,String>> displayedOptions;
 	private static final String TEXT1 = "text1";
@@ -39,8 +39,7 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		final int[] toLayoutId = new int[] {android.R.id.text1, android.R.id.text2};
 		if(displayedOptions==null){
 			displayedOptions = new ArrayList<Map<String,String>>();
-			displayedOptions.add(displayDate("start"));
-			displayedOptions.add(displayDate("end"));
+			displayedOptions.add(displayDate());
 			displayedOptions.add(toMap(getResources().getString(R.string.options_app_text1), getResources().getString(R.string.options_app_text2)));
 		}
 		setStartView(startview);
@@ -82,19 +81,17 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 	public void onListItemClick(ListView l,View v,int position, long id){
 		switch (position-1) {
 		case 0:
+			TimespanDialog date = new TimespanDialog();
+			date.setListener(this);
+	    	date.show(getFragmentManager(), getString(R.string.datepicker));/*
 	    	DatePickerFragment dateStart = new DatePickerFragment();
 	    	dateStart.setListener(this,"start");
-	    	dateStart.show(getFragmentManager(), getString(R.string.datepicker));
-			break;
-		case 1:
-	    	DatePickerFragment dateEnd = new DatePickerFragment();
-	    	dateEnd.setListener(this,"end");
-	    	dateEnd.show(getFragmentManager(), getString(R.string.datepicker));
+	    	dateStart.show(getFragmentManager(), getString(R.string.datepicker));*/
 			break;			
-		case 2:
+		case 1:
 			dataSet.getApps(this);			
 			break;
-		case 3:
+		case 2:
 			special = true;
 			dataSet.getApps(this);			
 			//dataSet.getContext(dataSet.getSelectedDateAsTimestamp(),dataSet.getNextDayAsTimestamp(),this);
@@ -103,19 +100,19 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 			break;
 		}
 	}
-	public void onDataAvailable(JSONObject jObj, String request){
+	public void onDataAvailable(JSONObject[] jObjs, String request){
 		//check if fragment is added to activity
 		if(!isAdded())
 			return;
 		if(request.equals(DataSet.RequestedFunction.getEventsAtDate)&&!special){			
 			SelectAppsDialogFragment apps = new SelectAppsDialogFragment();
-			apps.setStrings(Utilities.jObjValuesToArrayList(jObj).toArray(new String[0]));
+			apps.setStrings(Utilities.jObjValuesToArrayList(jObjs).toArray(new String[0]));
 			apps.setMode(SelectAppsDialogFragment.SELECT_APPS);
 			apps.show(getFragmentManager(), getString(R.string.datepicker));
 		}else if(request.equals(DataSet.RequestedFunction.getEventsAtDate)&&special){
 			special=false;
 			SelectAppsDialogFragment apps = new SelectAppsDialogFragment();
-			apps.setStrings(Utilities.jObjValuesToArrayList(jObj).toArray(new String[0]));
+			apps.setStrings(Utilities.jObjValuesToArrayList(jObjs).toArray(new String[0]));
 			apps.setMode(SelectAppsDialogFragment.SELECT_HIGHLIGHT_APPS);
 			apps.show(getFragmentManager(), getString(R.string.datepicker));			
 		}
@@ -128,28 +125,29 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		updateOptions(pos);
 	}
 	
-    public void onDateChosen(int year, int month, int day, String whichDate){
+    public void onDateChosen(int startyear, int startmonth, int startday, int endyear, int endmonth, int endday){
+    	/*
     	if(whichDate.equals("start"))
         	dataSet.setSelectedDateStart(year, month, day);
     	else
     		dataSet.setSelectedDateEnd(year, month, day);
-    	updateDate(whichDate);
+    		*/
+    	dataSet.setSelectedDates(startyear, startmonth, startday, endyear, endmonth, endday);
+//    	dataSet.setSelectedDateEnd(endyear, endmonth, endday);
+    	updateDate();
     }
-	public void updateDate(String which){
-		if(which.equals("start"))
-			displayedOptions.set(0, displayDate(which));
-		else
-			displayedOptions.set(1, displayDate(which));
+	public void updateDate(){
+		displayedOptions.set(0, displayDate());
 		optionsListAdapter.notifyDataSetChanged();
 	}
 	
 	private void updateOptions(int pos){
 		switch (pos) {
 		case 0:
-			if(displayedOptions.size()<4){//check if exists because of nullpointer
+			if(displayedOptions.size()<3){//check if exists because of nullpointer
 				displayedOptions.add(toMap(getString(R.string.options_map_text1), getString(R.string.options_map_text2)));}
 			else{
-				displayedOptions.set(3,toMap(getString(R.string.options_map_text1), getString(R.string.options_map_text2)));}
+				displayedOptions.set(2,toMap(getString(R.string.options_map_text1), getString(R.string.options_map_text2)));}
 			optionsListAdapter.notifyDataSetChanged();
 			break;
 		case 1:
@@ -158,13 +156,13 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 //			else{
 //				displayedOptions.set(2,toMap(getString(R.string.options_chart_text1), getString(R.string.options_chart_text2)));}
 //			optionsListAdapter.notifyDataSetChanged();
-			if(displayedOptions.size()>3){
-				displayedOptions.remove(3);
+			if(displayedOptions.size()>2){
+				displayedOptions.remove(2);
 				optionsListAdapter.notifyDataSetChanged();}
 			break;
 		case 2:
-			if(displayedOptions.size()>3){
-				displayedOptions.remove(3);
+			if(displayedOptions.size()>2){
+				displayedOptions.remove(2);
 				optionsListAdapter.notifyDataSetChanged();}
 			break;
 		default:
@@ -172,11 +170,13 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		}
 	}
 	
-	private Map<String,String> displayDate(String which){
-		if(which.equals("start"))
-			return toMap(dataSet.getSelectedDateStartAsString(),getResources().getString(R.string.options_date_text2));
+	private Map<String,String> displayDate(){
+		String s1 = dataSet.getSelectedDateStartAsString();
+		String s2 = dataSet.getSelectedDateEndAsString();
+		if(s1.equals(s2))
+			return toMap(s2,getResources().getString(R.string.options_date_text2));
 		else
-			return toMap(dataSet.getSelectedDateEndAsString(),getResources().getString(R.string.options_date_text2));
+			return toMap(s1+"-\n"+s2,getResources().getString(R.string.options_date_text2));
 	}
 	
 	private Map<String,String> toMap(String text1, String text2){
