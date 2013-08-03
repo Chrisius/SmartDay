@@ -91,8 +91,8 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 				mMap = this.getMap();
 			mMap.setInfoWindowAdapter(this);
 			mMap.setOnInfoWindowClickListener(this);
-			double zoomLat=0;
-			double zoomLng=0;
+			double zoomLat=50.45;
+			double zoomLng=6.06;
 			CameraPosition camera = mMap.getCameraPosition();
 			try{
 				for(int i=0; i<markerList.size();i++){
@@ -144,7 +144,9 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 				e.printStackTrace();
 			}
 			if(camera.target.latitude==0&&camera.target.longitude==0)
-				zoomTo(zoomLat, zoomLng);
+				zoomTo(zoomLat, zoomLng);/*
+			else if(zoomLat != 50.45 && zoomLng != 6.06)
+				zoomTo(zoomLat, zoomLng);*/
 		}
 	}
 	/**
@@ -197,7 +199,9 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 						long end=usage.optLong("end", -1);
 						double lat;
 						double lng;
-						if(start!=-1&&end!=-1){
+						if(end==-1)
+							end=start;
+						if(start!=-1){
 							if(location.getJSONObject(0).getString("key").equals("lat")){
 								lat = location.getJSONObject(0).getDouble("value");
 								lng = location.getJSONObject(1).getDouble("value");	
@@ -214,8 +218,8 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 										JSONObject markerApp = markerApps.getJSONObject(l);
 										if(markerApp.getString("app").equals(appName)){
 											markerApp.getJSONArray("usage").put(new JSONObject()
-											.put("start", usage.getLong("start"))
-											.put("end",usage.getLong("end")));
+											.put("start", start)
+											.put("end",end));
 										found =true;
 										break;
 										}
@@ -226,8 +230,8 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 											.put("app", appName)
 											.put("usage", new JSONArray()
 												.put(new JSONObject()
-													.put("start", usage.getLong("start"))
-													.put("end",usage.getLong("end"))
+													.put("start", start)
+													.put("end",end)
 												)
 											)
 										);
@@ -258,11 +262,12 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 									.put("end", locEnd)
 									.put("apps", new JSONArray()
 										.put(new JSONObject()
+											.put("highlight",highlightApps.optBoolean(appName))
 											.put("app", appName)
 											.put("usage", new JSONArray()
 												.put(new JSONObject()
-													.put("start", usage.getLong("start"))
-													.put("end",usage.getLong("end"))
+													.put("start", start)
+													.put("end",end)
 												)
 											)
 										)
@@ -285,7 +290,7 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener,
 							JSONObject tmpUsage = tmpUsages.getJSONObject(k);
 							long tmpStart = tmpUsage.optLong("start",-1);
 							long tmpEnd = tmpUsage.optLong("end", -1);
-							if(markerEnd==-1&&tmpEnd!=-1 && markerEnd<tmpEnd){
+							if(tmpEnd!=-1 && markerEnd<tmpEnd){
 								markerEnd = tmpEnd;
 							}
 							if(markerStart>tmpStart&&tmpStart!=-1){
