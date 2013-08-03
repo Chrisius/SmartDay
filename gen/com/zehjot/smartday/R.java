@@ -346,37 +346,43 @@ containing a value of this type.
         public static final int common_signin_button_text_long=0x7f07000e;
         /**  Error Messages 
          */
-        public static final int date_error=0x7f070027;
+        public static final int date_error=0x7f07002d;
         public static final int datepicker=0x7f07001a;
-        public static final int error=0x7f070028;
-        public static final int error_authentication_fail=0x7f07002b;
-        public static final int error_no_string=0x7f070029;
-        public static final int error_no_user_jObj=0x7f07002a;
-        public static final int error_storing_file=0x7f07002c;
-        public static final int file_app_colors=0x7f07003c;
+        public static final int error=0x7f07002e;
+        public static final int error_authentication_fail=0x7f070031;
+        public static final int error_no_string=0x7f07002f;
+        public static final int error_no_user_jObj=0x7f070030;
+        public static final int error_storing_file=0x7f070032;
+        public static final int file_app_colors=0x7f070042;
         /**  FileNames 
          */
-        public static final int file_ignored_apps=0x7f07003b;
+        public static final int file_ignored_apps=0x7f070041;
         public static final int hello_world=0x7f070017;
-        public static final int hint_user_email=0x7f070043;
+        public static final int hint_user_email=0x7f070049;
         /**  Hint 
          */
-        public static final int hint_user_name=0x7f070041;
-        public static final int hint_user_pass=0x7f070042;
-        public static final int info_no_data_connection=0x7f07002e;
+        public static final int hint_user_name=0x7f070047;
+        public static final int hint_user_pass=0x7f070048;
+        public static final int info_no_data_connection=0x7f070034;
         /**  Infos 
          */
-        public static final int info_user_data_ok=0x7f07002d;
+        public static final int info_user_data_ok=0x7f070033;
         public static final int key_apps=0x7f070025;
-        public static final int key_date=0x7f070021;
-        public static final int key_date_day=0x7f070022;
+        public static final int key_date_end=0x7f070021;
+        public static final int key_date_end_day=0x7f070022;
         /**  SharedPreferences Identifier 
          */
-        public static final int key_date_default=0x7f07001f;
-        public static final int key_date_default_timestamp=0x7f070020;
-        public static final int key_date_month=0x7f070023;
+        public static final int key_date_end_default=0x7f07001f;
+        public static final int key_date_end_default_timestamp=0x7f070020;
+        public static final int key_date_end_month=0x7f070023;
+        public static final int key_date_end_year=0x7f070024;
         public static final int key_date_selected_apps=0x7f070026;
-        public static final int key_date_year=0x7f070024;
+        public static final int key_date_start=0x7f070029;
+        public static final int key_date_start_day=0x7f07002a;
+        public static final int key_date_start_default=0x7f070027;
+        public static final int key_date_start_default_timestamp=0x7f070028;
+        public static final int key_date_start_month=0x7f07002b;
+        public static final int key_date_start_year=0x7f07002c;
         /**  Location client code resources (prefix with location_client) 
 
         Begin strings for location.reporting
@@ -389,31 +395,31 @@ containing a value of this type.
         public static final int location_client_ulr_inactive_age_unknown=0x7f070013;
         public static final int location_client_ulr_inactive_unknown_restriction=0x7f070014;
         public static final int options=0x7f070019;
-        public static final int options_actionbar_blacklist=0x7f070037;
-        public static final int options_actionbar_colorApp=0x7f07003a;
-        public static final int options_actionbar_deleteFiles=0x7f070038;
-        public static final int options_actionbar_newUser=0x7f070039;
-        public static final int options_app_select=0x7f070036;
-        public static final int options_app_text1=0x7f070033;
-        public static final int options_app_text2=0x7f070034;
-        public static final int options_chart_text1=0x7f070031;
-        public static final int options_chart_text2=0x7f070032;
-        public static final int options_date_text2=0x7f070035;
+        public static final int options_actionbar_blacklist=0x7f07003d;
+        public static final int options_actionbar_colorApp=0x7f070040;
+        public static final int options_actionbar_deleteFiles=0x7f07003e;
+        public static final int options_actionbar_newUser=0x7f07003f;
+        public static final int options_app_select=0x7f07003c;
+        public static final int options_app_text1=0x7f070039;
+        public static final int options_app_text2=0x7f07003a;
+        public static final int options_chart_text1=0x7f070037;
+        public static final int options_chart_text2=0x7f070038;
+        public static final int options_date_text2=0x7f07003b;
         /**  Option Names 
          */
-        public static final int options_map_text1=0x7f07002f;
-        public static final int options_map_text2=0x7f070030;
+        public static final int options_map_text1=0x7f070035;
+        public static final int options_map_text2=0x7f070036;
         public static final int save=0x7f07001c;
         /**  Bundle identifier 
          */
         public static final int start_view=0x7f07001d;
         public static final int today=0x7f07001b;
-        public static final int user_email=0x7f070040;
-        public static final int user_file=0x7f07003d;
+        public static final int user_email=0x7f070046;
+        public static final int user_file=0x7f070043;
         /**  UserFile Identifier
          */
-        public static final int user_name=0x7f07003e;
-        public static final int user_pass=0x7f07003f;
+        public static final int user_name=0x7f070044;
+        public static final int user_pass=0x7f070045;
     }
     public static final class style {
         /** 

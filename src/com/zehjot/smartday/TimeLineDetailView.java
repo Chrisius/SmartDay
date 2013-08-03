@@ -444,7 +444,7 @@ public class TimeLineDetailView extends View {
 			Log.d("location clicked", "lng"+lng+"lat"+lat);										
 			JSONObject jObject = new JSONObject();
 			try {
-				jObject.put("date", DataSet.getInstance(getContext()).getSelectedDateAsTimestamp());
+				jObject.put("date", DataSet.getInstance(getContext()).getSelectedDateEndAsTimestamp());
 				jObject.put("time", start);
 				jObject.put("lng",lng);
 				jObject.put("lat",lat);

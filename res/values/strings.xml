@@ -28,14 +28,21 @@
 	<string name="bundle_app_string_array">bundle_app_string_array</string>
 
 <!-- SharedPreferences Identifier -->
-    <string name="key_date_default">default_date</string>
-    <string name="key_date_default_timestamp">default_date_as_timestamp</string>
-    <string name="key_date">date_by_user</string>
-    <string name="key_date_day">day</string>
-    <string name="key_date_month">month</string>
-    <string name="key_date_year">year</string>
+    <string name="key_date_end_default">default_date</string>
+    <string name="key_date_end_default_timestamp">default_date_as_timestamp</string>
+    <string name="key_date_end">date_by_user</string>
+    <string name="key_date_end_day">day</string>
+    <string name="key_date_end_month">month</string>
+    <string name="key_date_end_year">year</string>
     <string name="key_apps">apps_chosen_by_user</string>
     <string name="key_date_selected_apps">date_selected_apps</string>
+    
+    <string name="key_date_start_default">default_date</string>
+    <string name="key_date_start_default_timestamp">default_date_as_timestamp</string>
+    <string name="key_date_start">date_by_user</string>
+    <string name="key_date_start_day">day</string>
+    <string name="key_date_start_month">month</string>
+    <string name="key_date_start_year">year</string>
     
 <!-- Error Messages -->
     <string name="date_error">no date found</string>

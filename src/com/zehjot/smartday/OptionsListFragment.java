@@ -40,6 +40,7 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		if(displayedOptions==null){
 			displayedOptions = new ArrayList<Map<String,String>>();
 			displayedOptions.add(displayDate());
+			displayedOptions.add(displayDate());
 			displayedOptions.add(toMap(getResources().getString(R.string.options_app_text1), getResources().getString(R.string.options_app_text2)));
 		}
 		setStartView(startview);
@@ -81,14 +82,19 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 	public void onListItemClick(ListView l,View v,int position, long id){
 		switch (position-1) {
 		case 0:
-	    	DatePickerFragment date = new DatePickerFragment();
-	    	date.setListener(this);
-			date.show(getFragmentManager(), getString(R.string.datepicker));
+	    	DatePickerFragment dateStart = new DatePickerFragment();
+	    	dateStart.setListener(this);
+	    	dateStart.show(getFragmentManager(), getString(R.string.datepicker));
 			break;
 		case 1:
+	    	DatePickerFragment dateEnd = new DatePickerFragment();
+	    	dateEnd.setListener(this);
+	    	dateEnd.show(getFragmentManager(), getString(R.string.datepicker));
+			break;			
+		case 2:
 			dataSet.getApps(this);			
 			break;
-		case 2:
+		case 3:
 			special = true;
 			dataSet.getApps(this);			
 			//dataSet.getContext(dataSet.getSelectedDateAsTimestamp(),dataSet.getNextDayAsTimestamp(),this);
@@ -123,7 +129,7 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 	}
 	
     public void onDateChosen(int year, int month, int day){ 	
-    	dataSet.setSelectedDate(year, month, day);
+    	dataSet.setSelectedDateEnd(year, month, day);
     	updateDate();
     }
 	public void updateDate(){
@@ -134,10 +140,10 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 	private void updateOptions(int pos){
 		switch (pos) {
 		case 0:
-			if(displayedOptions.size()<3){//check if exists because of nullpointer
+			if(displayedOptions.size()<4){//check if exists because of nullpointer
 				displayedOptions.add(toMap(getString(R.string.options_map_text1), getString(R.string.options_map_text2)));}
 			else{
-				displayedOptions.set(2,toMap(getString(R.string.options_map_text1), getString(R.string.options_map_text2)));}
+				displayedOptions.set(3,toMap(getString(R.string.options_map_text1), getString(R.string.options_map_text2)));}
 			optionsListAdapter.notifyDataSetChanged();
 			break;
 		case 1:
@@ -146,13 +152,13 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 //			else{
 //				displayedOptions.set(2,toMap(getString(R.string.options_chart_text1), getString(R.string.options_chart_text2)));}
 //			optionsListAdapter.notifyDataSetChanged();
-			if(displayedOptions.size()>2){
-				displayedOptions.remove(2);
+			if(displayedOptions.size()>3){
+				displayedOptions.remove(3);
 				optionsListAdapter.notifyDataSetChanged();}
 			break;
 		case 2:
-			if(displayedOptions.size()>2){
-				displayedOptions.remove(2);
+			if(displayedOptions.size()>3){
+				displayedOptions.remove(3);
 				optionsListAdapter.notifyDataSetChanged();}
 			break;
 		default:
@@ -161,7 +167,7 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 	}
 	
 	private Map<String,String> displayDate(){
-		return toMap(dataSet.getSelectedDateAsString(),getResources().getString(R.string.options_date_text2));
+		return toMap(dataSet.getSelectedDateEndAsString(),getResources().getString(R.string.options_date_text2));
 	}
 	
 	private Map<String,String> toMap(String text1, String text2){

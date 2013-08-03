@@ -122,14 +122,14 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		int day = c.get(Calendar.DAY_OF_MONTH);
 		int month = c.get(Calendar.MONTH);
 		int year = c.get(Calendar.YEAR);
-		editor.putString(activity.getString(R.string.key_date_default), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
-		editor.putLong(activity.getString(R.string.key_date_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();
+		editor.putString(activity.getString(R.string.key_date_end_default), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
+		editor.putLong(activity.getString(R.string.key_date_end_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();
 		//editor.putString(activity.getString(R.string.key_date_selected_apps),"not Initialized"); //Sets String for selectDate to "not Initialized"
 		editor.commit();
-		editor.putString(activity.getString(R.string.key_date), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
-		editor.putInt(activity.getString(R.string.key_date_day), day);
-		editor.putInt(activity.getString(R.string.key_date_month), month);
-		editor.putInt(activity.getString(R.string.key_date_year), year);
+		editor.putString(activity.getString(R.string.key_date_end), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
+		editor.putInt(activity.getString(R.string.key_date_end_day), day);
+		editor.putInt(activity.getString(R.string.key_date_end_month), month);
+		editor.putInt(activity.getString(R.string.key_date_end_year), year);
 		editor.commit();
 		instance.getApps(null);
 	}
@@ -139,8 +139,8 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		int day = c.get(Calendar.DAY_OF_MONTH);
 		int month = c.get(Calendar.MONTH);
 		int year = c.get(Calendar.YEAR);
-		editor.putString(activity.getString(R.string.key_date_default), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
-		editor.putLong(activity.getString(R.string.key_date_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();		
+		editor.putString(activity.getString(R.string.key_date_end_default), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
+		editor.putLong(activity.getString(R.string.key_date_end_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();		
 	}
 	
 	private static void createUserData(){
@@ -158,7 +158,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	}
 	
 	public void getApps(onDataAvailableListener listener){
-		getAppsAtDate(getSelectedDateAsTimestamp(),listener);
+		getAppsAtDate(getSelectedDateEndAsTimestamp(),listener);
 	}
 	
 	private void getAppsAtDate(long timestamp, onDataAvailableListener listener){
@@ -216,24 +216,24 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		((onDataAvailableListener)activity).onDataAvailable(null, RequestedFunction.updatedFilter);
 	}
 	
-	public String getSelectedDateAsString(){
-		String date = getSharedString(R.string.key_date);
-		String default_date = sharedPreferences.getString(activity.getString(R.string.key_date_default), activity.getString(R.string.key_date_default));
+	public String getSelectedDateEndAsString(){
+		String date = getSharedString(R.string.key_date_end);
+		String default_date = sharedPreferences.getString(activity.getString(R.string.key_date_end_default), activity.getString(R.string.key_date_end_default));
 		if(date.equals(default_date))
 			return activity.getString(R.string.today);
 		return date;
 	}
 
 	public long getTodayAsTimestamp(){
-		return sharedPreferences.getLong(activity.getString(R.string.key_date_default_timestamp), -1);
+		return sharedPreferences.getLong(activity.getString(R.string.key_date_end_default_timestamp), -1);
 	}
 
-	public void setSelectedDate(int year,  int month, int day){
+	public void setSelectedDateEnd(int year,  int month, int day){
 		//TODO notify
-		editor.putString(activity.getString(R.string.key_date), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
-		editor.putInt(activity.getString(R.string.key_date_day), day);
-		editor.putInt(activity.getString(R.string.key_date_month), month);
-		editor.putInt(activity.getString(R.string.key_date_year), year);
+		editor.putString(activity.getString(R.string.key_date_end), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
+		editor.putInt(activity.getString(R.string.key_date_end_day), day);
+		editor.putInt(activity.getString(R.string.key_date_end_month), month);
+		editor.putInt(activity.getString(R.string.key_date_end_year), year);
 		editor.commit();
 		getApps((onDataAvailableListener) activity);
 	}
@@ -246,14 +246,14 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		return new int[] {year, month, day};
 	}
 	*/
-	public long getSelectedDateAsTimestamp(){
-		int year = getSharedInt(R.string.key_date_year);
-		int month = getSharedInt(R.string.key_date_month);
-		int day = getSharedInt(R.string.key_date_day);		
+	public long getSelectedDateEndAsTimestamp(){
+		int year = getSharedInt(R.string.key_date_end_year);
+		int month = getSharedInt(R.string.key_date_end_month);
+		int day = getSharedInt(R.string.key_date_end_day);		
 		return Utilities.getTimestamp(year, month, day, 0, 0, 0);
 	}
 	public long getNextDayAsTimestamp(){	
-		return getSelectedDateAsTimestamp()+24*60*60;
+		return getSelectedDateEndAsTimestamp()+24*60*60;
 	}
 	
 	/** ColorsOfApps:
@@ -350,11 +350,11 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				return;
 			}else if(requestedFunction.equals(RequestedFunction.getEventsAtDate)){
 				JSONObject result = constructBasicJSONObj(jObj);
-				if(getSelectedDateAsTimestamp()<getTodayAsTimestamp()){
+				if(getSelectedDateEndAsTimestamp()<getTodayAsTimestamp()){
 					tmpJSONResult = result;					
 					if(fileName != null)
 						new StoreFileTask(activity).execute(result.toString(),fileName);
-				}else if(getSelectedDateAsTimestamp()==getTodayAsTimestamp()){
+				}else if(getSelectedDateEndAsTimestamp()==getTodayAsTimestamp()){
 					tmpJSONResultToday = result;
 				}
 				if(requester!=null)
@@ -363,7 +363,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				return;				
 			}else if(requestedFunction.equals(RequestedFunction.initDataSet)){
 				JSONObject result = constructBasicJSONObj(jObj);
-				if(getSelectedDateAsTimestamp()==getTodayAsTimestamp())
+				if(getSelectedDateEndAsTimestamp()==getTodayAsTimestamp())
 					tmpJSONResultToday = result;
 				else
 					tmpJSONResult = result;
@@ -432,7 +432,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		getData(requester, RequestedFunction.getAllApps, data);
 	}
 	public void getPositions(onDataAvailableListener requester){
-		long start=getSelectedDateAsTimestamp();
+		long start=getSelectedDateEndAsTimestamp();
 		long end=getNextDayAsTimestamp();
 		
 		JSONObject data = new JSONObject();
@@ -457,7 +457,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		JSONObject result=new JSONObject();
 		long totalDuration=0;
 		try{
-			result.put("dateTimestamp", getSelectedDateAsTimestamp());
+			result.put("dateTimestamp", getSelectedDateEndAsTimestamp());
 			result.put("downloadTimestamp", Utilities.getSystemTime());
 			jArrayInput = jObj.getJSONArray("events");					
 			for(int i=0; i<jArrayInput.length();i++){
@@ -631,12 +631,12 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 			 */			
 			//Check cached data
 			if(tmpJSONResultToday!=null 
-					&& getSelectedDateAsTimestamp() == getTodayAsTimestamp() 
+					&& getSelectedDateEndAsTimestamp() == getTodayAsTimestamp() 
 					&& (Utilities.getSystemTime()-tmpJSONResultToday.optLong("downloadTimestamp"))<todayCacheMin ){
 				onDataLoaded(tmpJSONResultToday, requestedFunction, requester, null);
 				return;
 			}else if(tmpJSONResult!=null 
-					&& tmpJSONResult.optLong(("dateTimestamp"),-1)==getSelectedDateAsTimestamp()){
+					&& tmpJSONResult.optLong(("dateTimestamp"),-1)==getSelectedDateEndAsTimestamp()){
 				onDataLoaded(tmpJSONResult, requestedFunction, requester, null);
 				return;				
 			}
