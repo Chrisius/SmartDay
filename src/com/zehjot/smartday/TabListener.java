@@ -16,7 +16,6 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     private final Class<T> fragmentClass;
     private static OnSectionSelectedListener options;
     private static JSONObject[] jObjs;
-    private static int hashOldJObj;
     
     public interface OnSectionSelectedListener{
     	public void onSectionSelected(int pos);
@@ -67,13 +66,7 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     }
     
     public static void addData(JSONObject[] jObjs){
-    	if(TabListener.jObjs==null){
     	TabListener.jObjs = jObjs;
-    	TabListener.hashOldJObj = TabListener.jObjs.hashCode();
-    	}else{
-        	TabListener.hashOldJObj = TabListener.jObjs.hashCode();
-        	TabListener.jObjs = jObjs;    		
-    	}
     }
     
     public void switchTab(JSONObject jObj){

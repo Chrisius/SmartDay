@@ -217,10 +217,10 @@ containing a value of this type.
         public static final int square=0x7f02001e;
     }
     public static final class id {
-        public static final int action_blacklist=0x7f060024;
-        public static final int action_color_apps=0x7f060027;
-        public static final int action_delete_files=0x7f060025;
-        public static final int action_new_user=0x7f060026;
+        public static final int action_blacklist=0x7f060025;
+        public static final int action_color_apps=0x7f060028;
+        public static final int action_delete_files=0x7f060026;
+        public static final int action_new_user=0x7f060027;
         public static final int ambilwarna_cursor=0x7f060010;
         public static final int ambilwarna_dialogView=0x7f06000c;
         public static final int ambilwarna_pref_widget_kotak=0x7f060015;
@@ -255,7 +255,8 @@ containing a value of this type.
         public static final int section_header_container=0x7f060008;
         public static final int section_list_fragment=0x7f060021;
         public static final int terrain=0x7f060003;
-        public static final int timelinell=0x7f060023;
+        public static final int timelinell=0x7f060024;
+        public static final int timelinescroll=0x7f060023;
         public static final int timelineview=0x7f060007;
     }
     public static final class layout {

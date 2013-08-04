@@ -151,7 +151,8 @@ public class Utilities{
 			try {
 				jArray = jObj.getJSONArray("result");
 				for(int i=0;i < jArray.length();i++ ){
-					list.add(jArray.getJSONObject(i).getString("app"));
+					if(!list.contains(jArray.getJSONObject(i).getString("app")))
+						list.add(jArray.getJSONObject(i).getString("app"));
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();

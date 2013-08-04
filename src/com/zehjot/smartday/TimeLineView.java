@@ -88,7 +88,6 @@ public class TimeLineView extends View {
         mScrollAnimator = ValueAnimator.ofFloat(0, 1);
         mScrollAnimator.addUpdateListener(new AnimatorTick());
         rectangles = new JSONArray();        
-
 		detail=null;
 	}
 	
@@ -355,6 +354,11 @@ public class TimeLineView extends View {
 		zoomDetector.onTouchEvent(event);
 		scrollDetector.onTouchEvent(event);
 		return true;
+	}
+	public void removeDetail(){
+		LinearLayout linearLayout = (LinearLayout)getParent();
+		selectApp("");
+		linearLayout.removeView(linearLayout.getChildAt(1));
 	}
 	
 	private class ZoomListener extends ScaleGestureDetector.SimpleOnScaleGestureListener{

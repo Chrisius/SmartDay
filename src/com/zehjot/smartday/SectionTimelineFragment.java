@@ -1,5 +1,6 @@
 package com.zehjot.smartday;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.zehjot.smartday.R;
@@ -9,6 +10,8 @@ import com.zehjot.smartday.data_access.DataSet.onDataAvailableListener;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 public class SectionTimelineFragment extends Fragment implements OnUpdateListener,onDataAvailableListener{
 	private JSONObject extra=null;
@@ -36,26 +40,36 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 	public void onUpdate(JSONObject[] jObjs) {
 		onDataAvailable(jObjs,"");
 	}
-	
 	@Override
 	public void putExtra(JSONObject jObj) {
+		if(jObj==null)
+			return;
 		Activity act = getActivity();
 		extra = jObj;
+		int scrollto=0;
 		if(act!=null){
 			ViewGroup root = (ViewGroup) getActivity().findViewById(R.id.timelinell);
 			for(int i=0;i<root.getChildCount();i++){
 				LinearLayout timelineLinearLayout= (LinearLayout) root.getChildAt(i);
 				TimeLineView timelineView = (TimeLineView) timelineLinearLayout.getChildAt(0);	
 				if(extra!=null&&timelineView.getDate()==extra.optLong("date",-1)){
+					try {
+						extra.put("scrollY", i*300);
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					scrollto=i;
 					timelineView.setExtra(jObj);
 					extra=null;
-					return;
+				}else{
+					timelineView.removeDetail();					
 				}
 			}			
 		}
-		
+
+		ScrollView sv = (ScrollView) getActivity().findViewById(R.id.timelinescroll);
+		sv.setScrollY(scrollto*300);
 	}
-	
 	@Override
 	public void onDataAvailable(JSONObject[] jObjs, String requestedFunction) {
 		ViewGroup root = (ViewGroup) getActivity().findViewById(R.id.timelinell);
