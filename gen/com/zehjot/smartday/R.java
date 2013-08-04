@@ -217,10 +217,10 @@ containing a value of this type.
         public static final int square=0x7f02001e;
     }
     public static final class id {
-        public static final int action_blacklist=0x7f060026;
-        public static final int action_color_apps=0x7f060029;
-        public static final int action_delete_files=0x7f060027;
-        public static final int action_new_user=0x7f060028;
+        public static final int action_blacklist=0x7f060024;
+        public static final int action_color_apps=0x7f060027;
+        public static final int action_delete_files=0x7f060025;
+        public static final int action_new_user=0x7f060026;
         public static final int ambilwarna_cursor=0x7f060010;
         public static final int ambilwarna_dialogView=0x7f06000c;
         public static final int ambilwarna_pref_widget_kotak=0x7f060015;
@@ -237,15 +237,13 @@ containing a value of this type.
         public static final int auth_user_name=0x7f060017;
         public static final int auth_user_pass=0x7f060018;
         public static final int chart_1=0x7f06001d;
-        public static final int chart_1_appDetails=0x7f060022;
-        public static final int chart_1_appNames=0x7f060021;
-        public static final int chart_1_details=0x7f060020;
-        public static final int chart_2=0x7f06001f;
-        public static final int chart_3=0x7f06001e;
+        public static final int chart_1_appDetails=0x7f060020;
+        public static final int chart_1_appNames=0x7f06001f;
+        public static final int chart_1_details=0x7f06001e;
         public static final int chart_test=0x7f06000a;
         public static final int hybrid=0x7f060004;
         public static final int left=0x7f060005;
-        public static final int map_container=0x7f060024;
+        public static final int map_container=0x7f060022;
         public static final int none=0x7f060000;
         public static final int normal=0x7f060001;
         public static final int option_header=0x7f06001b;
@@ -255,9 +253,9 @@ containing a value of this type.
         public static final int satellite=0x7f060002;
         public static final int section_fragment_container=0x7f06000b;
         public static final int section_header_container=0x7f060008;
-        public static final int section_list_fragment=0x7f060023;
+        public static final int section_list_fragment=0x7f060021;
         public static final int terrain=0x7f060003;
-        public static final int timelinell=0x7f060025;
+        public static final int timelinell=0x7f060023;
         public static final int timelineview=0x7f060007;
     }
     public static final class layout {

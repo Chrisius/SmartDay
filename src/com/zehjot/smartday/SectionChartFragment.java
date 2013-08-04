@@ -31,7 +31,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class SectionChartFragment extends Fragment implements onDataAvailableListener, OnUpdateListener{
-	private MyChart chart1=null;
+//	private MyChart chart1=null;
+	private MyChart[] charts=null;
 	private static double minTimeinPercent = 0.05;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -46,170 +47,43 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-	}/*
-	private void draw(String[] apps, double[] time, int[] colors){
-		draw3();
-		draw1(apps, time, colors);
-		draw2();	
-		//draw4();
-		draw5();
-	}*/
-	/*
-	private void draw1(String[] apps, double[] time, int[] colors){
-		double totaltime = 0;
-		DataSet dataset = DataSet.getInstance(getActivity());
-		JSONObject selectedApps = dataset.getSelectedApps();
-		for(int i=0; i < apps.length; i++){
-			if(selectedApps.optBoolean(apps[i], true)){
-				totaltime += time[i];
-			}
-		}
-		totaltime = Math.round(totaltime*100.f);
-		totaltime /=100;
-		if(chartView1==null){
-			double otherTime = 0;
-			categories1 = new CategorySeries("Number1");
-			renderer1 = new DefaultRenderer();
-			for(int i=0; i < apps.length; i++){
-				if(selectedApps.optBoolean(apps[i], true)){
-					if(time[i]/totaltime>minTimeinPercent){
-					SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-					categories1.add(apps[i], time[i]);
-					r.setColor(colors[i]);
-					renderer1.addSeriesRenderer(r);
-					}else{
-						otherTime += time[i];
-					}
-				}
-			}
-			if(otherTime > 0){
-				SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-				otherTime = Math.round(otherTime*100.f);
-				otherTime /=100;
-				categories1.add("other", otherTime);
-				r.setColor(DataSet.getInstance(getActivity()).getColorsOfApps().optInt("other"));
-				renderer1.addSeriesRenderer(r);				
-			}
-			renderer1.setFitLegend(true);			
-			renderer1.setDisplayValues(true);
-			renderer1.setPanEnabled(false);
-			renderer1.setClickEnabled(true);
-			renderer1.setInScroll(true);
-			renderer1.setChartTitle(""+totaltime);
-			chartView1 = ChartFactory.getPieChartView(getActivity(), categories1, renderer1);	
-			
-			chartView1.setOnClickListener(new View.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-			          SeriesSelection seriesSelection = chartView1.getCurrentSeriesAndPoint();
-			          if (seriesSelection == null) {
-			        	  
-			          } else {
-			        	  SimpleSeriesRenderer[] renederers = renderer1.getSeriesRenderers();
-			        	  for(SimpleSeriesRenderer renderer : renederers){
-			        		  renderer.setHighlighted(false);
-			        	  }
-			        	  //renderer1.getSeriesRendererAt(seriesSelection.getPointIndex()).get
-			        	  //addDetails();
-			        	  renderer1.getSeriesRendererAt(seriesSelection.getPointIndex()).setHighlighted(true);
-			        	  chartView1.repaint();
-			          }
-					
-				}
-			});
-			
-			
-			LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_1);
-			layout.addView(chartView1);
-		}else{
-			double otherTime = 0;
-			categories1.clear();
-			renderer1.removeAllRenderers();	
-			for(int i=0; i < apps.length; i++){
-				if(selectedApps.optBoolean(apps[i], true)){
-					if(time[i]/totaltime>minTimeinPercent){
-					SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-					categories1.add(apps[i], time[i]);
-					r.setColor(colors[i]);
-					renderer1.addSeriesRenderer(r);
-					}else{
-						otherTime += time[i];
-					}
-				}
-			}
-			if(otherTime > 0){
-				SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-				otherTime = Math.round(otherTime*100.f);
-				otherTime /=100;
-				categories1.add("other", otherTime);
-				r.setColor(DataSet.getInstance(getActivity()).getColorsOfApps().optInt("other"));
-				renderer1.addSeriesRenderer(r);				
-			}
-			renderer1.setChartTitle(""+totaltime);
-			chartView1.repaint();
-		}
 	}
-	
-*/
-	
-/*
-	private void draw4(){
-		CategorySeries categories = new CategorySeries("Number12");
-		categories.add("Social", 12.0);
-		categories.add("Productiv", 6.0);
-		categories.add("Undefined", 8);
-		
-		int[] colors = {Color.CYAN, Color.MAGENTA, Color.BLACK};
-		
-		DefaultRenderer renderer = new DefaultRenderer();
-		for(int color : colors){
-			SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-			r.setColor(color);
-			renderer.addSeriesRenderer(r);
-		}
-		
-		renderer.setPanEnabled(false);
-		renderer.setInScroll(true);
-		
-		GraphicalView chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);
-					
-		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_4);
-		layout.addView(chartView);
-	}
-	private void draw5(){
-		CategorySeries categories = new CategorySeries("Number13");
-		categories.add("Social", 12.0);
-		categories.add("Productiv", 6.0);
-		categories.add("Undefined", 8);
-		
-		int[] colors = {Color.CYAN, Color.MAGENTA, Color.BLACK};
-		
-		DefaultRenderer renderer = new DefaultRenderer();
-		for(int color : colors){
-			SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-			r.setColor(color);
-			renderer.addSeriesRenderer(r);
-		}
-		
-		renderer.setPanEnabled(false);
-		renderer.setInScroll(true);
-		
-		GraphicalView chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);
-					
-		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_5);
-		layout.addView(chartView);
-	}*/
 	@Override
 	public void onSaveInstanceState(Bundle outState){
 		super.onSaveInstanceState(outState);
 	}
-
+	private void removeHighlights(){
+		for(int i=0; i<charts.length;i++){
+			charts[i].removeHighlight();
+		}
+	}
 	@Override
 	public void onDataAvailable(JSONObject[] jObjs, String request) {
-		if(chart1 == null)
-			chart1 = new MyChart();
-		chart1.draw(jObjs[0], R.id.chart_1,R.id.chart_1_details);
+		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart_1);
+		if(charts==null || charts.length!=jObjs.length){
+			charts = new MyChart[jObjs.length];
+			layout.removeAllViews();
+		}
+		for(int i=0;i<jObjs.length;i++){
+			if(layout.findViewById(i+10)==null){
+				LinearLayout chartDrawContainer = new LinearLayout(getActivity());
+				chartDrawContainer.setLayoutParams(new LayoutParams(600, 600));
+				chartDrawContainer.setId(i+10);
+				layout.addView(chartDrawContainer);
+			}
+			if(layout.findViewById(i+10).getParent()==null)
+				layout.addView(layout.findViewById(i+10));
+			if(charts[i]==null)
+				charts[i] = new MyChart();
+			boolean highlight=false;
+			if(i==0)
+				highlight=true;
+			charts[i].draw(jObjs[i],(LinearLayout)(layout.findViewById(i+10)),R.id.chart_1_details,highlight);			
+		}
+//		
+//		if(chart1 == null)
+//			chart1 = new MyChart();
+//		chart1.draw(jObjs[0], R.id.chart_1,R.id.chart_1_details);
 	}
 
 	public void onUpdate(JSONObject[] jObjs) {
@@ -221,21 +95,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		// TODO Auto-generated method stub
 		
 	}
-	/*
-	private void addDetails(){
-		LinearLayout linearLayout = (LinearLayout) getActivity().findViewById(R.id.chart_4);
-	    //LinearLayout layout = (LinearLayout) findViewById(R.id.info);
-
-
-	    TextView valueTV = new TextView(getActivity());
-	    valueTV.setText("hallo hallo");
-	    valueTV.setLayoutParams(new LayoutParams(
-	            LayoutParams.WRAP_CONTENT,
-	            LayoutParams.WRAP_CONTENT));
-
-	    linearLayout.addView(valueTV);
-	}
-	*/
 	
 	private class MyChart{
 		private CategorySeries categories; 
@@ -249,6 +108,22 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		private JSONArray otherRendererToArrayIndex;
 		private int otherColor;
 		private String selectedApp="";
+		private boolean highlight = false;
+		private boolean wasClicked = false;
+		private long date=-1;		
+		private boolean repaint=true;
+		
+		public void removeHighlight(){
+      	  SimpleSeriesRenderer[] renederers = renderer.getSeriesRenderers();
+      	  for(SimpleSeriesRenderer renderer : renederers){
+      		  renderer.setHighlighted(false);
+      		  wasClicked =false;
+      	  }
+      	  if(repaint)
+      		  chartView.repaint();
+      	  else
+      		  repaint = true;
+		}
 		
 		private void processData(JSONObject jObj){
 			data = jObj;
@@ -346,10 +221,16 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			}
 		}
 		
-		public void draw(JSONObject jObj, int drawContainer, final int detailContainer){
+		
+		
+		public void draw(JSONObject jObj, LinearLayout drawContainer, final int detailContainer, boolean mhighlight){
+			this.highlight = mhighlight;
+			date = jObj.optLong("dateTimestamp");
 			processData(jObj);
-			((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailContainer)).getChildAt(0)).getChildAt(0)).removeAllViews();
-			((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailContainer)).getChildAt(1)).getChildAt(0)).removeAllViews();
+			if(highlight){
+				((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailContainer)).getChildAt(0)).getChildAt(0)).removeAllViews();
+				((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailContainer)).getChildAt(1)).getChildAt(0)).removeAllViews();
+			}
 			rendererToArrayIndex = new JSONObject();
 			otherRendererToArrayIndex = new JSONArray();
 			double totaltime = 0;
@@ -390,15 +271,18 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						otherTime /=100;
 						categories.add("Other", otherTime);
 						r.setColor(otherColor);
-						r.setHighlighted(true);
+						r.setHighlighted(highlight);
 						renderer.addSeriesRenderer(r);	
 					}else{					
 //						if(apps.length-1<0)
 //							renderer.getSeriesRendererAt(apps.length).setHighlighted(true);
 //						else
-							renderer.getSeriesRendererAt(renderer.getSeriesRendererCount()-1).setHighlighted(true);
+							renderer.getSeriesRendererAt(renderer.getSeriesRendererCount()-1).setHighlighted(highlight);
 					}
-					addDetail(renderer.getSeriesRendererCount()-1, detailContainer);
+					if(highlight){
+						addDetail(renderer.getSeriesRendererCount()-1, detailContainer);
+						wasClicked=true;
+					}
 				}
 				renderer.setFitLegend(true);	
 				renderer.setDisplayValues(true);
@@ -406,21 +290,16 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				renderer.setZoomEnabled(false);
 				renderer.setClickEnabled(true);
 				renderer.setInScroll(true);
-				renderer.setChartTitle("Total time "+totaltime+" min");
+				renderer.setChartTitle(Utilities.getDate(date)+", Total time "+totaltime+" min");
 				chartView = ChartFactory.getPieChartView(getActivity(), categories, renderer);	
 				chartView.setOnClickListener(new View.OnClickListener() {
-					
 					@Override
 					public void onClick(View v) {
 				          SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
-				          if (seriesSelection == null) {
-				        	  
-				          } else {
-				        	  SimpleSeriesRenderer[] renederers = renderer.getSeriesRenderers();
-				        	  for(SimpleSeriesRenderer renderer : renederers){
-				        		  renderer.setHighlighted(false);
-				        	  }
-				        	  //renderer1.getSeriesRendererAt(seriesSelection.getPointIndex()).get
+				          if (seriesSelection != null) {
+				        	  repaint = false;
+				        	  removeHighlights();
+				        	  wasClicked = true;
 				        	  addDetail(seriesSelection.getPointIndex(),detailContainer);
 				        	  renderer.getSeriesRendererAt(seriesSelection.getPointIndex()).setHighlighted(true);
 				        	  chartView.repaint();
@@ -428,7 +307,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					}
 				});
 				
-				LinearLayout layout = (LinearLayout) getActivity().findViewById(drawContainer);
+				LinearLayout layout = drawContainer;
 				layout.addView(chartView);
 			}else{
 				
@@ -443,7 +322,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						SimpleSeriesRenderer r = new SimpleSeriesRenderer();
 						categories.add(apps[i],  Math.round((time[i]/totaltime)*10000.f)/100);
 						if(apps[i].equals(selectedApp)){
-							r.setHighlighted(true);
+							r.setHighlighted(wasClicked);
 							highlighted=true;
 							selectedRenderer = renderer.getSeriesRendererCount();
 						}
@@ -467,22 +346,23 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						otherTime /=100;
 						categories.add("Other", otherTime);
 						r.setColor(otherColor);
-						if(!highlighted){
-							r.setHighlighted(true);
+						if(!highlighted&&wasClicked){
+							r.setHighlighted(wasClicked);
 							highlighted=true;
 							selectedRenderer =renderer.getSeriesRendererCount();
 							selectedApp="";
 						}
 						renderer.addSeriesRenderer(r);				
-					}else if(!highlighted){
-						renderer.getSeriesRendererAt(renderer.getSeriesRendererCount()-1).setHighlighted(true);
+					}else if(!highlighted&&wasClicked){
+						renderer.getSeriesRendererAt(renderer.getSeriesRendererCount()-1).setHighlighted(highlight);
 						highlighted=true;
 						selectedRenderer = renderer.getSeriesRendererCount()-1;
 						selectedApp="";
 					}
 				}
-				addDetail(selectedRenderer, detailContainer);
-				renderer.setChartTitle("Total time "+totaltime+" min");
+				if(wasClicked)
+					addDetail(selectedRenderer, detailContainer);
+				renderer.setChartTitle(Utilities.getDate(date)+", Total time "+totaltime+" min");
 				chartView.repaint();
 			}
 		}
@@ -559,7 +439,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 										int timestamp = h*60*60 + m*60 + s;
 										JSONObject jObject = new JSONObject();
 										try {
-											jObject.put("time", timestamp).put("app", selectedApp );
+											jObject.put("time", timestamp).put("app", selectedApp ).put("date", date);
 										} catch (JSONException e) {
 											e.printStackTrace();
 										}
@@ -603,7 +483,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 										int timestamp = h*60*60 + m*60 + s;
 										JSONObject jObject = new JSONObject();
 										try {
-											jObject.put("time", timestamp).put("app", selectedApp );
+											jObject.put("time", timestamp).put("app", selectedApp ).put("date", date);
 										} catch (JSONException e) {
 											e.printStackTrace();
 										}
@@ -682,7 +562,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 							int timestamp = h*60*60 + m*60 + s;
 							JSONObject jObject = new JSONObject();
 							try {
-								jObject.put("time", timestamp).put("app", selectedApp );
+								jObject.put("time", timestamp).put("app", selectedApp ).put("date", date);
 							} catch (JSONException e) {
 								e.printStackTrace();
 							}
@@ -719,7 +599,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 							int timestamp = h*60*60 + m*60 + s;
 							JSONObject jObject = new JSONObject();
 							try {
-								jObject.put("time", timestamp).put("app", selectedApp );
+								jObject.put("time", timestamp).put("app", selectedApp ).put("date", date);
 							} catch (JSONException e) {
 								e.printStackTrace();
 							}

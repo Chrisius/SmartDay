@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
-
+import java.util.Locale;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
@@ -54,9 +53,9 @@ public class Utilities{
 	public static long getTimestamp(int year, int month, int day, int h, int m, int s){
 		Calendar c = Calendar.getInstance();
 		c.set(year, month, day,h,m,s);
-		TimeZone tz = c.getTimeZone();
+//		TimeZone tz = c.getTimeZone();
 		long date = c.getTimeInMillis();
-		date += tz.getOffset(date);
+//		date += tz.getOffset(date);
 		return date/1000;//c.getTimeInMillis()+seconds*1000+minutes*60000+hour*360000;
 	}
 	
@@ -219,6 +218,15 @@ public class Utilities{
 	    	durationAsString = "0 sec";
 	    return durationAsString;
 	}
+	public static String getDate(long timestampInSec){
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(timestampInSec*1000);
+		int day = c.get(Calendar.DAY_OF_MONTH);
+		String month=c.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
+		int year = c.get(Calendar.YEAR);
+		return day+". "+month+" "+year;
+	}
+	
 	public static int getTimeOfDay(long sec){
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(sec*1000);

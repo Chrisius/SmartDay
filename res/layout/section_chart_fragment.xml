@@ -8,24 +8,10 @@
     android:layout_height="fill_parent"
     android:fillViewport="true">
     <LinearLayout
+		android:id="@+id/chart_1"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:orientation="vertical">
-		        <LinearLayout 
-			        android:id="@+id/chart_1"
-			    	android:orientation="horizontal"
-			        android:layout_width="600dp"
-				   	android:layout_height="600dp"/>		
-	    <LinearLayout 
-	        android:id="@+id/chart_3"
-	    	android:orientation="vertical"
-	        android:layout_width="fill_parent"
-		   	android:layout_height="450dp"/>
-	    <LinearLayout
-	        android:id="@+id/chart_2"
-	   		android:orientation="vertical"
-	        android:layout_width="fill_parent"
-		   	android:layout_height="450dp"/>   
 	
 	</LinearLayout>
 </ScrollView>

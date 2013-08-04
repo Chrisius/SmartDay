@@ -34,6 +34,7 @@ public class TimeLineDetailView extends View {
 	private int maxBarLength;
 	private float yOffset;
 	private float xOffset;
+	private long date;
 
 	private Paint mRectanglePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	private String selectedApp;
@@ -153,6 +154,7 @@ public class TimeLineDetailView extends View {
 		 * Get App Bar Length
 		 */
 		try{
+			date = jObj.getLong("dateTimestamp");
 			JSONArray apps = jObj.getJSONArray("result");
 			totalDuration=0;
 			longestDuration=0;
@@ -444,7 +446,7 @@ public class TimeLineDetailView extends View {
 			Log.d("location clicked", "lng"+lng+"lat"+lat);										
 			JSONObject jObject = new JSONObject();
 			try {
-				jObject.put("date", DataSet.getInstance(getContext()).getSelectedDateEndAsTimestamp());
+				jObject.put("date", date);
 				jObject.put("time", start);
 				jObject.put("lng",lng);
 				jObject.put("lat",lat);

@@ -87,15 +87,69 @@ public class TimespanDialog extends DialogFragment implements DatePickerFragment
 
 	@Override
 	public void onDateChosen(int year, int month, int day, String whichDate) {
-		if(whichDate.equals("start")){
+		/**
+		 * Upper bound for date
+		 */
+		long today = DataSet.getInstance(getActivity()).getTodayAsTimestamp();
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(today*1000);
+		int maxYear = c.get(Calendar.YEAR);
+		int maxMonth = c.get(Calendar.MONTH);
+		int maxDay = c.get(Calendar.DAY_OF_MONTH);
+		
+		if(year>maxYear)
+			year=maxYear;	
+		if(month>maxMonth&&year>=maxYear)
+			month = maxMonth;
+		if(day>maxDay&&month>=maxMonth&&year>=maxYear)
+			day = maxDay;	
+		/**
+		 * Display and save selected date
+		 */
+		if(whichDate.equals("start")){			
 			TextView view = (TextView) linearLayout.getChildAt(0);	
-			view.setText("  From: "+day+". "+getActivity().getResources().getStringArray(R.array.months)[month]+" "+year);
+			if(day==maxDay&&month==maxMonth&&year==maxYear)
+				view.setText("  From: Today");
+			else
+				view.setText("  From: "+day+". "+getActivity().getResources().getStringArray(R.array.months)[month]+" "+year);
+			
+			//if startDate>endDate set endDate=startDate and update view
+			if(year>endYear)
+				endYear=year;	
+			if(month>endMonth&&year>=endYear)
+				endMonth = month;
+			if(day>endDay&&month>=endMonth&&year>=endYear)
+				endDay = day;
+			view = (TextView) linearLayout.getChildAt(1);		
+			if(endDay==maxDay&&endMonth==maxMonth&&endYear==maxYear)
+				view.setTag("  From: Today");
+			else
+				view.setText("  From: "+endDay+". "+getActivity().getResources().getStringArray(R.array.months)[endMonth]+" "+endYear);			
+			
+			
 			startDay = day;
 			startMonth = month;
 			startYear = year;
 		}else{
 			TextView view = (TextView) linearLayout.getChildAt(1);	
-			view.setText("To: "+day+". "+getActivity().getResources().getStringArray(R.array.months)[month]+" "+year);
+			if(day==maxDay&&month==maxMonth&&year==maxYear)
+				view.setText("To: Today");
+			else
+				view.setText("To: "+day+". "+getActivity().getResources().getStringArray(R.array.months)[month]+" "+year);
+			
+			//if endDate<startDate set startDate=endDate and update view
+			if(year<startYear)
+				startYear=year;	
+			if(month<startMonth&&year<=startYear)
+				startMonth = month;
+			if(day<startDay&&month<=startMonth&&year<=startYear)
+				startDay=day;	
+			view = (TextView) linearLayout.getChildAt(0);		
+			if(startDay==maxDay&&startMonth==maxMonth&&startYear==maxYear)
+				view.setTag("  From: Today");
+			else
+				view.setText("  From: "+startDay+". "+getActivity().getResources().getStringArray(R.array.months)[startMonth]+" "+startYear);		
+			
 			endDay = day;
 			endMonth = month;
 			endYear = year;

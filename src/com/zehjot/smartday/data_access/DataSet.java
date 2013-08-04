@@ -1,7 +1,9 @@
 package com.zehjot.smartday.data_access;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Random;
 
 import org.json.JSONArray;
@@ -184,16 +186,19 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		}
 		changedIgnoreApps=false;
 		DataSet.days = new JSONObject[numberSelectedDays];
-		for(int i=0;i<numberOfdays;i++){
-			long date=getSelectedDateStartAsTimestamp()+(24*60*60*i);
-			getAppsAtDate(date,listener);
-		}
+		manageMultipleDays(0,listener);
 		//getAppsAtDate(getSelectedDateEndAsTimestamp(),listener);
 	}
 	
+	private void manageMultipleDays(int i,onDataAvailableListener listener){
+			long date=getSelectedDateStartAsTimestamp()+(24*60*60*i);
+			getAppsAtDate(date,listener);
+	}
+	
+	
 	private void getAppsAtDate(long timestamp, onDataAvailableListener listener){
 		long start=timestamp;
-		long end=getNextDayAsTimestamp();
+		long end=getNextDayAsTimestamp(start);
 		
 		JSONObject data = new JSONObject();
 		try {
@@ -319,8 +324,8 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		int day = getSharedInt(R.string.key_date_start_day);		
 		return Utilities.getTimestamp(year, month, day, 0, 0, 0);
 	}
-	public long getNextDayAsTimestamp(){	
-		return getSelectedDateEndAsTimestamp()+24*60*60;
+	public long getNextDayAsTimestamp(long timestamp){	
+		return timestamp+24*60*60;
 	}
 	
 	/** ColorsOfApps:
@@ -427,6 +432,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				}
 				if(requester!=null){
 					result = filterIgnoredApps(result);
+					dataReady(result, requestedFunction, requester);/*
 					for(int i=0;i<numberSelectedDays;i++){
 						if(days[i]==null){
 							try {
@@ -440,7 +446,14 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 								return;
 						}
 					}
-					requester.onDataAvailable(days, requestedFunction);
+					Arrays.sort(days, new Comparator<JSONObject>() {
+						@Override
+						public int compare(JSONObject lhs, JSONObject rhs) {
+							int i= ((Long)rhs.optLong("dateTimestamp", 0)).compareTo(lhs.optLong("dateTimestamp",0));
+							return i;
+						}
+					});					
+					requester.onDataAvailable(days, requestedFunction);*/
 					return;				
 				}
 			}else if(requestedFunction.equals(RequestedFunction.initDataSet)){
@@ -474,6 +487,8 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 			}
 			if(requester!=null){
 				jObj = filterIgnoredApps(jObj);
+				dataReady(jObj, requestedFunction, requester);
+				/*
 				for(int i=0;i<numberSelectedDays;i++){
 					if(days[i]==null){
 						try {
@@ -487,10 +502,44 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 							return;
 					}
 				}
-				requester.onDataAvailable(days, requestedFunction);
+				Arrays.sort(days, new Comparator<JSONObject>() {
+					@Override
+					public int compare(JSONObject lhs, JSONObject rhs) {
+						int i= ((Long)rhs.optLong("dateTimestamp", 0)).compareTo(lhs.optLong("dateTimestamp",0));
+						return i;
+					}
+				});					
+				requester.onDataAvailable(days, requestedFunction);*/
+				return;
 			}
 		}
 	}
+	private void dataReady(JSONObject jObj, String requestedFunction, onDataAvailableListener requester){
+		for(int i=0;i<numberSelectedDays;i++){
+			if(days[i]==null){
+				try {
+					days[i]=new JSONObject(jObj.toString());
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				if(i==numberSelectedDays-1){
+					Arrays.sort(days, new Comparator<JSONObject>() {
+						@Override
+						public int compare(JSONObject lhs, JSONObject rhs) {
+							int i= ((Long)lhs.optLong("dateTimestamp", 0)).compareTo(rhs.optLong("dateTimestamp",0));
+							return i;
+						}
+					});					
+					requester.onDataAvailable(days, requestedFunction);
+					break;
+				}else{
+					manageMultipleDays(i+1, requester);
+					return;
+				}
+			}
+		}
+	}
+	
 	/*
 	public void getContext(onDataAvailableListener requester){
 		getContext(getSelectedDateAsTimestamp(), getNextDayAsTimestamp(), requester);
@@ -529,7 +578,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	}
 	public void getPositions(onDataAvailableListener requester){
 		long start=getSelectedDateEndAsTimestamp();
-		long end=getNextDayAsTimestamp();
+		long end=getNextDayAsTimestamp(start);
 		
 		JSONObject data = new JSONObject();
 		try {
@@ -553,7 +602,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		JSONObject result=new JSONObject();
 		long totalDuration=0;
 		try{
-			result.put("dateTimestamp", getSelectedDateEndAsTimestamp());
+			result.put("dateTimestamp", jObj.getLong("date"));
 			result.put("downloadTimestamp", Utilities.getSystemTime());
 			jArrayInput = jObj.getJSONArray("events");					
 			for(int i=0; i<jArrayInput.length();i++){
@@ -661,17 +710,19 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	}
 	private JSONObject filterIgnoredApps(JSONObject jObj){
 		JSONObject result = null;
-		JSONArray output = new JSONArray();
+		//JSONArray output = new JSONArray();
 		try{
 			result = new JSONObject(jObj, new String[]{"locations","downloadTimestamp","dateTimestamp","totalDuration"});
-			JSONArray locations = jObj.getJSONArray("locations");			
+			result.put("result", new JSONArray(jObj.getJSONArray("result").toString()));
+			JSONArray locations = new JSONArray(jObj.getJSONArray("locations").toString());			
 			result.put("locations", locations);
+			/*
 			for(int i=0; i<jObj.getJSONArray("result").length();i++){
 				JSONObject app = jObj.getJSONArray("result").getJSONObject(i);
 				if(!ignoreApps.optBoolean(app.getString("app")))
 					output.put(app);
-			}
-			return result.put("result",output);
+			}*/
+			return result;//.put("result",output);
 		}catch(JSONException e){
 			return result;
 		}
@@ -714,7 +765,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 			days=null;
 			String fileName = Utilities.getFileName(requestedFunction, user, jObj,activity);
 			String url = Utilities.getURL(Config.Request.events, jObj.toString(), user, activity);
-			new DownloadTask(requester,activity).execute(url,requestedFunction,fileName);			
+			new DownloadTask(requester,activity).execute(url,requestedFunction,fileName,jObj.optLong("start",1)+"");			
 		}else if(requestedFunction.equals(RequestedFunction.getAllApps)){
 			String url = Utilities.getURL(Config.Request.values,jObj.toString(),user, activity);
 			if(Config.getDebug())

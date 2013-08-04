@@ -89,7 +89,13 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 		if(((MainActivity)activity).isRunning())
 			progress.cancel();
 		//}
-		listener.onDataDownloaded(serverResponse, result, timestamp,request, requester, fileName);		
+		try {
+			result.put("date", timestamp);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		listener.onDataDownloaded(serverResponse, result, timestamp,request, requester, fileName);
 	}
 	
 	private JSONObject downloadData(String urlString) throws IOException, JSONException{
@@ -123,7 +129,6 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 			}catch (Exception e) {
 	            Log.e("Buffer Error", "Error converting result " + e.toString());
 	        }
-			
 			return new JSONObject(json);
 		}finally{
 	        if (is != null) {

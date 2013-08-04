@@ -42,93 +42,52 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 		Activity act = getActivity();
 		extra = jObj;
 		if(act!=null){
-			View tl = getActivity().findViewById(R.id.timelineview);
-			if(tl!=null){
-				((TimeLineView) tl).setExtra(jObj);
-				extra=null;
-			}				
+			ViewGroup root = (ViewGroup) getActivity().findViewById(R.id.timelinell);
+			for(int i=0;i<root.getChildCount();i++){
+				LinearLayout timelineLinearLayout= (LinearLayout) root.getChildAt(i);
+				TimeLineView timelineView = (TimeLineView) timelineLinearLayout.getChildAt(0);	
+				if(extra!=null&&timelineView.getDate()==extra.optLong("date",-1)){
+					timelineView.setExtra(jObj);
+					extra=null;
+					return;
+				}
+			}			
 		}
 		
 	}
 	
 	@Override
 	public void onDataAvailable(JSONObject[] jObjs, String requestedFunction) {
-		ViewGroup root = (ViewGroup) getActivity().findViewById(R.id.timelinell);			
+		ViewGroup root = (ViewGroup) getActivity().findViewById(R.id.timelinell);
+		if(root.getChildCount()!=jObjs.length)
+			root.removeAllViews();	
 		
-		if(root!=null){
-			
-			
-			
-			if(getActivity().findViewById(R.id.timelineview)==null){
-				LinearLayout linearLayout = new LinearLayout(getActivity());
-				linearLayout.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-				linearLayout.setOrientation(LinearLayout.VERTICAL);
-				root.addView(linearLayout);
-				TimeLineView timeline = new TimeLineView(getActivity());
-				timeline.setId(R.id.timelineview);
-				timeline.setLayoutParams(new LayoutParams(
-						LayoutParams.WRAP_CONTENT,
-						LayoutParams.WRAP_CONTENT));
-				if(extra!=null){
-					timeline.setExtra(extra);
-					extra=null;
-				}
-				timeline.setData(jObjs[0]);
-				linearLayout.addView(timeline);
-			}else{				
-				if(extra!=null){
-					((TimeLineView)getActivity().findViewById(R.id.timelineview)).setExtra(extra);
-					extra=null;
-				}
-				((TimeLineView)getActivity().findViewById(R.id.timelineview)).setData(jObjs[0]);
-			}
-			
-			if(root.findViewById(101)==null){
-				LinearLayout linearLayout = new LinearLayout(getActivity());
-				linearLayout.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-				linearLayout.setOrientation(LinearLayout.VERTICAL);
-				root.addView(linearLayout);			
+		if(root!=null){			
+			for(int i=0;i<jObjs.length;i++){
+				if(root.getChildAt(i)==null){
+					LinearLayout linearLayout = new LinearLayout(getActivity());
+					linearLayout.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+					linearLayout.setOrientation(LinearLayout.VERTICAL);
+					root.addView(linearLayout);
 					TimeLineView timeline = new TimeLineView(getActivity());
 					timeline.setLayoutParams(new LayoutParams(
 							LayoutParams.WRAP_CONTENT,
 							LayoutParams.WRAP_CONTENT));
-					if(extra!=null){
+					if(extra!=null&&extra.optLong("date",-1)==jObjs[i].optLong("dateTimestamp",1)){
 						timeline.setExtra(extra);
 						extra=null;
 					}
-					timeline.setData(jObjs[0]);
-					timeline.setId(101);
+					timeline.setData(jObjs[i]);
 					linearLayout.addView(timeline);
-			}else{
-				if(extra!=null){
-					((TimeLineView)getActivity().findViewById(R.id.timelineview)).setExtra(extra);
-					extra=null;
-				}
-				((TimeLineView)root.findViewById(101)).setData(jObjs[0]);
-			}
-			
-			if(root.findViewById(102)==null){
-				LinearLayout linearLayout = new LinearLayout(getActivity());
-				linearLayout.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-				linearLayout.setOrientation(LinearLayout.VERTICAL);
-				root.addView(linearLayout);			
-					TimeLineView timeline = new TimeLineView(getActivity());
-					timeline.setLayoutParams(new LayoutParams(
-							LayoutParams.WRAP_CONTENT,
-							LayoutParams.WRAP_CONTENT));
-					if(extra!=null){
-						timeline.setExtra(extra);
+				}else{
+					LinearLayout timelineLinearLayout= (LinearLayout) root.getChildAt(i);
+					TimeLineView timelineView = (TimeLineView) timelineLinearLayout.getChildAt(0);				
+					if(extra!=null&&extra.optLong("date",-1)==jObjs[i].optLong("dateTimestamp",1)){
+						timelineView.setExtra(extra);
 						extra=null;
 					}
-					timeline.setData(jObjs[0]);
-					timeline.setId(102);
-					linearLayout.addView(timeline);
-			}else{
-				if(extra!=null){
-					((TimeLineView)getActivity().findViewById(R.id.timelineview)).setExtra(extra);
-					extra=null;
+					timelineView.setData(jObjs[i]);
 				}
-				((TimeLineView)root.findViewById(102)).setData(jObjs[0]);
 			}
 		}
 	}

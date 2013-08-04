@@ -27,6 +27,9 @@ import android.widget.Scroller;
  *
  */
 public class TimeLineView extends View {
+	private boolean debug = false;
+	
+	
 	private Paint mTextPaint = new Paint();
 	private Paint mSubTextPaint = new Paint();
 	private Paint mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -56,6 +59,7 @@ public class TimeLineView extends View {
 	private int appSessionCount=0;
 	
 	private TimeLineDetailView detail;
+	private long date;
 	
 	public TimeLineView(Context context) {
 		super(context);
@@ -165,8 +169,10 @@ public class TimeLineView extends View {
 		lineWidth *= scaleFactor;///(width-width*24.f/25.f)*0.5f;
 		lineWidth -= 2.f*offset;//*= 24.f/25.f;
 		debugDrawCounter +=1;
-//		canvas.drawText(DataSet.getInstance(getContext()).getSelectedDateAsString(), xpad-scrollX+10, ypad+mTextSize, mDebugTextPaint);
-		canvas.drawText("height="+this.getHeight()+" width="+this.getWidth()+" calls="+debugDrawCounter+" scale="+scaleFactor+" scrollX="+scrollX+" Selected App= "+selectedApp+" AppSessions="+appSessionCount, xpad-scrollX, ypad+mTextSize, mDebugTextPaint);
+		if(!debug)
+			canvas.drawText(Utilities.getDate(date), xpad-scrollX+10, ypad+mTextSize, mDebugTextPaint);
+		else
+			canvas.drawText("height="+this.getHeight()+" width="+this.getWidth()+" calls="+debugDrawCounter+" scale="+scaleFactor+" scrollX="+scrollX+" Selected App= "+selectedApp+" AppSessions="+appSessionCount, xpad-scrollX, ypad+mTextSize, mDebugTextPaint);
 		/**
 		 * Line with hourdisplay
 		 */
@@ -258,12 +264,15 @@ public class TimeLineView extends View {
 		extra = jObj;
 		invalidate();
 	}
-	
+	public long getDate(){
+		return this.date;
+	}
 	public void setData(JSONObject jObj){
 		if(jObj == null)
 			return;
 		try {
 			this.jObj = jObj;
+			date = jObj.getLong("dateTimestamp");
 			rectangles=new JSONArray();
 			String appName;
 			long start;
