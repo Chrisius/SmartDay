@@ -101,7 +101,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		private DefaultRenderer renderer;
 		private String[] apps = {"No Data available"};
 		private JSONObject data;
-		private JSONObject rawData;
 		private double[] time = {1.0};
 		private int[] colors = {0xA4A4A4FF};
 		private GraphicalView chartView;
@@ -227,7 +226,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		public void draw(JSONObject jObj, LinearLayout drawContainer, boolean mhighlight){
 			this.highlight = mhighlight;
 			date = jObj.optLong("dateTimestamp");
-			rawData = jObj;
 			processData(jObj);
 			LinearLayout appNames =(LinearLayout) getActivity().findViewById(R.id.chart_appNames);
 			LinearLayout appTimes =(LinearLayout) getActivity().findViewById(R.id.chart_time);
@@ -416,8 +414,8 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 							LinearLayout appLocations =(LinearLayout) getActivity().findViewById(R.id.chart_location);
 							appTimes.removeAllViews();
 							appLocations.removeAllViews();
-							JSONObject appTime = getTimesOfApp(appName);
-							JSONArray appUsages = appTime.optJSONArray("times");
+							JSONObject app = getTimesOfApp(appName);
+							JSONArray appUsages = app.optJSONArray("usage");
 							if(appUsages==null)
 								return;
 							/*
@@ -431,11 +429,11 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 							/**
 							 * Header
 							 */
-							TextView header = getView("Total time:"+"\n"+"    "+Utilities.getTimeString(appTime.optInt("total")));
+							TextView header = getView("Total time:"+"\n"+"    "+Utilities.getTimeString(app.optInt("duration")));
 							header.setPadding(10, 5, 10, 5);
 							appTimes.addView(header);
 						    header = getView("Locations:"+"\n"+"    ");
-							header.setPadding(10, 0, 10, 2);
+							header.setPadding(10, 5, 10, 5);
 							appLocations.addView(header);
 						    
 							for(int i = 0; i<appUsages.length();i++){
@@ -443,8 +441,12 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 								 * Time and duration
 								 */
 								JSONObject appUsage = appUsages.optJSONObject(i);
-								long start = appUsage.optLong("start");
-								long duration = appUsage.optLong("duration");
+								long start = appUsage.optLong("start",-1);
+								long end = appUsage.optLong("end",-1);
+								if(end ==-1){
+									end = start;
+								}
+								long duration = end-start;
 								TextView view = getView("Used at "+ Utilities.getTimeFromTimeStamp(start));
 								view.setOnClickListener(new View.OnClickListener() {									
 									@Override
@@ -560,10 +562,10 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				String appName = ((TextView)valueTV).getText().toString();
 				selectedApp = appName;
 				valueTV.setBackgroundResource(android.R.color.holo_blue_dark);
-				JSONObject appTime = getTimesOfApp(appName);
-				if(appTime == null)
+				JSONObject app = getTimesOfApp(appName);
+				if(app == null)
 					return;
-				JSONArray appUsages = appTime.optJSONArray("times");				
+				JSONArray appUsages = app.optJSONArray("usage");				
 				if(appUsages==null)
 					return;
 				/*
@@ -577,11 +579,11 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				/**
 				 * Header
 				 */
-				TextView header = getView("Total time:"+"\n"+"    "+Utilities.getTimeString(appTime.optInt("total")));
+				TextView header = getView("Total time:"+"\n"+"    "+Utilities.getTimeString(app.optInt("duration")));
 				header.setPadding(10, 5, 10, 5);
 			    appTimes.addView(header);
 			    header = getView("Locations:"+"\n"+"    ");
-				header.setPadding(10, 0, 10, 2);
+				header.setPadding(10, 5, 10, 5);
 				appLocations.addView(header);
 			    
 				for(int i = 0; i<appUsages.length();i++){
@@ -589,8 +591,12 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					 * Time and duration
 					 */
 					JSONObject appUsage = appUsages.optJSONObject(i);
-					long start = appUsage.optLong("start");
-					long duration = appUsage.optLong("duration");
+					long start = appUsage.optLong("start",-1);
+					long end = appUsage.optLong("end",-1);
+					if(end ==-1){
+						end = start;
+					}
+					long duration = end-start;
 					TextView view = getView("Used at "+ Utilities.getTimeFromTimeStamp(start));
 					/*		
 							new TextView(getActivity());
@@ -699,41 +705,47 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			 * 		"duration":long
 			 * 		}
 			 * 		...
-			 * 			],
+			 * 	],
 			 * 	"total":int
+			 *  "location":[
+			 *  	{
+			 *  		...
+			 *  	}
+			 *  ]
 			 * }
 			 */
 			JSONObject result = new JSONObject();
 			JSONArray jArray = data.optJSONArray("result");
-			int totalTime = 0;
+//			int totalTime = 0;
 			if(jArray == null)
 				return null;
 			for(int i=0; i<jArray.length();i++){
 				JSONObject app = jArray.optJSONObject(i);
 				if(app.optString("app").equals(appName)){
-					JSONArray usages = app.optJSONArray("usage");
-					JSONArray output = new JSONArray();
-					try {
-						for(int j = 0 ; j<usages.length();j++){
-							JSONObject usage = usages.optJSONObject(j);
-							long start = usage.optLong("start",-1);
-							long end = usage.optLong("end",-1);
-							if(start!=-1 && end!=-1){
-								output.put(
-									new JSONObject()
-										.put("start", start)
-										.put("duration", end-start)
-								);
-								totalTime += end-start;
-							}
-						}
-						result.put("times", output);
-						result.put("total", totalTime);
-						return result;
-					} catch (JSONException e) {
-						e.printStackTrace();
-						return null;
-					}	
+					return app;
+//					JSONArray usages = app.optJSONArray("usage");
+//					JSONArray output = new JSONArray();
+//					try {
+//						for(int j = 0 ; j<usages.length();j++){
+//							JSONObject usage = usages.optJSONObject(j);
+//							long start = usage.optLong("start",-1);
+//							long end = usage.optLong("end",-1);
+//							if(start!=-1 && end!=-1){
+//								output.put(
+//									new JSONObject()
+//										.put("start", start)
+//										.put("duration", end-start)
+//								);
+//								totalTime += end-start;
+//							}
+//						}
+//						result.put("times", output);
+//						result.put("total", totalTime);
+//						return result;
+//					} catch (JSONException e) {
+//						e.printStackTrace();
+//						return null;
+//					}	
 				}					
 			}
 			return result;

@@ -72,10 +72,10 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 	@Override
 	public void onDataAvailable(JSONObject[] jObjs, String requestedFunction) {
 		ViewGroup root = (ViewGroup) getActivity().findViewById(R.id.timelinell);
-		if(root.getChildCount()!=jObjs.length)
-			root.removeAllViews();	
 		
-		if(root!=null){			
+		if(root!=null){		
+			if(root.getChildCount()!=jObjs.length)
+				root.removeAllViews();		
 			for(int i=0;i<jObjs.length;i++){
 				if(root.getChildAt(i)==null){
 					LinearLayout linearLayout = new LinearLayout(getActivity());
