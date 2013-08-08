@@ -27,7 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
+//import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class SectionChartFragment extends Fragment implements onDataAvailableListener, OnUpdateListener{
@@ -78,7 +78,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			boolean highlight=false;
 			if(i==0)
 				highlight=true;
-			charts[i].draw(jObjs[i],(LinearLayout)(layout.findViewById(i+10)),R.id.chart_1_details,highlight);			
+			charts[i].draw(jObjs[i],(LinearLayout)(layout.findViewById(i+10)),highlight);			
 		}
 //		
 //		if(chart1 == null)
@@ -101,6 +101,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		private DefaultRenderer renderer;
 		private String[] apps = {"No Data available"};
 		private JSONObject data;
+		private JSONObject rawData;
 		private double[] time = {1.0};
 		private int[] colors = {0xA4A4A4FF};
 		private GraphicalView chartView;
@@ -223,13 +224,18 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 		
 		
 		
-		public void draw(JSONObject jObj, LinearLayout drawContainer, final int detailContainer, boolean mhighlight){
+		public void draw(JSONObject jObj, LinearLayout drawContainer, boolean mhighlight){
 			this.highlight = mhighlight;
 			date = jObj.optLong("dateTimestamp");
+			rawData = jObj;
 			processData(jObj);
+			LinearLayout appNames =(LinearLayout) getActivity().findViewById(R.id.chart_appNames);
+			LinearLayout appTimes =(LinearLayout) getActivity().findViewById(R.id.chart_time);
+			LinearLayout appLocations =(LinearLayout) getActivity().findViewById(R.id.chart_location);
 			if(highlight){
-				((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailContainer)).getChildAt(0)).getChildAt(0)).removeAllViews();
-				((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailContainer)).getChildAt(1)).getChildAt(0)).removeAllViews();
+				appNames.removeAllViews();
+				appTimes.removeAllViews();
+				appLocations.removeAllViews();
 			}
 			rendererToArrayIndex = new JSONObject();
 			otherRendererToArrayIndex = new JSONArray();
@@ -280,7 +286,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 							renderer.getSeriesRendererAt(renderer.getSeriesRendererCount()-1).setHighlighted(highlight);
 					}
 					if(highlight){
-						addDetail(renderer.getSeriesRendererCount()-1, detailContainer);
+						addDetail(renderer.getSeriesRendererCount()-1);
 						wasClicked=true;
 					}
 				}
@@ -300,7 +306,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				        	  repaint = false;
 				        	  removeHighlights();
 				        	  wasClicked = true;
-				        	  addDetail(seriesSelection.getPointIndex(),detailContainer);
+				        	  addDetail(seriesSelection.getPointIndex());
 				        	  renderer.getSeriesRendererAt(seriesSelection.getPointIndex()).setHighlighted(true);
 				        	  chartView.repaint();
 				          }
@@ -361,20 +367,25 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					}
 				}
 				if(wasClicked)
-					addDetail(selectedRenderer, detailContainer);
+					addDetail(selectedRenderer);
 				renderer.setChartTitle(Utilities.getDate(date)+", Total time "+totaltime+" min");
 				chartView.repaint();
 			}
 		}
-		private void addDetail(int selectedSeries,int detailViewContainer){
-			((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0)).getChildAt(0)).removeAllViews();
-			((LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).getChildAt(0)).removeAllViews();
+		private void addDetail(int selectedSeries){
+			LinearLayout appNames =(LinearLayout) getActivity().findViewById(R.id.chart_appNames);
+			LinearLayout appTimes =(LinearLayout) getActivity().findViewById(R.id.chart_time);
+			LinearLayout appLocations =(LinearLayout) getActivity().findViewById(R.id.chart_location);
+			appNames.removeAllViews();
+			appTimes.removeAllViews();
+			appLocations.removeAllViews();
+			
+			
 			if(apps.length<1)
 				return;
 			/*
 			((LinearLayout)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0)).removeAllViews();
-			((LinearLayout)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).removeAllViews();*/
-			LinearLayout appNames = (LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0)).getChildAt(0);		
+			((LinearLayout)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).removeAllViews();*/		
 			if(selectedSeries==renderer.getSeriesRendererCount()-1&&otherRendererToArrayIndex.length()>0){
 				selectedApp="";
 				String[] sortedArray = new String[otherRendererToArrayIndex.length()];
@@ -401,8 +412,10 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 								apps.getChildAt(i).setBackgroundResource(0);
 							}
 							v.setBackgroundResource(android.R.color.holo_blue_dark);
-							LinearLayout details = (LinearLayout)((ScrollView)((LinearLayout) v.getParent().getParent().getParent()).getChildAt(1)).getChildAt(0);
-							details.removeAllViews();
+							LinearLayout appTimes =(LinearLayout) getActivity().findViewById(R.id.chart_time);
+							LinearLayout appLocations =(LinearLayout) getActivity().findViewById(R.id.chart_location);
+							appTimes.removeAllViews();
+							appLocations.removeAllViews();
 							JSONObject appTime = getTimesOfApp(appName);
 							JSONArray appUsages = appTime.optJSONArray("times");
 							if(appUsages==null)
@@ -415,11 +428,20 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						            LayoutParams.WRAP_CONTENT));
 							header.setTextSize(18);
 							header.setPadding(10, 5, 10, 5);*/
+							/**
+							 * Header
+							 */
 							TextView header = getView("Total time:"+"\n"+"    "+Utilities.getTimeString(appTime.optInt("total")));
 							header.setPadding(10, 5, 10, 5);
-						    details.addView(header);
+							appTimes.addView(header);
+						    header = getView("Locations:"+"\n"+"    ");
+							header.setPadding(10, 0, 10, 2);
+							appLocations.addView(header);
 						    
 							for(int i = 0; i<appUsages.length();i++){
+								/**
+								 * Time and duration
+								 */
 								JSONObject appUsage = appUsages.optJSONObject(i);
 								long start = appUsage.optLong("start");
 								long duration = appUsage.optLong("duration");
@@ -457,7 +479,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 								view.setTextSize(18);*/
 								view.setPadding(10, 5, 10, 0);
 								view.setId((i*2));
-							    details.addView(view);
+								appTimes.addView(view);
 							
 							    view = getView("    for "+Utilities.getTimeString(duration));/*
 							    String durationAsString = Utilities.getTimeString(duration);
@@ -494,7 +516,30 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 								});
 								view.setPadding(10, 0, 10, 5);
 								view.setId((i*2)+1);						    
-							    details.addView(view);
+								appTimes.addView(view);
+								
+							    /**
+							     * Locations
+							     */
+							    JSONArray location = appUsage.optJSONArray("location");
+							    double lat=0;
+							    double lng=0;
+							    if(location!=null){
+							    	JSONObject tmpJObj = location.optJSONObject(0);
+							    	if(tmpJObj!=null){
+								    	if(tmpJObj.optString("key").equals("lat")){
+								    		lat=tmpJObj.optDouble("value");
+								    		lng=location.optJSONObject(1).optDouble("value");
+								    	}else{
+								    		lng=tmpJObj.optDouble("value");
+								    		lat=location.optJSONObject(1).optDouble("value");
+								    	}
+							    	}
+							    }
+							    view = getView("show location");
+							    view.setOnClickListener(new LocationClickListener(lng, lat, appUsage.optLong("start")));
+							    view.setPadding(10, 11, 10, 18);//TODO maybe not just trail and error...
+							    appLocations.addView(view);
 							}
 							
 						}
@@ -515,8 +560,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				String appName = ((TextView)valueTV).getText().toString();
 				selectedApp = appName;
 				valueTV.setBackgroundResource(android.R.color.holo_blue_dark);
-				LinearLayout details = (LinearLayout)((ScrollView)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).getChildAt(0);
-				details.removeAllViews();
 				JSONObject appTime = getTimesOfApp(appName);
 				if(appTime == null)
 					return;
@@ -531,11 +574,20 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			            LayoutParams.WRAP_CONTENT));
 				header.setTextSize(18);
 				header.setPadding(10, 5, 10, 5);*/
+				/**
+				 * Header
+				 */
 				TextView header = getView("Total time:"+"\n"+"    "+Utilities.getTimeString(appTime.optInt("total")));
 				header.setPadding(10, 5, 10, 5);
-			    details.addView(header);
+			    appTimes.addView(header);
+			    header = getView("Locations:"+"\n"+"    ");
+				header.setPadding(10, 0, 10, 2);
+				appLocations.addView(header);
 			    
 				for(int i = 0; i<appUsages.length();i++){
+					/**
+					 * Time and duration
+					 */
 					JSONObject appUsage = appUsages.optJSONObject(i);
 					long start = appUsage.optLong("start");
 					long duration = appUsage.optLong("duration");
@@ -573,7 +625,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					});
 					view.setPadding(10, 5, 10, 0);
 					view.setId((i*2));
-				    details.addView(view);
+				    appTimes.addView(view);
 				    
 				    view = getView("    for "+Utilities.getTimeString(duration));/*
 				    String durationAsString = Utilities.getTimeString(duration);
@@ -610,7 +662,29 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					});
 					view.setPadding(10, 0, 10, 5);
 					view.setId((i*2)+1);				    
-				    details.addView(view);
+				    appTimes.addView(view);
+				    /**
+				     * Locations
+				     */
+				    JSONArray location = appUsage.optJSONArray("location");
+				    double lat=0;
+				    double lng=0;
+				    if(location!=null){
+				    	JSONObject tmpJObj = location.optJSONObject(0);
+				    	if(tmpJObj!=null){
+					    	if(tmpJObj.optString("key").equals("lat")){
+					    		lat=tmpJObj.optDouble("value");
+					    		lng=location.optJSONObject(1).optDouble("value");
+					    	}else{
+					    		lng=tmpJObj.optDouble("value");
+					    		lat=location.optJSONObject(1).optDouble("value");
+					    	}
+				    	}
+				    }
+				    view = getView("show location");
+				    view.setOnClickListener(new LocationClickListener(lng, lat, appUsage.optLong("start")));
+				    view.setPadding(10, 11, 10, 18);//TODO maybe not just trail and error...
+				    appLocations.addView(view);
 				}
 				
 			}
@@ -674,6 +748,32 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			header.setTextSize(18);
 			header.setTextColor(getResources().getColor(android.R.color.white));
 			return header;
+		}
+		
+		private class LocationClickListener implements View.OnClickListener{
+	    	private double lng;
+	    	private double lat;
+	    	private long start;
+			public LocationClickListener(double lng,double lat, long start) {
+	    		this.lng = lng;
+	    		this.lat = lat;
+	    		this.start = start;
+			}
+			@Override
+			public void onClick(View v) {
+				Log.d("location clicked", "lng"+lng+"lat"+lat);										
+				JSONObject jObject = new JSONObject();
+				try {
+					jObject.put("date", date);
+					jObject.put("time", start);
+					jObject.put("lng",lng);
+					jObject.put("lat",lat);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				((MainActivity)getActivity()).switchTab(0, jObject);
+			}
+			
 		}
 	}
 }

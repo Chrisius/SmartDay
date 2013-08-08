@@ -16,7 +16,6 @@
 	</LinearLayout>
 </ScrollView>
 		        <LinearLayout 
-			        android:id="@+id/chart_1_details"
 			    	android:orientation="horizontal"
 			        android:layout_width="wrap_content"
 				   	android:layout_height="wrap_content">
@@ -25,7 +24,7 @@
 					    android:layout_height="fill_parent"
 					    android:fillViewport="true">	
 				        <LinearLayout 
-					        android:id="@+id/chart_1_appNames"
+					        android:id="@+id/chart_appNames"
 					    	android:orientation="vertical"
 					        android:layout_width="wrap_content"
 						   	android:layout_height="wrap_content"/>
@@ -36,10 +35,20 @@
 					    android:layout_height="fill_parent"
 					    android:fillViewport="true">		
 				        <LinearLayout 
-					        android:id="@+id/chart_1_appDetails"
-					    	android:orientation="vertical"
+					    	android:orientation="horizontal"
 					        android:layout_width="wrap_content"
-						   	android:layout_height="wrap_content"/>
-				       </ScrollView>
+						   	android:layout_height="wrap_content">
+					        <LinearLayout 
+						        android:id="@+id/chart_time"
+						    	android:orientation="vertical"
+						        android:layout_width="wrap_content"
+							   	android:layout_height="wrap_content"/>
+					        <LinearLayout 
+						        android:id="@+id/chart_location"
+						    	android:orientation="vertical"
+						        android:layout_width="wrap_content"
+							   	android:layout_height="wrap_content"/>
+					   </LinearLayout>
+				   </ScrollView>
 		        </LinearLayout>
 </LinearLayout>

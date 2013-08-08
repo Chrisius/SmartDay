@@ -237,10 +237,10 @@ containing a value of this type.
         public static final int auth_user_name=0x7f060017;
         public static final int auth_user_pass=0x7f060018;
         public static final int chart_1=0x7f06001d;
-        public static final int chart_1_appDetails=0x7f060020;
-        public static final int chart_1_appNames=0x7f06001f;
-        public static final int chart_1_details=0x7f06001e;
+        public static final int chart_appNames=0x7f06001e;
+        public static final int chart_location=0x7f060020;
         public static final int chart_test=0x7f06000a;
+        public static final int chart_time=0x7f06001f;
         public static final int hybrid=0x7f060004;
         public static final int left=0x7f060005;
         public static final int map_container=0x7f060022;

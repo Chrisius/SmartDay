@@ -10,8 +10,6 @@ import com.zehjot.smartday.data_access.DataSet.onDataAvailableListener;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,11 +62,12 @@ public class SectionTimelineFragment extends Fragment implements OnUpdateListene
 				}else{
 					timelineView.removeDetail();					
 				}
-			}			
+			}
+			ScrollView sv = (ScrollView) act.findViewById(R.id.timelinescroll);
+			sv.setScrollY(scrollto*300);
 		}
 
-		ScrollView sv = (ScrollView) getActivity().findViewById(R.id.timelinescroll);
-		sv.setScrollY(scrollto*300);
+
 	}
 	@Override
 	public void onDataAvailable(JSONObject[] jObjs, String requestedFunction) {
