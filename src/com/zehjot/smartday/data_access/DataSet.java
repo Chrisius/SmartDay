@@ -628,9 +628,13 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 							for(int k = 0; k<usages.length();k++){
 								JSONObject usage = usages.getJSONObject(k);
 								if(usage.getString("session").equals(appSession)){
-									usage.put("end", time);
-									jObjOutput.put("duration", jObjOutput.optLong("duration", 0)+time-usage.optLong("start",time));
-									totalDuration += time-usage.optLong("start",time);
+									if(jObjInput.getString("action").equals("START")){
+										usage.put("start", time);														
+									}else{
+										usage.put("end", time);										
+									}
+									jObjOutput.put("duration", jObjOutput.optLong("duration", 0)+Math.abs(time-usage.optLong("start",time)));
+									totalDuration += Math.abs(time-usage.optLong("start",time));
 									found = true;
 									break;
 								}

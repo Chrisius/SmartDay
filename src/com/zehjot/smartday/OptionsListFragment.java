@@ -186,18 +186,6 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		return map;
 	}
 	
-	/*private List<Map<String,String>> toListMap(String[] text1, String[] text2){
-		List<Map<String,String>> listItem = new ArrayList<Map<String,String>>(2);
-		
-		for(int i = 0; i<text1.length;i++){
-			Map<String, String> listItemMap = new HashMap<String, String>();
-			listItemMap.put(TEXT1, text1[i]);
-			listItemMap.put(TEXT2, text2[i]);
-			listItem.add(listItemMap);
-		}
-		return listItem;
-	}*/
-	
 	private void setStartView(int pos){
 		switch (pos) {
 		case 0:

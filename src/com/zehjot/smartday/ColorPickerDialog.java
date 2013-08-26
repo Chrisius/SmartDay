@@ -147,7 +147,7 @@ public class ColorPickerDialog extends DialogFragment{
 			
 			layout.addView(row);
 		}
-		builder.setTitle("test");
+		builder.setTitle("Chose a color");
 		builder.setView(view);
 		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			

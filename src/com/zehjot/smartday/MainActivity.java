@@ -67,8 +67,7 @@ public class MainActivity extends Activity
     
     @Override
     public void onStop(){
-    	this.
-    	isRunning = false;
+    	this.isRunning = false;
     	super.onStop();
     }
     @Override
