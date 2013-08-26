@@ -631,10 +631,11 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 									if(jObjInput.getString("action").equals("START")){
 										usage.put("start", time);														
 									}else{
-										usage.put("end", time);										
+										usage.put("end", time);								
 									}
-									jObjOutput.put("duration", jObjOutput.optLong("duration", 0)+Math.abs(time-usage.optLong("start",time)));
-									totalDuration += Math.abs(time-usage.optLong("start",time));
+									int tmp_duration = (int) Math.abs(usage.optLong("end",time)-usage.optLong("start",time));
+									totalDuration += tmp_duration;
+									jObjOutput.put("duration", jObjOutput.optLong("duration", 0)+tmp_duration);
 									found = true;
 									break;
 								}
@@ -642,8 +643,12 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 							if(!found){
 								JSONObject usage = new JSONObject();
 								//usage.put("end", Utilities.getSystemTime()/1000);
-								jObjOutput.put("sessionCount", jObjOutput.optInt("sessionCount",0)+1);
-								usage.put("start", time);
+								jObjOutput.put("sessionCount", jObjOutput.optInt("sessionCount",0)+1);									
+								if(jObjInput.getString("action").equals("START")){
+									usage.put("start", time);														
+								}else{
+									usage.put("end", time);										
+								}
 								usage.put("session",appSession);
 								usages.put(usage);
 								found = true;
@@ -654,8 +659,12 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 					if(!found){
 						JSONObject app = new JSONObject();
 							JSONArray usages = new JSONArray();
-								JSONObject usage = new JSONObject();
-								usage.put("start", time);
+								JSONObject usage = new JSONObject();									
+								if(jObjInput.getString("action").equals("START")){
+									usage.put("start", time);														
+								}else{
+									usage.put("end", time);										
+								}
 								usage.put("session",appSession);
 							usages.put(usage);
 						app.put("usage",usages);
@@ -690,25 +699,43 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 						JSONArray appUsages = jArrayOutput.getJSONObject(j).getJSONArray("usage");
 						for(int k = 0; k<appUsages.length();k++){
 							JSONObject usage = appUsages.getJSONObject(k);
-							if(usage.getLong("start")<=time && !usage.has("location")){
+							if(usage.has("start")&& usage.getLong("start")<=time && !usage.has("location")){
+								usage.put("location",location);
+							}else if(usage.has("start")&& usage.getLong("start")<=time && usage.has("end")&& usage.getLong("end")>=time){
+								usage.put("location",location);
+							}else if(usage.has("end")&& usage.getLong("end")>=time && !usage.has("location")){
 								usage.put("location",location);
 							}
 						}
 					}
 				}
 			}
-			for(int i = 0; i<jArrayOutput.length(); i++){
+			for(int i = 0; i<jArrayOutput.length(); i++){					
+				JSONObject [] arrayOfJSONObjects = new JSONObject[jArrayOutput.getJSONObject(i).getJSONArray("usage").length()];
 				for(int j = 0; j < jArrayOutput.getJSONObject(i).getJSONArray("usage").length(); j++){
+					arrayOfJSONObjects[j] = jArrayOutput.getJSONObject(i).getJSONArray("usage").getJSONObject(j);
 					if(!jArrayOutput.getJSONObject(i).getJSONArray("usage").getJSONObject(j).has("location")){
 						jArrayOutput.getJSONObject(i).getJSONArray("usage").getJSONObject(j).put("location", lastKnownPos);
 					}
 				}
+				Arrays.sort(arrayOfJSONObjects, new Comparator<JSONObject>() {
+					@Override
+					public int compare(JSONObject lhs, JSONObject rhs) {
+						int res= ((Long)lhs.optLong("start", 0)).compareTo(rhs.optLong("start",0));
+						return res;
+					}
+				});
+				JSONArray newJSONArray = new JSONArray();
+				for(int j=0;j<arrayOfJSONObjects.length;j++){
+					newJSONArray.put(arrayOfJSONObjects[j]);
+				}
+				jArrayOutput.getJSONObject(i).put("usage", newJSONArray);
 			}
 			result.put("result", jArrayOutput);
 			result.put("totalDuration", totalDuration);
 			result.put("locations",locations);
 		}catch(JSONException e){
-			
+			e.printStackTrace();			
 		}
 		return result;
 	}
