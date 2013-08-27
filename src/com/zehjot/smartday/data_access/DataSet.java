@@ -272,14 +272,14 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		return sharedPreferences.getLong(activity.getString(R.string.key_date_end_default_timestamp), -1);
 	}
 
-	public void setSelectedDateEnd(int year,  int month, int day){
-		editor.putString(activity.getString(R.string.key_date_end), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
-		editor.putInt(activity.getString(R.string.key_date_end_day), day);
-		editor.putInt(activity.getString(R.string.key_date_end_month), month);
-		editor.putInt(activity.getString(R.string.key_date_end_year), year);
-		editor.commit();
-		getApps((onDataAvailableListener) activity);
-	}
+//	public void setSelectedDateEnd(int year,  int month, int day){
+//		editor.putString(activity.getString(R.string.key_date_end), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
+//		editor.putInt(activity.getString(R.string.key_date_end_day), day);
+//		editor.putInt(activity.getString(R.string.key_date_end_month), month);
+//		editor.putInt(activity.getString(R.string.key_date_end_year), year);
+//		editor.commit();
+//		getApps((onDataAvailableListener) activity);
+//	}
 	
 	public void setSelectedDates(int startyear, int startmonth, int startday, int endyear, int endmonth, int endday){
 		editor.putString(activity.getString(R.string.key_date_start), startday+". "+activity.getResources().getStringArray(R.array.months)[startmonth]+" "+startyear);
@@ -295,14 +295,14 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		
 	}
 	
-	public void setSelectedDateStart(int year,  int month, int day){
-		editor.putString(activity.getString(R.string.key_date_start), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
-		editor.putInt(activity.getString(R.string.key_date_start_day), day);
-		editor.putInt(activity.getString(R.string.key_date_start_month), month);
-		editor.putInt(activity.getString(R.string.key_date_start_year), year);
-		editor.commit();
-		getApps((onDataAvailableListener) activity);
-	}
+//	public void setSelectedDateStart(int year,  int month, int day){
+//		editor.putString(activity.getString(R.string.key_date_start), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
+//		editor.putInt(activity.getString(R.string.key_date_start_day), day);
+//		editor.putInt(activity.getString(R.string.key_date_start_month), month);
+//		editor.putInt(activity.getString(R.string.key_date_start_year), year);
+//		editor.commit();
+//		getApps((onDataAvailableListener) activity);
+//	}
 	/*
 	public int[] getSelectedDateAsArray(){
 		int year = getSharedInt(R.string.key_date_year);
@@ -432,28 +432,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				}
 				if(requester!=null){
 					result = filterIgnoredApps(result);
-					dataReady(result, requestedFunction, requester);/*
-					for(int i=0;i<numberSelectedDays;i++){
-						if(days[i]==null){
-							try {
-								days[i]=new JSONObject(result.toString());
-							} catch (JSONException e) {
-								e.printStackTrace();
-							}
-							if(i==numberSelectedDays-1)
-								break;
-							else
-								return;
-						}
-					}
-					Arrays.sort(days, new Comparator<JSONObject>() {
-						@Override
-						public int compare(JSONObject lhs, JSONObject rhs) {
-							int i= ((Long)rhs.optLong("dateTimestamp", 0)).compareTo(lhs.optLong("dateTimestamp",0));
-							return i;
-						}
-					});					
-					requester.onDataAvailable(days, requestedFunction);*/
+					dataReady(result, requestedFunction, requester);
 					return;				
 				}
 			}else if(requestedFunction.equals(RequestedFunction.initDataSet)){
@@ -488,28 +467,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 			if(requester!=null){
 				jObj = filterIgnoredApps(jObj);
 				dataReady(jObj, requestedFunction, requester);
-				/*
-				for(int i=0;i<numberSelectedDays;i++){
-					if(days[i]==null){
-						try {
-							days[i]=new JSONObject(jObj.toString());
-						} catch (JSONException e) {
-							e.printStackTrace();
-						}
-						if(i==numberSelectedDays-1)
-							break;
-						else
-							return;
-					}
-				}
-				Arrays.sort(days, new Comparator<JSONObject>() {
-					@Override
-					public int compare(JSONObject lhs, JSONObject rhs) {
-						int i= ((Long)rhs.optLong("dateTimestamp", 0)).compareTo(lhs.optLong("dateTimestamp",0));
-						return i;
-					}
-				});					
-				requester.onDataAvailable(days, requestedFunction);*/
 				return;
 			}
 		}
