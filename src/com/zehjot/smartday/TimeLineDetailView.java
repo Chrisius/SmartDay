@@ -251,10 +251,11 @@ public class TimeLineDetailView extends View {
 		}
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
-			setId(1);
-			LinearLayout linearLayout = (LinearLayout)getParent().getParent();
-			((TimeLineView)linearLayout.getChildAt(0)).selectApp("");
-			linearLayout.removeView(linearLayout.getChildAt(1));
+			close();
+//			setId(1);
+//			LinearLayout linearLayout = (LinearLayout)getParent().getParent();
+//			((TimeLineView)linearLayout.getChildAt(0)).selectApp("");
+//			linearLayout.removeView(linearLayout.getChildAt(1));
 			return true;
 		}
 		

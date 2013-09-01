@@ -368,6 +368,7 @@ public class TimeLineView extends View {
 		@Override
 		public boolean onScaleBegin(ScaleGestureDetector detector) {
 			if(zoomStart){
+				disableVerticalScroll();
 				time = ((detector.getFocusX()-offset-scrollX)/lineWidth)*24.f;
 				pointOnScreen = detector.getFocusX();
 				zoomStart = false;
@@ -376,7 +377,6 @@ public class TimeLineView extends View {
 		}
 		@Override
 		public boolean onScale(ScaleGestureDetector detector) {
-			disableVerticalScroll();
 			scaleFactor *= detector.getScaleFactor();
 			if(scaleFactor<1.f){
 				scrollX =0;
@@ -398,7 +398,6 @@ public class TimeLineView extends View {
 		boolean scrollerKilled=false;
 		@Override
 		public boolean onDown(MotionEvent e) {
-
 			if(!mScroller.isFinished()){
 				mScroller.forceFinished(true);
 				scrollerKilled = true;
@@ -475,22 +474,22 @@ public class TimeLineView extends View {
 					time = app.optInt("start");
 					selectedTime = (int) time;
 				}
-				appSessionCount = getAppSessionCount(selectedApp);
+				//appSessionCount = getAppSessionCount(selectedApp);
 				invalidate();
 				addDetail();
 			}
 			return true;
 		}
-		private int getAppSessionCount(String selectedApp) {
-			JSONArray apps = jObj.optJSONArray("result");
-			if(apps==null)
-				return 0;
-			for(int i=0; i<apps.length();i++){
-				if(apps.optJSONObject(i).optString("app").equals(selectedApp))
-					return apps.optJSONObject(i).optInt("sessionCount");
-			}
-			return 0;
-		}
+//		private int getAppSessionCount(String selectedApp) {
+//			JSONArray apps = jObj.optJSONArray("result");
+//			if(apps==null)
+//				return 0;
+//			for(int i=0; i<apps.length();i++){
+//				if(apps.optJSONObject(i).optString("app").equals(selectedApp))
+//					return apps.optJSONObject(i).optInt("sessionCount");
+//			}
+//			return 0;
+//		}
 	}
 	private class AnimatorTick implements ValueAnimator.AnimatorUpdateListener{
 		float tmp=0;
@@ -551,26 +550,20 @@ public class TimeLineView extends View {
 		return null;
 	}
 	
+	private static int disableScrollCalls = 0;
 	private void disableVerticalScroll(){
+		disableScrollCalls +=1;
 		ViewGroup root = (ViewGroup) ((Activity)getContext()).findViewById(R.id.timelinell);
-		((ScrollView)root.getParent()).requestDisallowInterceptTouchEvent(true);/*
-		if(root!=null&&root.getParent().getClass().getSimpleName().equals("ScrollView")){
-			((ScrollView)root.getParent()).setOnTouchListener(new OnTouchListener() {
-				
-				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-					
-					return true;
-				}
-			});
-		}*/
+		((ScrollView)root.getParent()).requestDisallowInterceptTouchEvent(true);
 	}
 	private void enableVerticalScroll(){
-		ViewGroup root = (ViewGroup) ((Activity)getContext()).findViewById(R.id.timelinell);
-		if(root!=null&&root.getParent().getClass().getSimpleName().equals("ScrollView")){
-//			((ScrollView)root.getParent()).setOnTouchListener(null);
-			((ScrollView)root.getParent()).requestDisallowInterceptTouchEvent(false);
-			Log.d("ScrollView","enabled");
+		disableScrollCalls -=1;
+		if(disableScrollCalls<=0){
+			ViewGroup root = (ViewGroup) ((Activity)getContext()).findViewById(R.id.timelinell);
+			if(root!=null&&root.getParent().getClass().getSimpleName().equals("ScrollView")){
+				((ScrollView)root.getParent()).requestDisallowInterceptTouchEvent(false);
+				Log.d("ScrollView","enabled");
+			}
 		}
 	}
 	

@@ -31,7 +31,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class SectionChartFragment extends Fragment implements onDataAvailableListener, OnUpdateListener{
-//	private MyChart chart1=null;
 	private MyChart[] charts=null;
 	private static double minTimeinPercent = 0.05;
 	@Override
@@ -277,11 +276,8 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						r.setColor(otherColor);
 						r.setHighlighted(highlight);
 						renderer.addSeriesRenderer(r);	
-					}else{					
-//						if(apps.length-1<0)
-//							renderer.getSeriesRendererAt(apps.length).setHighlighted(true);
-//						else
-							renderer.getSeriesRendererAt(renderer.getSeriesRendererCount()-1).setHighlighted(highlight);
+					}else{		
+						renderer.getSeriesRendererAt(renderer.getSeriesRendererCount()-1).setHighlighted(highlight);
 					}
 					if(highlight){
 						addDetail(renderer.getSeriesRendererCount()-1);
@@ -381,9 +377,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			
 			if(apps.length<1)
 				return;
-			/*
-			((LinearLayout)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(0)).removeAllViews();
-			((LinearLayout)((LinearLayout) getActivity().findViewById(detailViewContainer)).getChildAt(1)).removeAllViews();*/		
 			if(selectedSeries==renderer.getSeriesRendererCount()-1&&otherRendererToArrayIndex.length()>0){
 				selectedApp="";
 				String[] sortedArray = new String[otherRendererToArrayIndex.length()];
@@ -392,13 +385,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				}
 				Arrays.sort(sortedArray);
 				for(int i = 0; i<otherRendererToArrayIndex.length(); i++){
-				    TextView valueTV = getView(sortedArray[i]);//getView(apps[otherRendererToArrayIndex.optInt(i)]);
-				    /*
-				    valueTV.setText(apps[otherRendererToArrayIndex.optInt(i)]);
-				    valueTV.setLayoutParams(new LayoutParams(
-				            LayoutParams.MATCH_PARENT,
-				            LayoutParams.WRAP_CONTENT));
-				    valueTV.setTextSize(18);*/
+				    TextView valueTV = getView(sortedArray[i]);
 				    valueTV.setPadding(10, 5, 10, 5);
 				    valueTV.setOnClickListener(new View.OnClickListener() {
 						@Override
@@ -418,14 +405,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 							JSONArray appUsages = app.optJSONArray("usage");
 							if(appUsages==null)
 								return;
-							/*
-							TextView header = new TextView(getActivity());
-							header.setText("Total time "+ appTime.optInt("total"));
-							header.setLayoutParams(new LayoutParams(
-						            LayoutParams.MATCH_PARENT,
-						            LayoutParams.WRAP_CONTENT));
-							header.setTextSize(18);
-							header.setPadding(10, 5, 10, 5);*/
 							/**
 							 * Header
 							 */
@@ -433,7 +412,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 							header.setPadding(10, 5, 10, 5);
 							appTimes.addView(header);
 						    header = getView("Locations:"+"\n"+"    ");
-							header.setPadding(10, 5, 10, 5);
+							header.setPadding(10, 5, 11, 5);
 							appLocations.addView(header);
 						    
 							for(int i = 0; i<appUsages.length();i++){
@@ -472,24 +451,12 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 										
 									}
 								});
-								/*		
-										new TextView(getActivity());
-								view.setText("Used at "+ Utilities.getTimeFromTimeStamp(start));
-								view.setLayoutParams(new LayoutParams(
-							            LayoutParams.MATCH_PARENT,
-							            LayoutParams.WRAP_CONTENT));
-								view.setTextSize(18);*/
+
 								view.setPadding(10, 5, 10, 0);
 								view.setId((i*2));
 								appTimes.addView(view);
 							
-							    view = getView("    for "+Utilities.getTimeString(duration));/*
-							    String durationAsString = Utilities.getTimeString(duration);
-							    view.setText("    for "+durationAsString);
-							    view.setLayoutParams(new LayoutParams(
-							            LayoutParams.MATCH_PARENT,
-							            LayoutParams.WRAP_CONTENT));
-								view.setTextSize(18);	*/								
+							    view = getView("    for "+Utilities.getTimeString(duration));				
 							    view.setOnClickListener(new View.OnClickListener() {									
 									@Override
 									public void onClick(View v) {
@@ -540,7 +507,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 							    }
 							    view = getView("show location");
 							    view.setOnClickListener(new LocationClickListener(lng, lat, appUsage.optLong("start")));
-							    view.setPadding(10, 11, 10, 18);//TODO maybe not just trail and error...
+							    view.setPadding(10, 11, 10, 24);//TODO maybe not just trail and error...
 							    appLocations.addView(view);
 							}
 							
@@ -550,11 +517,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				}
 			}else{
 				TextView valueTV = getView(apps[rendererToArrayIndex.optInt(""+selectedSeries)]);
-			   /* valueTV.setText(apps[rendererToArrayIndex.optInt(""+selectedSeries)]);
-			    valueTV.setLayoutParams(new LayoutParams(
-			            LayoutParams.WRAP_CONTENT,
-			            LayoutParams.WRAP_CONTENT));
-			    valueTV.setTextSize(18);			*/
 			    valueTV.setPadding(10, 5, 10, 5);	
 			    appNames.addView(valueTV);
 			    
@@ -568,14 +530,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				JSONArray appUsages = app.optJSONArray("usage");				
 				if(appUsages==null)
 					return;
-				/*
-				TextView header = new TextView(getActivity());
-				header.setText("Total time "+ appTime.optInt("total"));
-				header.setLayoutParams(new LayoutParams(
-			            LayoutParams.MATCH_PARENT,
-			            LayoutParams.WRAP_CONTENT));
-				header.setTextSize(18);
-				header.setPadding(10, 5, 10, 5);*/
 				/**
 				 * Header
 				 */
@@ -583,7 +537,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				header.setPadding(10, 5, 10, 5);
 			    appTimes.addView(header);
 			    header = getView("Locations:"+"\n"+"    ");
-				header.setPadding(10, 5, 10, 5);
+				header.setPadding(10, 5, 11, 5);
 				appLocations.addView(header);
 			    
 				for(int i = 0; i<appUsages.length();i++){
@@ -597,14 +551,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 						end = start;
 					}
 					long duration = end-start;
-					TextView view = getView("Used at "+ Utilities.getTimeFromTimeStamp(start));
-					/*		
-							new TextView(getActivity());
-					view.setText("Used at "+ Utilities.getTimeFromTimeStamp(start));
-					view.setLayoutParams(new LayoutParams(
-				            LayoutParams.MATCH_PARENT,
-				            LayoutParams.WRAP_CONTENT));
-					view.setTextSize(18);*/								
+					TextView view = getView("Used at "+ Utilities.getTimeFromTimeStamp(start));					
 					view.setOnClickListener(new View.OnClickListener() {									
 						@Override
 						public void onClick(View v) {
@@ -633,13 +580,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 					view.setId((i*2));
 				    appTimes.addView(view);
 				    
-				    view = getView("    for "+Utilities.getTimeString(duration));/*
-				    String durationAsString = Utilities.getTimeString(duration);
-				    view.setText("    for "+durationAsString);
-				    view.setLayoutParams(new LayoutParams(
-				            LayoutParams.MATCH_PARENT,
-				            LayoutParams.WRAP_CONTENT));
-					view.setTextSize(18);	*/							    
+				    view = getView("    for "+Utilities.getTimeString(duration));		    
 				    view.setOnClickListener(new View.OnClickListener() {									
 						@Override
 						public void onClick(View v) {
@@ -689,7 +630,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				    }
 				    view = getView("show location");
 				    view.setOnClickListener(new LocationClickListener(lng, lat, appUsage.optLong("start")));
-				    view.setPadding(10, 11, 10, 18);//TODO maybe not just trail and error...
+				    view.setPadding(10, 11, 10, 24);//TODO maybe not just trail and error...
 				    appLocations.addView(view);
 				}
 				
@@ -716,36 +657,12 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 			 */
 			JSONObject result = new JSONObject();
 			JSONArray jArray = data.optJSONArray("result");
-//			int totalTime = 0;
 			if(jArray == null)
 				return null;
 			for(int i=0; i<jArray.length();i++){
 				JSONObject app = jArray.optJSONObject(i);
 				if(app.optString("app").equals(appName)){
 					return app;
-//					JSONArray usages = app.optJSONArray("usage");
-//					JSONArray output = new JSONArray();
-//					try {
-//						for(int j = 0 ; j<usages.length();j++){
-//							JSONObject usage = usages.optJSONObject(j);
-//							long start = usage.optLong("start",-1);
-//							long end = usage.optLong("end",-1);
-//							if(start!=-1 && end!=-1){
-//								output.put(
-//									new JSONObject()
-//										.put("start", start)
-//										.put("duration", end-start)
-//								);
-//								totalTime += end-start;
-//							}
-//						}
-//						result.put("times", output);
-//						result.put("total", totalTime);
-//						return result;
-//					} catch (JSONException e) {
-//						e.printStackTrace();
-//						return null;
-//					}	
 				}					
 			}
 			return result;

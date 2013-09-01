@@ -384,9 +384,4 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener/
 		
 	}
 
-
-
-
-
-
 }
