@@ -228,6 +228,16 @@ public class Utilities{
 		return day+". "+month+" "+year;
 	}
 	
+	public static String getDateWithDay(long timestampInSec){
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(timestampInSec*1000);
+		int day = c.get(Calendar.DAY_OF_MONTH);
+		String weekday = c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+		String month=c.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
+		int year = c.get(Calendar.YEAR);
+		return weekday+", "+day+". "+month+" "+year;
+	}
+	
 	public static int getTimeOfDay(long sec){
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(sec*1000);

@@ -145,14 +145,21 @@ public class TimeLineView extends View {
 			Log.d("TimeLineView", "extra available");
 			selectedApp=extra.optString("app");
 			selectedTime=extra.optInt("time",-1);
-			scaleFactor = 4;
+			int endtime = extra.optInt("end",-1);
+			if(endtime != -1 && selectedTime!=-1){
+				scaleFactor = 24.f/((endtime-selectedTime)/3600.f);
+			}else
+				scaleFactor = 4;
 			if(selectedTime!=-1){
 				height = this.getHeight();
 				offset = height*0.2f;
 				lineWidth = this.getWidth();
 				lineWidth *= scaleFactor;///(width-width*24.f/25.f)*0.5f;
 				lineWidth -= 2.f*offset;//*= 24.f/25.f;
-				scrollX = getWidth()/4.f - (selectedTime/(60.f*60.f))*(lineWidth/24.f)-offset;
+				if(endtime!=-1)
+					scrollX = - (selectedTime/(60.f*60.f))*(lineWidth/24.f)-offset;					
+				else
+					scrollX = getWidth()/4.f - (selectedTime/(60.f*60.f))*(lineWidth/24.f)-offset;
 			}
 			extra = null;
 			addDetail();
@@ -168,8 +175,14 @@ public class TimeLineView extends View {
 		lineWidth *= scaleFactor;///(width-width*24.f/25.f)*0.5f;
 		lineWidth -= 2.f*offset;//*= 24.f/25.f;
 		debugDrawCounter +=1;
-		if(!debug)
-			canvas.drawText(Utilities.getDate(date), xpad-scrollX+10, ypad+mTextSize, mDebugTextPaint);
+		if(!debug){
+			canvas.drawText(Utilities.getDateWithDay(date), xpad-scrollX+10, ypad+mTextSize, mDebugTextPaint);
+			if(((LinearLayout)getParent()).getChildAt(1)!=null){
+				canvas.drawText("Doubletap below to close details", xpad-scrollX+10, height-mTextSize, mDebugTextPaint); 	
+			}else{			
+				canvas.drawText("Tap on a bar to open details", xpad-scrollX+10, height-mTextSize, mDebugTextPaint); 
+			}
+		}
 		else
 			canvas.drawText("height="+this.getHeight()+" width="+this.getWidth()+" calls="+debugDrawCounter+" scale="+scaleFactor+" scrollX="+scrollX+" Selected App= "+selectedApp+" AppSessions="+appSessionCount, xpad-scrollX, ypad+mTextSize, mDebugTextPaint);
 		/**

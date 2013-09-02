@@ -45,7 +45,7 @@ public class TimeLineDetailView extends View {
 		super(context);
 		textSize = 18;
 		yOffset = textSize/3.f;
-		xOffset = 20;
+		xOffset = 20; //was 20
 		
 		mTextPaint = new Paint();
 		mTextPaint.setTextSize(textSize);

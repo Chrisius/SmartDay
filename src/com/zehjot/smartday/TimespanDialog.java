@@ -99,8 +99,10 @@ public class TimespanDialog extends DialogFragment implements DatePickerFragment
 		
 		if(year>maxYear)
 			year=maxYear;	
-		if(month>maxMonth&&year>=maxYear)
+		if(month>maxMonth&&year>=maxYear){
 			month = maxMonth;
+			day = maxDay;
+		}
 		if(day>maxDay&&month>=maxMonth&&year>=maxYear)
 			day = maxDay;	
 		/**

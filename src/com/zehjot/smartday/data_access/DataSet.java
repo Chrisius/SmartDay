@@ -155,7 +155,9 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		int month = c.get(Calendar.MONTH);
 		int year = c.get(Calendar.YEAR);
 		editor.putString(activity.getString(R.string.key_date_end_default), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
-		editor.putLong(activity.getString(R.string.key_date_end_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();		
+		editor.putLong(activity.getString(R.string.key_date_end_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();
+		editor.putString(activity.getString(R.string.key_date_start_default), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
+		editor.putLong(activity.getString(R.string.key_date_start_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();				
 	}
 	
 	private static void createUserData(){
@@ -701,15 +703,15 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		//JSONArray output = new JSONArray();
 		try{
 			result = new JSONObject(jObj, new String[]{"locations","downloadTimestamp","dateTimestamp","totalDuration"});
-			result.put("result", new JSONArray(jObj.getJSONArray("result").toString()));
+			JSONArray output=result.put("result", new JSONArray()).getJSONArray("result");
 			JSONArray locations = new JSONArray(jObj.getJSONArray("locations").toString());			
 			result.put("locations", locations);
-			/*
 			for(int i=0; i<jObj.getJSONArray("result").length();i++){
 				JSONObject app = jObj.getJSONArray("result").getJSONObject(i);
 				if(!ignoreApps.optBoolean(app.getString("app")))
 					output.put(app);
-			}*/
+			}
+			jObj = null;
 			return result;//.put("result",output);
 		}catch(JSONException e){
 			return result;
