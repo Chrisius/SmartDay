@@ -75,6 +75,7 @@
 	<string name="options_actionbar_deleteFiles">Delete saved files</string>
 	<string name="options_actionbar_newUser">Switch user</string>
 	<string name="options_actionbar_colorApp">Color apps</string>
+	<string name="options_actionbar_about">About</string>
 	
 <!-- FileNames -->
 	<string name="file_ignored_apps">ignoreAppsFile</string>

@@ -32,7 +32,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class SectionMapFragment extends MapFragment implements OnUpdateListener/*,onDataAvailableListener*/, InfoWindowAdapter, OnInfoWindowClickListener{
+public class SectionMapFragment extends MapFragment implements OnUpdateListener, InfoWindowAdapter, OnInfoWindowClickListener{
 	private GoogleMap mMap;
 	private List<Marker> markerList = new ArrayList<Marker>();
 	private JSONObject marker;
@@ -51,7 +51,6 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener/
 	}
 	 @Override
 	public void putExtra(JSONObject jObj) {
-		//DataSet.getInstance(getActivity()).getPositions(this);
 		double lat = jObj.optDouble("lat",0);
 		double lng = jObj.optDouble("lng",0);
 		long start = jObj.optLong("time",0);
@@ -147,9 +146,7 @@ public class SectionMapFragment extends MapFragment implements OnUpdateListener/
 				e.printStackTrace();
 			}
 			if(camera.target.latitude==0&&camera.target.longitude==0)
-				zoomTo(zoomLat, zoomLng);/*
-			else if(zoomLat != 50.45 && zoomLng != 6.06)
-				zoomTo(zoomLat, zoomLng);*/
+				zoomTo(zoomLat, zoomLng);
 		}
 	}
 	/**

@@ -42,7 +42,6 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
         	}
         } else {
             ft.show(fragment);
-//            if(hashOldJObj!=jObjs.hashCode())
             if(fragment.isResumed())
             	((OnUpdateListener) fragment).onUpdate(jObjs);            
         }

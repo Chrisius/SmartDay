@@ -173,7 +173,6 @@ public class UserData {
 					dialog.show();
 			}
 			else{
-				//Utilities.showDialog(activity.getString(R.string.info_user_data_ok), activity);
 				user = tmpUser;
 				tmpUser = null;
 				mCallBack.onUserDataAvailable(user);
@@ -256,7 +255,6 @@ public class UserData {
 		       .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 		           @Override
 		           public void onClick(DialogInterface dialog, int id) {
-		        	  // 	user=null;
 		           }
 		       });
 			return builder.create();

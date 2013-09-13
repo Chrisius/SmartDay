@@ -68,8 +68,6 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//getListView().addHeaderView(getActivity().getLayoutInflater().inflate(R.layout.header_view,null),null,false); //Inflates the Header View und attaches it to the List		
-		//setListAdapter(optionsListAdapter);
 	}
 	
 	@Override
@@ -83,10 +81,7 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		case 0:
 			TimespanDialog date = new TimespanDialog();
 			date.setListener(this);
-	    	date.show(getFragmentManager(), getString(R.string.datepicker));/*
-	    	DatePickerFragment dateStart = new DatePickerFragment();
-	    	dateStart.setListener(this,"start");
-	    	dateStart.show(getFragmentManager(), getString(R.string.datepicker));*/
+	    	date.show(getFragmentManager(), getString(R.string.datepicker));
 			break;			
 		case 1:
 			dataSet.getApps(this);			
@@ -94,7 +89,6 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 		case 2:
 			special = true;
 			dataSet.getApps(this);			
-			//dataSet.getContext(dataSet.getSelectedDateAsTimestamp(),dataSet.getNextDayAsTimestamp(),this);
 			break;
 		default:
 			break;
@@ -126,14 +120,7 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 	}
 	
     public void onDateChosen(int startyear, int startmonth, int startday, int endyear, int endmonth, int endday){
-    	/*
-    	if(whichDate.equals("start"))
-        	dataSet.setSelectedDateStart(year, month, day);
-    	else
-    		dataSet.setSelectedDateEnd(year, month, day);
-    		*/
     	dataSet.setSelectedDates(startyear, startmonth, startday, endyear, endmonth, endday);
-//    	dataSet.setSelectedDateEnd(endyear, endmonth, endday);
     	updateDate();
     }
 	public void updateDate(){
@@ -151,11 +138,6 @@ public class OptionsListFragment extends ListFragment implements onDataAvailable
 			optionsListAdapter.notifyDataSetChanged();
 			break;
 		case 1:
-//			if(displayedOptions.size()<3){//check if exists because of nullpointer
-//				displayedOptions.add(toMap(getString(R.string.options_chart_text1), getString(R.string.options_chart_text2)));}
-//			else{
-//				displayedOptions.set(2,toMap(getString(R.string.options_chart_text1), getString(R.string.options_chart_text2)));}
-//			optionsListAdapter.notifyDataSetChanged();
 			if(displayedOptions.size()>2){
 				displayedOptions.remove(2);
 				optionsListAdapter.notifyDataSetChanged();}

@@ -217,6 +217,7 @@ containing a value of this type.
         public static final int square=0x7f02001e;
     }
     public static final class id {
+        public static final int action_about=0x7f060029;
         public static final int action_blacklist=0x7f060025;
         public static final int action_color_apps=0x7f060028;
         public static final int action_delete_files=0x7f060026;
@@ -352,16 +353,16 @@ containing a value of this type.
         public static final int error_no_string=0x7f07002f;
         public static final int error_no_user_jObj=0x7f070030;
         public static final int error_storing_file=0x7f070032;
-        public static final int file_app_colors=0x7f070042;
+        public static final int file_app_colors=0x7f070043;
         /**  FileNames 
          */
-        public static final int file_ignored_apps=0x7f070041;
+        public static final int file_ignored_apps=0x7f070042;
         public static final int hello_world=0x7f070017;
-        public static final int hint_user_email=0x7f070049;
+        public static final int hint_user_email=0x7f07004a;
         /**  Hint 
          */
-        public static final int hint_user_name=0x7f070047;
-        public static final int hint_user_pass=0x7f070048;
+        public static final int hint_user_name=0x7f070048;
+        public static final int hint_user_pass=0x7f070049;
         public static final int info_no_data_connection=0x7f070034;
         /**  Infos 
          */
@@ -394,6 +395,7 @@ containing a value of this type.
         public static final int location_client_ulr_inactive_age_unknown=0x7f070013;
         public static final int location_client_ulr_inactive_unknown_restriction=0x7f070014;
         public static final int options=0x7f070019;
+        public static final int options_actionbar_about=0x7f070041;
         public static final int options_actionbar_blacklist=0x7f07003d;
         public static final int options_actionbar_colorApp=0x7f070040;
         public static final int options_actionbar_deleteFiles=0x7f07003e;
@@ -413,12 +415,12 @@ containing a value of this type.
          */
         public static final int start_view=0x7f07001d;
         public static final int today=0x7f07001b;
-        public static final int user_email=0x7f070046;
-        public static final int user_file=0x7f070043;
+        public static final int user_email=0x7f070047;
+        public static final int user_file=0x7f070044;
         /**  UserFile Identifier
          */
-        public static final int user_name=0x7f070044;
-        public static final int user_pass=0x7f070045;
+        public static final int user_name=0x7f070045;
+        public static final int user_pass=0x7f070046;
     }
     public static final class style {
         /** 

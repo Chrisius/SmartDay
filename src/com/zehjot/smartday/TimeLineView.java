@@ -154,8 +154,8 @@ public class TimeLineView extends View {
 				height = this.getHeight();
 				offset = height*0.2f;
 				lineWidth = this.getWidth();
-				lineWidth *= scaleFactor;///(width-width*24.f/25.f)*0.5f;
-				lineWidth -= 2.f*offset;//*= 24.f/25.f;
+				lineWidth *= scaleFactor;
+				lineWidth -= 2.f*offset;
 				if(endtime!=-1)
 					scrollX = - (selectedTime/(60.f*60.f))*(lineWidth/24.f)-offset;					
 				else
@@ -164,16 +164,14 @@ public class TimeLineView extends View {
 			extra = null;
 			addDetail();
 		}
-		//canvas.scale(scaleFactor, scaleFactor);
 		canvas.translate(scrollX, 0);
-		//canvas.drawColor(getResources().getColor(android.R.color.holo_green_light));
 		float xpad = (float) (getPaddingLeft()+getPaddingRight());
 		float ypad = (float) (getPaddingTop()+getPaddingBottom());
 		height = this.getHeight();
 		offset = height*0.2f;
 		lineWidth = this.getWidth();
-		lineWidth *= scaleFactor;///(width-width*24.f/25.f)*0.5f;
-		lineWidth -= 2.f*offset;//*= 24.f/25.f;
+		lineWidth *= scaleFactor;
+		lineWidth -= 2.f*offset;
 		debugDrawCounter +=1;
 		if(!debug){
 			canvas.drawText(Utilities.getDateWithDay(date), xpad-scrollX+10, ypad+mTextSize, mDebugTextPaint);
@@ -493,16 +491,6 @@ public class TimeLineView extends View {
 			}
 			return true;
 		}
-//		private int getAppSessionCount(String selectedApp) {
-//			JSONArray apps = jObj.optJSONArray("result");
-//			if(apps==null)
-//				return 0;
-//			for(int i=0; i<apps.length();i++){
-//				if(apps.optJSONObject(i).optString("app").equals(selectedApp))
-//					return apps.optJSONObject(i).optInt("sessionCount");
-//			}
-//			return 0;
-//		}
 	}
 	private class AnimatorTick implements ValueAnimator.AnimatorUpdateListener{
 		float tmp=0;

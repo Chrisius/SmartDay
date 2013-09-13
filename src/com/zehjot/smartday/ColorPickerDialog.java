@@ -29,8 +29,6 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 public class ColorPickerDialog extends DialogFragment{
-	//String[] appNames = {};
-	//int[] colors ={};
 	JSONArray newColors = new JSONArray();
 	JSONArray colorsOfApps;
 	List<App> apps = new ArrayList<App>();
@@ -52,14 +50,9 @@ public class ColorPickerDialog extends DialogFragment{
 		
 		try {
 			colorsOfApps = DataSet.getInstance(getActivity()).getColorsOfApps().getJSONArray("colors");
-			//appNames = new String[colorsOfApps.length()];
-			//colors = new int[colorsOfApps.length()];
 			for(int i=0; i<colorsOfApps.length();i++){
 				
 				apps.add(new App(colorsOfApps.getJSONObject(i).getString("app"),colorsOfApps.getJSONObject(i).getInt("color"),i));		
-
-//				appNames[i] = colorsOfApps.getJSONObject(i).getString("app");
-//				colors[i] = colorsOfApps.getJSONObject(i).getInt("color");
 			}
 			Collections.sort(apps, new Comparator<App>(){
 				@Override
@@ -141,7 +134,7 @@ public class ColorPickerDialog extends DialogFragment{
 			
 			TextView color = new TextView(getActivity());
 			color.setBackgroundColor(apps.get(i).color);
-			color.setLayoutParams(new LayoutParams(50, LayoutParams.WRAP_CONTENT));//(new TableLayout.LayoutParams(50,LayoutParams.WRAP_CONTENT,1.f));//LayoutParams.MATCH_PARENT
+			color.setLayoutParams(new LayoutParams(50, LayoutParams.WRAP_CONTENT));
 			color.setPadding(0, 5, 5, 5);
 			row.addView(color);
 			

@@ -79,10 +79,6 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				highlight=true;
 			charts[i].draw(jObjs[i],(LinearLayout)(layout.findViewById(i+10)),highlight);			
 		}
-//		
-//		if(chart1 == null)
-//			chart1 = new MyChart();
-//		chart1.draw(jObjs[0], R.id.chart_1,R.id.chart_1_details);
 	}
 
 	public void onUpdate(JSONObject[] jObjs) {
@@ -90,9 +86,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 	}
 	
 	@Override
-	public void putExtra(JSONObject jObj) {
-		// TODO Auto-generated method stub
-		
+	public void putExtra(JSONObject jObj) {		
 	}
 	
 	private class MyChart{
@@ -630,7 +624,7 @@ public class SectionChartFragment extends Fragment implements onDataAvailableLis
 				    }
 				    view = getView("show location");
 				    view.setOnClickListener(new LocationClickListener(lng, lat, appUsage.optLong("start")));
-				    view.setPadding(10, 11, 10, 24);//TODO maybe not just trail and error...
+				    view.setPadding(10, 11, 10, 24);// maybe not just trail and error...
 				    appLocations.addView(view);
 				}
 				

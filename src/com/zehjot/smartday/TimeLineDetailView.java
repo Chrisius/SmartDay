@@ -55,51 +55,7 @@ public class TimeLineDetailView extends View {
 		
 		selectedApp ="";
 	}
-/*
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		//The Specified Mode (Exactly=hard coded pixels, at_most=match_parent, unspecified=wrap_content)
-		int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-		int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-		int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-		int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-		
-		int width;
-		int height;
-		
-		switch (widthMode) {
-		case MeasureSpec.EXACTLY:
-			width = widthSize;
-			break;
-		case MeasureSpec.AT_MOST:
-			width = widthSize;
-			break;
-		case MeasureSpec.UNSPECIFIED:
-			width = 0;
-			break;
-		default:
-			width = 0;
-			break;
-		}
-		
-		switch (heightMode) {
-		case MeasureSpec.EXACTLY:
-			height = heightSize;
-			break;
-		case MeasureSpec.AT_MOST:
-			height = Math.min(heightSize,300);
-			break;
-		case MeasureSpec.UNSPECIFIED:
-			height = 300;
-			break;
-		default:
-			height = 300;
-			break;
-		}	
-		setMeasuredDimension(width, height);
-	}
-*/	
-	
+
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -233,7 +189,6 @@ public class TimeLineDetailView extends View {
 		if(orderedApps!=null){
 			int height = (int) ((orderedApps.length)*textSize+(yOffset)*(orderedApps.length+1));
 			this.setLayoutParams(new LinearLayout.LayoutParams(500, height));
-			//requestLayout();
 		}
 		invalidate();
 	}
@@ -252,10 +207,6 @@ public class TimeLineDetailView extends View {
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
 			close();
-//			setId(1);
-//			LinearLayout linearLayout = (LinearLayout)getParent().getParent();
-//			((TimeLineView)linearLayout.getChildAt(0)).selectApp("");
-//			linearLayout.removeView(linearLayout.getChildAt(1));
 			return true;
 		}
 		
@@ -287,7 +238,6 @@ public class TimeLineDetailView extends View {
 			if(y>=start && y<=end){
 				return orderedApps[i].optString("app");
 			}
-			//canvas.drawText(orderedApps[i].optString("app", "Error"), xpad+20, ypad+(i+1)*textSize+(yOffset)*i, mTextPaint);
 		}
 		return "";
 	}		

@@ -44,9 +44,9 @@ public class SelectAppsDialogFragment extends DialogFragment{
 		if(saved==null){	
 			try{
 				if(mode == SELECT_APPS){
-					selectedApps = /*dataSet.getSelectedApps();*/new JSONObject(dataSet.getSelectedApps().toString());
+					selectedApps = new JSONObject(dataSet.getSelectedApps().toString());
 				}else if(mode == IGNORE_APPS){
-					selectedApps = /*dataSet.getIgnoreApps();*/new JSONObject(dataSet.getIgnoreApps().toString());
+					selectedApps = new JSONObject(dataSet.getIgnoreApps().toString());
 				}else if(mode == SELECT_HIGHLIGHT_APPS){
 					selectedApps = new JSONObject(dataSet.getSelectedHighlightApps().toString());
 				}
@@ -80,10 +80,8 @@ public class SelectAppsDialogFragment extends DialogFragment{
 				try{
 					if(isChecked){
 						selectedApps.put(strings[which], "true");
-						//boolSelectedApps[which]="true" != null;
 					} else {
 						selectedApps.put(strings[which], "false");
-						//boolSelectedApps[which]="false" != null;
 					}
 				}catch(JSONException e){
 					e.printStackTrace();

@@ -15,11 +15,7 @@ public class StoreFileTask extends AsyncTask<String, Void, Boolean>{
 	
 	@Override
 	protected void onPreExecute(){
-		super.onPreExecute();/*
-		progress = new ProgressDialog(activity);
-		progress.setCancelable(false);
-		progress.setMessage("Saving Files...");
-		progress.show();*/
+		super.onPreExecute();
 	}
 	
 	@Override
@@ -33,7 +29,6 @@ public class StoreFileTask extends AsyncTask<String, Void, Boolean>{
 	@Override
 	protected void onPostExecute(Boolean result) {
 		super.onPostExecute(result);
-		//progress.cancel();	
 		if(!result)
 			Utilities.showDialog(activity.getString(R.string.error_storing_file), activity);
 	}

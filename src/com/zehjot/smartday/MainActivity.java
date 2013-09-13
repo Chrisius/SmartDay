@@ -40,17 +40,13 @@ public class MainActivity extends Activity
         setContentView(R.layout.activity_main);
         fm = getFragmentManager();
         if(savedInstanceState==null && dataSet!=null){
-        	initShit(savedInstanceState);
+        	init(savedInstanceState);
         }else{
         	dataSet = DataSet.getInstance(this);   
         }
 
         if(savedInstanceState != null){
-        	/*
-        	if(DataSet.getUser()==null)
-        		return;
-        		*/
-        	initShit(savedInstanceState);
+        	init(savedInstanceState);
         	getActionBar().setSelectedNavigationItem(0);
         	getActionBar().setSelectedNavigationItem(1);
         	getActionBar().setSelectedNavigationItem(2);
@@ -72,7 +68,6 @@ public class MainActivity extends Activity
     }
     @Override
     public void onPause() {
-    	// TODO Auto-generated method stub
     	super.onPause();
     }
     
@@ -89,6 +84,18 @@ public class MainActivity extends Activity
     public boolean onOptionsItemSelected(MenuItem item){
     	super.onOptionsItemSelected(item);
     	switch (item.getItemId()) {
+    	case R.id.action_about:
+    		String message = "This application was created for the Bachelor thesis 'Native Visualization of Mobile Activity Patterns'.\n" +
+    				"The thesis and application was written and developed by Christian Janﬂen in 2013.\n" +
+    				"It is available at RWTH-Aachen University, Germany.\n" +
+    				"\n"+
+    				"All credits for the charts go to the AChartEngine library.\n" +
+    				"http://www.achartengine.org/\n" +
+    				"\n"+
+    				"All credits for the color picker go to Yuku Sugianto and his Android Color Picker project.\n" +
+    				"https://code.google.com/p/android-color-picker/";
+    		Utilities.showDialog(message, activity);
+    		break;
 		case R.id.action_blacklist:
 			dataSet.getAllApps(this);
 			break;
@@ -114,7 +121,6 @@ public class MainActivity extends Activity
 		default:
 			break;
 		}
-    	//Utilities.showDialog(item.toString()+item.getItemId(), this);
     	return true;
     }
     
@@ -128,7 +134,6 @@ public class MainActivity extends Activity
     @Override
     public void onDestroy(){
     	super.onDestroy();
-    	//dataSet.delete();
     }
     
 
@@ -136,7 +141,7 @@ public class MainActivity extends Activity
 	@Override
 	public void onDataAvailable(JSONObject[] jObjs, String request) {
 		if(request.equals(DataSet.RequestedFunction.initDataSet)){
-			initShit(null);
+			init(null);
 		}else if(request.equals(DataSet.RequestedFunction.getAllApps)){
 			SelectAppsDialogFragment ignoreAppsDialog = new SelectAppsDialogFragment();
 			ignoreAppsDialog.setStrings(Utilities.jObjValuesToArrayList(jObjs).toArray(new String[0]));
@@ -182,7 +187,7 @@ public class MainActivity extends Activity
         }
 	}
 	
-	private void initShit(Bundle savedInstanceState){
+	private void init(Bundle savedInstanceState){
     	optionsListFragment = (OptionsListFragment) fm.findFragmentByTag("optionsList");
 		if(optionsListFragment== null){
 	    	optionsListFragment = new OptionsListFragment();
@@ -210,7 +215,6 @@ public class MainActivity extends Activity
         time = new TabListener<SectionTimelineFragment>(this, "timeline", SectionTimelineFragment.class, optionsListFragment);
         tab.setTabListener(time);
         actionBar.addTab(tab);
-    	//actionBar.setSelectedNavigationItem(0);
 
 		
 	}

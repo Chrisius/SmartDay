@@ -48,7 +48,6 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 	protected void onPreExecute(){
 		super.onPreExecute();
 		progress = new ProgressDialog(activity);
-//		progress.setCancelable(false);
 		progress.setCanceledOnTouchOutside(false);
 		progress.setMessage("Downloading data from server...");
 		progress.setOnCancelListener( this);
@@ -85,14 +84,11 @@ public class DownloadTask extends AsyncTask<String, Void, JSONObject> implements
 	@Override
 	protected void onPostExecute(JSONObject result) {
 		super.onPostExecute(result);
-		//if(oldActivity == activity){
 		if(((MainActivity)activity).isRunning())
 			progress.cancel();
-		//}
 		try {
 			result.put("date", timestamp);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		listener.onDataDownloaded(serverResponse, result, timestamp,request, requester, fileName);

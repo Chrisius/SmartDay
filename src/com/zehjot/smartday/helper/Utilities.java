@@ -42,21 +42,14 @@ public class Utilities{
 		} catch (JSONException e) {
 			e.printStackTrace();
 			return null;
-		}/*
-		try {
-			fileName += jObj.getString("end");
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}*/
+		}
 		return Security.sha1(fileName);
 	}
 	public static long getTimestamp(int year, int month, int day, int h, int m, int s){
 		Calendar c = Calendar.getInstance();
 		c.set(year, month, day,h,m,s);
-//		TimeZone tz = c.getTimeZone();
 		long date = c.getTimeInMillis();
-//		date += tz.getOffset(date);
-		return date/1000;//c.getTimeInMillis()+seconds*1000+minutes*60000+hour*360000;
+		return date/1000;
 	}
 	
 	public static long getSystemTime(){

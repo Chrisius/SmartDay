@@ -133,7 +133,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		editor.putString(activity.getString(R.string.key_date_start_default), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
 		editor.putLong(activity.getString(R.string.key_date_end_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();
 		editor.putLong(activity.getString(R.string.key_date_start_default_timestamp), Utilities.getTimestamp(year, month, day, 0, 0, 0)).commit();
-		//editor.putString(activity.getString(R.string.key_date_selected_apps),"not Initialized"); //Sets String for selectDate to "not Initialized"
 		editor.commit();
 		editor.putString(activity.getString(R.string.key_date_end), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
 		editor.putInt(activity.getString(R.string.key_date_end_day), day);
@@ -177,11 +176,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	public void getApps(onDataAvailableListener listener){
 		long sec = (getSelectedDateEndAsTimestamp()-getSelectedDateStartAsTimestamp());
 		int numberOfdays = (int) (sec/(24*60*60))+1;
-		numberSelectedDays = numberOfdays;/*
-		if(days!=null &&days[0].optLong("dateTimestamp")==getSelectedDateStartAsTimestamp()&&days[days.length-1].optLong("dateTimestamp")==getSelectedDateEndAsTimestamp()){
-			listener.onDataAvailable(days, RequestedFunction.getEventsAtDate);
-			return;
-		}	*/
+		numberSelectedDays = numberOfdays;
 		if(days!=null &&!changedIgnoreApps&&days[0].optLong("dateTimestamp")==getSelectedDateStartAsTimestamp()&&days[days.length-1].optLong("dateTimestamp")==getSelectedDateEndAsTimestamp()){
 			listener.onDataAvailable(days, RequestedFunction.getEventsAtDate);
 			return;
@@ -189,7 +184,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		changedIgnoreApps=false;
 		DataSet.days = new JSONObject[numberSelectedDays];
 		manageMultipleDays(0,listener);
-		//getAppsAtDate(getSelectedDateEndAsTimestamp(),listener);
 	}
 	
 	private void manageMultipleDays(int i,onDataAvailableListener listener){
@@ -206,10 +200,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		try {
 			data.put("model", "SPECIFIC");
 			data.put("start", start);
-			data.put("end", end);/*
-			data.put("source", "MOBILE");
-			data.put("type", "APPSTART");
-			data.put("key", "app");*/
+			data.put("end", end);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -235,15 +226,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		changedIgnoreApps=true;
 		getApps((onDataAvailableListener) activity);//(null, RequestedFunction.updatedFilter);
 	}
-/*
-	public boolean[] getSelectedApps(ArrayList<String> apps){
-		boolean[] boolSelectedApps = new boolean[apps.size()];
-		for(int i=0 ; i<apps.size();i++){
-			boolSelectedApps[i] = selectedApps.optBoolean(apps.get(i));
-		}
-		return boolSelectedApps;
-	}
-*/
 	public void setSelectedApps(JSONObject selectedApps){
 		DataSet.selectedApps = selectedApps;
 		((onDataAvailableListener)activity).onDataAvailable(null, RequestedFunction.updatedFilter);
@@ -273,15 +255,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	public long getTodayAsTimestamp(){
 		return sharedPreferences.getLong(activity.getString(R.string.key_date_end_default_timestamp), -1);
 	}
-
-//	public void setSelectedDateEnd(int year,  int month, int day){
-//		editor.putString(activity.getString(R.string.key_date_end), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
-//		editor.putInt(activity.getString(R.string.key_date_end_day), day);
-//		editor.putInt(activity.getString(R.string.key_date_end_month), month);
-//		editor.putInt(activity.getString(R.string.key_date_end_year), year);
-//		editor.commit();
-//		getApps((onDataAvailableListener) activity);
-//	}
 	
 	public void setSelectedDates(int startyear, int startmonth, int startday, int endyear, int endmonth, int endday){
 		editor.putString(activity.getString(R.string.key_date_start), startday+". "+activity.getResources().getStringArray(R.array.months)[startmonth]+" "+startyear);
@@ -297,23 +270,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 		
 	}
 	
-//	public void setSelectedDateStart(int year,  int month, int day){
-//		editor.putString(activity.getString(R.string.key_date_start), day+". "+activity.getResources().getStringArray(R.array.months)[month]+" "+year);
-//		editor.putInt(activity.getString(R.string.key_date_start_day), day);
-//		editor.putInt(activity.getString(R.string.key_date_start_month), month);
-//		editor.putInt(activity.getString(R.string.key_date_start_year), year);
-//		editor.commit();
-//		getApps((onDataAvailableListener) activity);
-//	}
-	/*
-	public int[] getSelectedDateAsArray(){
-		int year = getSharedInt(R.string.key_date_year);
-		int month = getSharedInt(R.string.key_date_month);
-		int day = getSharedInt(R.string.key_date_day);
-		
-		return new int[] {year, month, day};
-	}
-	*/
 	public long getSelectedDateEndAsTimestamp(){
 		int year = getSharedInt(R.string.key_date_end_year);
 		int month = getSharedInt(R.string.key_date_end_month);
@@ -415,13 +371,8 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 			downloadTaskErrorHandler(jObj, serverResponse,requestedFunction);
 		}else{
 			if(requestedFunction.equals(RequestedFunction.getAllApps)){
-				if(requester!=null)
-					
+				if(requester!=null)					
 					requester.onDataAvailable(new JSONObject[]{constructAllAppNamesJSONObject(jObj)}, requestedFunction);
-				else{
-					//JSONObject result = constructColorJSONObj(jObj);
-					//setColorsOfApps(result);
-				}
 				return;
 			}else if(requestedFunction.equals(RequestedFunction.getEventsAtDate)){
 				JSONObject result = constructBasicJSONObj(jObj);
@@ -498,25 +449,7 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 			}
 		}
 	}
-	
-	/*
-	public void getContext(onDataAvailableListener requester){
-		getContext(getSelectedDateAsTimestamp(), getNextDayAsTimestamp(), requester);
-	}
-	*//*
-	public void getContext(long start, long end, onDataAvailableListener requester){
-		JSONObject data = new JSONObject();
-		try{
-		data.put("model", "SPECIFIC");
-		data.put("start", start);
-		data.put("end", end);
-		//data.put("type", "POSITION");
-		}catch(JSONException e){
-			
-		}
-		getData(requester, "events", data);
-	}
-	*/
+
 	private String getSharedString(int id){
 		return sharedPreferences.getString(activity.getString(id), activity.getString(R.string.error_no_string));
 	}
@@ -546,7 +479,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 			data.put("end", end);
 			data.put("source", "MOBILE");
 			data.put("type", "POSITION");
-//			data.put("key", "app");
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -601,7 +533,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 							}
 							if(!found){
 								JSONObject usage = new JSONObject();
-								//usage.put("end", Utilities.getSystemTime()/1000);
 								jObjOutput.put("sessionCount", jObjOutput.optInt("sessionCount",0)+1);									
 								if(jObjInput.getString("action").equals("START")){
 									usage.put("start", time);														
@@ -700,7 +631,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 	}
 	private JSONObject filterIgnoredApps(JSONObject jObj){
 		JSONObject result = null;
-		//JSONArray output = new JSONArray();
 		try{
 			result = new JSONObject(jObj, new String[]{"locations","downloadTimestamp","dateTimestamp","totalDuration"});
 			JSONArray output=result.put("result", new JSONArray()).getJSONArray("result");
@@ -712,28 +642,12 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 					output.put(app);
 			}
 			jObj = null;
-			return result;//.put("result",output);
+			return result;
 		}catch(JSONException e){
 			return result;
 		}
 	}
 
-	/*
-	private JSONObject constructAppNameJSONObj(JSONObject jObj){
-		JSONObject result= new JSONObject();
-		JSONArray output= new JSONArray();
-		try{
-			for(int i = 0; i< jObj.getJSONArray("result").length(); i++){
-				JSONObject app = jObj.getJSONArray("result").getJSONObject(i);
-				output.put(new JSONObject().put("app",app.getString("app")));			
-			}
-			result.put("result", output);
-		}catch(JSONException e){
-			return result;			
-		}
-		return result;
-	}
-	*/
 	private JSONObject constructAllAppNamesJSONObject(JSONObject jObj){
 		JSONObject result= new JSONObject();
 		JSONArray output= new JSONArray();
@@ -791,9 +705,6 @@ public class DataSet implements OnUserDataAvailableListener, onDataDownloadedLis
 				String url = Utilities.getURL(Config.Request.events, jObj.toString(), user, activity);
 				new DownloadTask(requester,activity).execute(url,requestedFunction,fileName,jObj.optLong("start",1)+"");
 			}
-		}else if(requestedFunction.equals(RequestedFunction.getPositions)){
-//			String url = Utilities.getURL(Config.Request.events, jObj.toString(), user, activity);
-//			new DownloadTask(requester,activity).execute(url,requestedFunction,null);				
 		}
 	}
 	private JSONObject constructPositionJSONObject(JSONObject jObj){
